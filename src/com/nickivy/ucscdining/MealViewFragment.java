@@ -31,16 +31,18 @@ public class MealViewFragment extends ListFragment{
         View rootView = inflater.inflate(R.layout.meal, container, false);
         int i = getArguments().getInt(ARG_COLLEGE_NUMBER);
         String college = MenuParser.collegeList[i];
-		
-        new RetrieveMenuTask().execute(i);
         
-/*        setListAdapter(new ArrayAdapter<String>(getActivity(),
-        		android.R.layout.simple_list_item_activated_1,
-        		MenuParser.cowellMenu));*/
-        
-        setListAdapter(new ArrayAdapter<String>(getActivity(),
-        		android.R.layout.simple_list_item_activated_1,
-        		MenuParser.menu));
+        /*
+         * If the menu has not been populated yet, load it
+         * otherwise, there's no need to redownload
+         */
+        if(MenuParser.fullMenu.size() == 0){
+        		new RetrieveMenuTask().execute(i);
+        }else{
+        	setListAdapter(new ArrayAdapter<String>(getActivity(),
+        			android.R.layout.simple_list_item_activated_1,
+        			MenuParser.fullMenu.get(i)));
+        }
         
         getActivity().setTitle(college);
         return rootView;
@@ -51,13 +53,19 @@ public class MealViewFragment extends ListFragment{
 	}
 	
 	private class RetrieveMenuTask extends AsyncTask<Integer, Integer, Long>{
+		
+		private int college;
 
 		@Override
 		protected Long doInBackground(Integer... arg0) {
 			
+			college = arg0[0];
+			
 			if(!needsRefresh){
 //				MenuParser.getCowellMealList();
-				MenuParser.getMealList(arg0[0]);
+//				MenuParser.getMealList(arg0[0]);
+				MenuParser.getFullMealList();
+				
 			}
 			
 			return null;
@@ -67,9 +75,12 @@ public class MealViewFragment extends ListFragment{
 /*	        setListAdapter(new ArrayAdapter<String>(getActivity(),
 	        		android.R.layout.simple_list_item_activated_1,
 	        		MenuParser.cowellMenu));*/
-	        setListAdapter(new ArrayAdapter<String>(getActivity(),
+/*	        setListAdapter(new ArrayAdapter<String>(getActivity(),
 	        		android.R.layout.simple_list_item_activated_1,
-	        		MenuParser.menu));
+	        		MenuParser.menu));*/
+			setListAdapter(new ArrayAdapter<String>(getActivity(),
+    		android.R.layout.simple_list_item_activated_1,
+    		MenuParser.fullMenu.get(college)));
 		}
 		
 	}
