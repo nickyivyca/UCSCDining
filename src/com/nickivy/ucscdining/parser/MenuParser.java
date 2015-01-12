@@ -54,7 +54,7 @@ public class MenuParser {
     		for(int k = 0; k < collegeList.length; k++){
     			Document doc = Jsoup.connect(URLList[k]).get();
 	
-    			Elements names = doc.select("td[valign=\"top\"][width=50%]");
+    			Elements names = doc.select("td[valign=\"top\"]");
 	
     			ArrayList<String> breakfastList = new ArrayList<String>(),
     					lunchList = new ArrayList<String>(),
