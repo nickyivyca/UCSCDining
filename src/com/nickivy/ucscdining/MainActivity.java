@@ -24,10 +24,11 @@ import com.nickivy.ucscdining.parser.MenuParser;
  * Additionally, will allow the user to fast forward to see planned menus for
  * days in the future.
  * 
- * <p>Currently just displays the whole Cowell menu at once, with extra entries to 
+ * <p>Currently just displays the whole menu at once, with extra entries to 
  * denote the separation between each meal.
  * 
- * TODO: yay
+ * TODO: Display each meal separately
+ * TODO: smart refresh
  * 
  * 
  *

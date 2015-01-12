@@ -32,11 +32,15 @@ public class MealViewFragment extends ListFragment{
         int i = getArguments().getInt(ARG_COLLEGE_NUMBER);
         String college = MenuParser.collegeList[i];
 		
-        new RetrieveMenuTask().execute(0);
+        new RetrieveMenuTask().execute(i);
+        
+/*        setListAdapter(new ArrayAdapter<String>(getActivity(),
+        		android.R.layout.simple_list_item_activated_1,
+        		MenuParser.cowellMenu));*/
         
         setListAdapter(new ArrayAdapter<String>(getActivity(),
         		android.R.layout.simple_list_item_activated_1,
-        		MenuParser.cowellMenu));
+        		MenuParser.menu));
         
         getActivity().setTitle(college);
         return rootView;
@@ -52,16 +56,20 @@ public class MealViewFragment extends ListFragment{
 		protected Long doInBackground(Integer... arg0) {
 			
 			if(!needsRefresh){
-				MenuParser.getCowellMealList();
+//				MenuParser.getCowellMealList();
+				MenuParser.getMealList(arg0[0]);
 			}
 			
 			return null;
 		}
 		
 		protected void onPostExecute(Long result){
+/*	        setListAdapter(new ArrayAdapter<String>(getActivity(),
+	        		android.R.layout.simple_list_item_activated_1,
+	        		MenuParser.cowellMenu));*/
 	        setListAdapter(new ArrayAdapter<String>(getActivity(),
 	        		android.R.layout.simple_list_item_activated_1,
-	        		MenuParser.cowellMenu));
+	        		MenuParser.menu));
 		}
 		
 	}
