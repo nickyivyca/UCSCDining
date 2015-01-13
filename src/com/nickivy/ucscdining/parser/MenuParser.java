@@ -95,6 +95,11 @@ public class MenuParser {
     				}
     			}
     			
+    			/* 
+    			 * Add empty ArrayList to the ArrayList of ArrayLists (!)
+    			 * 
+    			 * then add all menu items to it  
+    			 */
     			fullMenu.add(new ArrayList<String>());
 	
     			fullMenu.get(k).addAll(breakfastList);

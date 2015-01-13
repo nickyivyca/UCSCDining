@@ -1668,7 +1668,7 @@ containing a value of this type.
         public static final int left_drawer=0x7f090041;
         public static final int listMode=0x7f09000a;
         public static final int list_item=0x7f090025;
-        public static final int meal=0x7f090042;
+        public static final int meal_refresh_layout=0x7f090042;
         public static final int middle=0x7f09001d;
         public static final int never=0x7f090017;
         public static final int none=0x7f09000f;
