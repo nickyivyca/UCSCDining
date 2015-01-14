@@ -1573,6 +1573,17 @@ containing a value of this type.
         public static final int dialog_fixed_width_minor=0x7f07000d;
         public static final int disabled_alpha_material_dark=0x7f070001;
         public static final int disabled_alpha_material_light=0x7f070000;
+        /**  Semantic definitions 
+         */
+        public static final int horizontal_page_margin=0x7f070030;
+        public static final int margin_huge=0x7f07002f;
+        public static final int margin_large=0x7f07002e;
+        public static final int margin_medium=0x7f07002d;
+        public static final int margin_small=0x7f07002c;
+        /**  Define standard dimensions to comply with Holo-style grids and rhythm. 
+         */
+        public static final int margin_tiny=0x7f07002b;
+        public static final int vertical_page_margin=0x7f070031;
     }
     public static final class drawable {
         public static final int abc_ab_share_pack_holo_dark=0x7f020000;
@@ -1690,12 +1701,14 @@ containing a value of this type.
         public static final int showCustom=0x7f090010;
         public static final int showHome=0x7f090011;
         public static final int showTitle=0x7f090012;
+        public static final int sliding_tabs=0x7f090043;
         public static final int split_action_bar=0x7f090004;
         public static final int submit_area=0x7f09003c;
         public static final int tabMode=0x7f09000c;
         public static final int title=0x7f090027;
         public static final int up=0x7f090001;
         public static final int useLogo=0x7f090013;
+        public static final int viewpager=0x7f090044;
         public static final int withText=0x7f090018;
         public static final int wrap_content=0x7f090009;
     }
@@ -1751,7 +1764,8 @@ containing a value of this type.
         public static final int drawer_list_item=0x7f030017;
         public static final int mainview=0x7f030018;
         public static final int meal=0x7f030019;
-        public static final int support_simple_spinner_dropdown_item=0x7f03001a;
+        public static final int pager_fragment=0x7f03001a;
+        public static final int support_simple_spinner_dropdown_item=0x7f03001b;
     }
     public static final class string {
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 
@@ -1815,6 +1829,7 @@ containing a value of this type.
         public static final int app_not_available=0x7f0a0014;
         public static final int drawer_close=0x7f0a0012;
         public static final int drawer_open=0x7f0a0011;
+        public static final int intro_message=0x7f0a0015;
     }
     public static final class style {
         /** 
@@ -2075,6 +2090,8 @@ containing a value of this type.
         public static final int Theme_AppCompat_Light_DialogWhenLarge=0x7f0b00c0;
         public static final int Theme_AppCompat_Light_NoActionBar=0x7f0b00be;
         public static final int Theme_AppCompat_NoActionBar=0x7f0b00bd;
+        public static final int Theme_Base=0x7f0b00ed;
+        public static final int Theme_Sample=0x7f0b00ee;
         public static final int ThemeOverlay_AppCompat=0x7f0b00c4;
         /**  Theme overlay that replaces the normal control color, which by default is the same as the
          secondary text color, with the primary text color. 
@@ -2093,6 +2110,10 @@ containing a value of this type.
          the value of colorAccent, colorPrimary and its variants. 
          */
         public static final int ThemeOverlay_AppCompat_Light=0x7f0b00c5;
+        /**  style name="AppTheme" parent="Theme.Sample" /
+ Widget styling 
+         */
+        public static final int Widget=0x7f0b00ef;
         /**  Styles in here can be extended for customisation in your application. Each utilises
          one of the.styles. If Holo themes are available on the current platform version
          they will be used instead of the compat styles. 
@@ -2158,6 +2179,8 @@ containing a value of this type.
          */
         public static final int Widget_AppCompat_Toolbar=0x7f0b0034;
         public static final int Widget_AppCompat_Toolbar_Button_Navigation=0x7f0b0035;
+        public static final int Widget_SampleMessage=0x7f0b00f0;
+        public static final int Widget_SampleMessageTile=0x7f0b00f1;
     }
     public static final class styleable {
         /**  ============================================ 

@@ -5,8 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-	<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-		android:id="@+id/fragment_container"
+	<FrameLayout android:id="@+id/fragment_container"
   	  	android:layout_width="match_parent"
     	android:layout_height="match_parent" />
     <ListView android:id="@+id/left_drawer"

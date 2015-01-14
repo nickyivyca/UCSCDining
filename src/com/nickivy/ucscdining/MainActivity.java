@@ -1,16 +1,17 @@
 package com.nickivy.ucscdining;
-import android.app.Fragment;
-import android.app.FragmentManager;
+
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -23,27 +24,31 @@ import com.nickivy.ucscdining.parser.MenuParser;
  * App for viewing UCSC dining menus. Eventually will be able to 
  * read all menus, display them based on time, with special colors displayed 
  * for events such as College Nights, Healthy Mondays, or Farm Fridays.
- * Additionally, will allow the user to fast forward to see planned menus for
+ * Additionally, will eventually allow the user to fast forward to see planned menus for
  * days in the future.
  * 
  * <p>Currently just displays the whole menu at once, with extra entries to 
  * denote the separation between each meal.
  * 
- * TODO: Display each meal separately
  * TODO: smart refresh
- * 
- * 
+ * TODO: tablet layout (display all 3 meals at once)
  *
  * @author Nick Ivy parkedraccoon@gmail.com
  */
 
 public class MainActivity extends ActionBarActivity{
 	
+	static final int ITEMS = 3;
+	
 	private ListView mDrawerList;
 	private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
+    private ActionBar mActionBar;
+    
+    private static int currentCollege = 0;
 	
-	public void onCreate(Bundle savedInstanceState){
+    @Override
+	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		
 		
@@ -57,19 +62,29 @@ public class MainActivity extends ActionBarActivity{
 			
 			mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 	        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+	        mActionBar = getSupportActionBar();
 
 	        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 			mDrawerList.setAdapter(new ArrayAdapter<String>(this,
 					R.layout.drawer_list_item, MenuParser.collegeList));
 			
-	        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-	        getSupportActionBar().setHomeButtonEnabled(true);
+	        mActionBar.setDisplayHomeAsUpEnabled(true);
+	        mActionBar.setHomeButtonEnabled(true);
+	        
 	        
 	        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 	        		R.string.drawer_open, R.string.drawer_close);
 	        
 	        mDrawerLayout.setDrawerListener(mDrawerToggle);
 	        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+	        
+	        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+	        MealViewFragment fragment =  new MealViewFragment();
+	        Bundle args = new Bundle();
+	        args.putInt(MealViewFragment.ARG_COLLEGE_NUMBER, currentCollege);
+	        fragment.setArguments(args);
+	        transaction.replace(R.id.fragment_container, fragment);
+	        transaction.commit();
 	        
 	        if (savedInstanceState == null) {
 	            selectItem(0);
@@ -106,13 +121,14 @@ public class MainActivity extends ActionBarActivity{
    }
     
     private void selectItem(int position) {
+    	currentCollege = position;
         // update the main content by replacing fragments
         Fragment fragment = new MealViewFragment();
         Bundle args = new Bundle();
-        args.putInt(MealViewFragment.ARG_COLLEGE_NUMBER, position);
+        args.putInt(MealViewFragment.ARG_COLLEGE_NUMBER, currentCollege);
         fragment.setArguments(args);
 
-        FragmentManager fragmentManager = getFragmentManager();
+        FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit();
 
         // update selected item and title, then close the drawer
