@@ -33,6 +33,14 @@ public class MealViewFragment extends ListFragment{
 	
 	final static String ARG_COLLEGE_NUMBER = "college_number";
 	
+	final int LISTVIEW_ID1 = 12,
+			LISTVIEW_ID2 = 13,
+			LISTVIEW_ID3 = 14,
+			SWIPEREF_ID1 = 15,
+			SWIPEREF_ID2 = 16,
+			SWIPEREF_ID3 = 17;
+
+	
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	private ViewPager mViewPager;
 	private SlidingTabLayout mSlidingTabLayout;
@@ -72,7 +80,7 @@ public class MealViewFragment extends ListFragment{
 		@Override
 		protected Long doInBackground(Integer... arg0) {			
 			college = arg0[0];
-			MenuParser.getMealList();			
+			MenuParser.getMealList();
 			
 			return null;
 		}
@@ -84,19 +92,19 @@ public class MealViewFragment extends ListFragment{
 			 * would work but is performance-inefficient
 			 */
 			MenuParser.needsRefresh= false;			
-			ListView listView = (ListView) getActivity().findViewById(12);
+			ListView listView = (ListView) getActivity().findViewById(LISTVIEW_ID1);
 			if(listView != null){
 				listView.setAdapter(new ArrayAdapter<String>(getActivity(),
 						android.R.layout.simple_list_item_activated_1,
 						MenuParser.fullMenuObj.get(college).getBreakfast()));
 			}
-			listView = (ListView) getActivity().findViewById(13);
+			listView = (ListView) getActivity().findViewById(LISTVIEW_ID2);
 			if(listView != null){
 				listView.setAdapter(new ArrayAdapter<String>(getActivity(),
 						android.R.layout.simple_list_item_activated_1,
 						MenuParser.fullMenuObj.get(college).getLunch()));
 			}
-			listView = (ListView) getActivity().findViewById(14);
+			listView = (ListView) getActivity().findViewById(LISTVIEW_ID3);
 			if(listView != null){
 				listView.setAdapter(new ArrayAdapter<String>(getActivity(),
 						android.R.layout.simple_list_item_activated_1,
@@ -110,17 +118,17 @@ public class MealViewFragment extends ListFragment{
 			 *  Manually try to recreate what the swiperefresh layout has by default.
 			 *  Same deal as above with nulls.
 			 */
-			mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(15);
+			mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID1);
 			if(mSwipeRefreshLayout != null){
 				mSwipeRefreshLayout.setProgressViewOffset(false, -100, height / 40);
 				mSwipeRefreshLayout.setRefreshing(false);
 			}
-			mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(16);
+			mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID2);
 			if(mSwipeRefreshLayout != null){
 				mSwipeRefreshLayout.setProgressViewOffset(false, -100, height / 40);
 				mSwipeRefreshLayout.setRefreshing(false);
 			}
-			mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(17);
+			mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID3);
 			if(mSwipeRefreshLayout != null){
 				mSwipeRefreshLayout.setProgressViewOffset(false, -100, height / 40);
 				mSwipeRefreshLayout.setRefreshing(false);
@@ -159,11 +167,11 @@ public class MealViewFragment extends ListFragment{
         	 * This is to reference it later for setting
         	 * its contents
         	 */
-        	mealList.setId(mealnum + 12);
+        	mealList.setId(mealnum + LISTVIEW_ID1);
         	
             mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.meal_refresh_layout);
             //Add 15 instead of 12 for swipelayout
-            mSwipeRefreshLayout.setId(mealnum + 15);
+            mSwipeRefreshLayout.setId(mealnum + SWIPEREF_ID1);
             mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
