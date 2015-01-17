@@ -1573,17 +1573,6 @@ containing a value of this type.
         public static final int dialog_fixed_width_minor=0x7f07000d;
         public static final int disabled_alpha_material_dark=0x7f070001;
         public static final int disabled_alpha_material_light=0x7f070000;
-        /**  Semantic definitions 
-         */
-        public static final int horizontal_page_margin=0x7f070030;
-        public static final int margin_huge=0x7f07002f;
-        public static final int margin_large=0x7f07002e;
-        public static final int margin_medium=0x7f07002d;
-        public static final int margin_small=0x7f07002c;
-        /**  Define standard dimensions to comply with Holo-style grids and rhythm. 
-         */
-        public static final int margin_tiny=0x7f07002b;
-        public static final int vertical_page_margin=0x7f070031;
     }
     public static final class drawable {
         public static final int abc_ab_share_pack_holo_dark=0x7f020000;
@@ -2090,8 +2079,6 @@ containing a value of this type.
         public static final int Theme_AppCompat_Light_DialogWhenLarge=0x7f0b00c0;
         public static final int Theme_AppCompat_Light_NoActionBar=0x7f0b00be;
         public static final int Theme_AppCompat_NoActionBar=0x7f0b00bd;
-        public static final int Theme_Base=0x7f0b00ed;
-        public static final int Theme_Sample=0x7f0b00ee;
         public static final int ThemeOverlay_AppCompat=0x7f0b00c4;
         /**  Theme overlay that replaces the normal control color, which by default is the same as the
          secondary text color, with the primary text color. 
@@ -2110,10 +2097,6 @@ containing a value of this type.
          the value of colorAccent, colorPrimary and its variants. 
          */
         public static final int ThemeOverlay_AppCompat_Light=0x7f0b00c5;
-        /**  style name="AppTheme" parent="Theme.Sample" /
- Widget styling 
-         */
-        public static final int Widget=0x7f0b00ef;
         /**  Styles in here can be extended for customisation in your application. Each utilises
          one of the.styles. If Holo themes are available on the current platform version
          they will be used instead of the compat styles. 
@@ -2179,8 +2162,6 @@ containing a value of this type.
          */
         public static final int Widget_AppCompat_Toolbar=0x7f0b0034;
         public static final int Widget_AppCompat_Toolbar_Button_Navigation=0x7f0b0035;
-        public static final int Widget_SampleMessage=0x7f0b00f0;
-        public static final int Widget_SampleMessageTile=0x7f0b00f1;
     }
     public static final class styleable {
         /**  ============================================ 

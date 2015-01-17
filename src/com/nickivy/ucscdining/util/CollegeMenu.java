@@ -41,7 +41,6 @@ public class CollegeMenu {
 		if(mBreakfast != null && mBreakfast.size() > 0){
 			return mBreakfast;
 		}
-		Log.v("ucscdining","breakfast null or empty");
 		ArrayList<String> ret = new ArrayList<String>();
 		return ret;
 	}

@@ -70,10 +70,9 @@ public class MealViewFragment extends ListFragment{
 		}
 
 		@Override
-		protected Long doInBackground(Integer... arg0) {
-			
+		protected Long doInBackground(Integer... arg0) {			
 			college = arg0[0];
-			MenuParser.getFullMealList();
+			MenuParser.getMealList();			
 			
 			return null;
 		}
