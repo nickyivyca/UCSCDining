@@ -6,7 +6,6 @@
     <string name="drawer_close">Closed</string>
     <string name="action_websearch">Web search</string>
     <string name="app_not_available">Not available</string>
-    <string name="intro_message">ayy lmao</string>
 
     <string-array name="meal_list">
         <item>Hamburger</item>

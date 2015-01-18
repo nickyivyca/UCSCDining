@@ -48,6 +48,8 @@ public class MenuParser {
     	"http://nutrition.sa.ucsc.edu/menuSamp.asp?locationNum=40&locationName=College+Nine+%26+Ten&sName=&naFlag="
     };
     
+    public static final String brunchMessage = "See lunch for today\'s brunch menu";
+    
     public static boolean needsRefresh = true;
     
     public static ArrayList<CollegeMenu> fullMenuObj = new ArrayList<CollegeMenu>(){{
@@ -115,6 +117,17 @@ public class MenuParser {
 		fullMenuObj.get(k).setBreakfast(breakfastList);
 		fullMenuObj.get(k).setLunch(lunchList);
 		fullMenuObj.get(k).setDinner(dinnerList);
+		
+		/*
+		 *  If empty breakfast and not empty lunch or dinner, set brunch message
+		 */
+		
+		
+		if(fullMenuObj.get(k).getBreakfast().isEmpty() && (!(fullMenuObj.get(k).getLunch()).isEmpty()) || !(fullMenuObj.get(k).getDinner().isEmpty())){
+			ArrayList<String> breakfastMessage = new ArrayList<String>();
+			breakfastMessage.add(brunchMessage);
+			fullMenuObj.get(k).setBreakfast(breakfastMessage);
+		}
     	
 
 	}

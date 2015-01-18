@@ -81,6 +81,22 @@ public class MealViewFragment extends ListFragment{
 		}
 		
 		protected void onPostExecute(Long result){
+			
+			/*
+			 *  If Breakfast is empty automatically set to lunch,
+			 *  set message in Breakfast about Brunch for if the user 
+			 *  goes there
+			 */
+			if(!MenuParser.fullMenuObj.get(college).getBreakfast().isEmpty() && 
+					MenuParser.fullMenuObj.get(college).getBreakfast().get(0).equals(MenuParser.brunchMessage)){
+				mViewPager.setCurrentItem(1);
+			}
+
+			// If Lunch  and breakfast are empty automatically set to lunch
+			// (rare occurence, pretty much only on return from holidays)
+			if(MenuParser.fullMenuObj.get(college).getBreakfast().isEmpty() && MenuParser.fullMenuObj.get(college).getLunch().isEmpty()){
+				mViewPager.setCurrentItem(2);
+			}
 			/*
 			 * only 2 views exist at a time, so the third returns null, but
 			 * we don't know which one it is, so check each one. try catch

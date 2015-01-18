@@ -1818,7 +1818,6 @@ containing a value of this type.
         public static final int app_not_available=0x7f0a0014;
         public static final int drawer_close=0x7f0a0012;
         public static final int drawer_open=0x7f0a0011;
-        public static final int intro_message=0x7f0a0015;
     }
     public static final class style {
         /** 
