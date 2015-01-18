@@ -13,9 +13,15 @@ import android.util.Log;
 
 public class CollegeMenu {
 	
+	/*
+	 *  Despite being available via get methods, those do null
+	 *  checking, sometimes we want the raw data
+	 */
 	private ArrayList<String> mBreakfast = new ArrayList<String>();
 	private ArrayList<String> mLunch = new ArrayList<String>();
 	private ArrayList<String> mDinner = new ArrayList<String>();
+	
+	private boolean isSet = false;
 	
 	public CollegeMenu(){}
 	
@@ -27,14 +33,17 @@ public class CollegeMenu {
 	
 	public void setBreakfast(ArrayList<String> meal){
 		mBreakfast = meal;
+		isSet = true;
 	}
 	
 	public void setLunch(ArrayList<String> meal){
 		mLunch = meal;
+		isSet = true;
 	}
 	
 	public void setDinner(ArrayList<String> meal){
 		mDinner = meal;
+		isSet = true;
 	}
 	
 	public ArrayList<String> getBreakfast(){
@@ -58,7 +67,16 @@ public class CollegeMenu {
 			return mDinner;
 		}
 		ArrayList<String> ret = new ArrayList<String>();
-		return ret;		
+		return ret;
+	}
+	
+	/**
+	 * Get if data has been written to the 
+	 * object at all
+	 * @return
+	 */
+	public boolean getIsSet(){
+		return isSet;
 	}
 
 }

@@ -52,8 +52,6 @@ public class MealViewFragment extends ListFragment{
 			Bundle savedInstanceState){
 		collegeNum = getArguments().getInt(ARG_COLLEGE_NUMBER);
         getActivity().setTitle(MenuParser.collegeList[collegeNum]);
-
-    	collegeNum = getArguments().getInt(ARG_COLLEGE_NUMBER);
     	
 		return inflater.inflate(R.layout.pager_fragment, container, false);
 	}
@@ -64,9 +62,6 @@ public class MealViewFragment extends ListFragment{
 		mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
 		mSlidingTabLayout.setViewPager(mViewPager);
 	}
-	
-	
-
 	
 	private class RetrieveMenuTask extends AsyncTask<Integer, Integer, Long>{
 		

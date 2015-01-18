@@ -59,11 +59,23 @@ public class MenuParser {
     }};
     
     public static void getSingleMealList(int k){
+    	Document doc = null;
+    	Elements names = null;
     	try{
-    		Document doc = null;
     		doc = Jsoup.connect(URLList[k]).get();
 	
-			Elements names = doc.select("td[valign=\"top\"]");
+			names = doc.select("td[valign=\"top\"]");
+    	} catch (IOException e) {
+    		Log.w("ucscdining","Unable to download dining menu");
+    		//needsRefresh = true;
+    		e.printStackTrace();
+    		
+    		/*
+    		 * In order to defeat an okhttp error, recurse
+    		 * TODO: Probably should only let this happen a limited amount of times
+    		 */
+    		getSingleMealList(k);
+    	}
 	
 			ArrayList<String> breakfastList = new ArrayList<String>(),
 					lunchList = new ArrayList<String>(),
@@ -97,25 +109,14 @@ public class MenuParser {
 						}
 					}
 				}
-        			
-    			fullMenuObj.get(k).setBreakfast(breakfastList);
-    			fullMenuObj.get(k).setLunch(lunchList);
-    			fullMenuObj.get(k).setDinner(dinnerList);
 			}else{
 				Log.w("ucscdining","array list empty!");
 			}
+		fullMenuObj.get(k).setBreakfast(breakfastList);
+		fullMenuObj.get(k).setLunch(lunchList);
+		fullMenuObj.get(k).setDinner(dinnerList);
     	
-    	} catch (IOException e) {
-    		Log.w("ucscdining","Unable to download dining menu");
-    		//needsRefresh = true;
-    		e.printStackTrace();
-    		
-    		/*
-    		 * In order to defeat an okhttp error, recurse
-    		 * TODO: Probably should only let this happen a limited amount of times
-    		 */
-    		getSingleMealList(k);
-    	}
+
 	}
     
     public static void getMealList() {

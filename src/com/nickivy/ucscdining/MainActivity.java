@@ -10,15 +10,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.nickivy.ucscdining.R;
 import com.nickivy.ucscdining.MealViewFragment;
 import com.nickivy.ucscdining.parser.MenuParser;
+import com.nickivy.ucscdining.util.CollegeMenu;
 
 /**
  * App for viewing UCSC dining menus. Eventually will be able to 
@@ -123,17 +126,45 @@ public class MainActivity extends ActionBarActivity{
     private void selectItem(int position) {
     	currentCollege = position;
         // update the main content by replacing fragments
-        Fragment fragment = new MealViewFragment();
-        Bundle args = new Bundle();
-        args.putInt(MealViewFragment.ARG_COLLEGE_NUMBER, currentCollege);
-        fragment.setArguments(args);
+    	if(getDiningHallOpen(position)){
+    		Fragment fragment = new MealViewFragment();
+    		Bundle args = new Bundle();
+    		args.putInt(MealViewFragment.ARG_COLLEGE_NUMBER, currentCollege);
+    		fragment.setArguments(args);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit();
+    		FragmentManager fragmentManager = getSupportFragmentManager();
+    		fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit();
 
-        // update selected item and title, then close the drawer
-        mDrawerList.setItemChecked(position, true);
-        mDrawerLayout.closeDrawer(mDrawerList);
+    		// update selected item and title, then close the drawer
+    		mDrawerList.setItemChecked(position, true);
+    		mDrawerLayout.closeDrawer(mDrawerList);
+    	}else{
+    		Toast.makeText(this, MenuParser.collegeList[position] + " dining hall closed today!", Toast.LENGTH_SHORT).show();
+    	}
+    }
+    
+    /**
+     * If the dining hall meal is not null, but contains nothing,
+     * it is closed. If it's null, data hasn't been loaded yet.
+     * 
+     * @param college college number
+     * @return
+     */
+    private boolean getDiningHallOpen(int college) {
+    	/*
+    	 *  If meal is null, collegemenu class will return dummyemptyreturn,
+    	 *  which means no data has been set yet
+    	 *  
+    	 *  For some reason isEmpty() isn't working
+    	 */
+    	if(MenuParser.fullMenuObj.get(college).getIsSet()){
+    		if(MenuParser.fullMenuObj.get(college).getBreakfast().isEmpty() &&
+    				MenuParser.fullMenuObj.get(college).getLunch().isEmpty() &&
+    				MenuParser.fullMenuObj.get(college).getDinner().isEmpty()){
+    			return false;
+    		}
+    	}
+    	return true;
     }
 
 }
