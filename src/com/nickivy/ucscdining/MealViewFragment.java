@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.Display;
@@ -23,12 +24,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
- * Fragment for displaying one meal. Uses sliding tab
+ * Fragment for displaying one menu. Uses sliding tab
  * layout from Google's examples.
- * 
- * <p>TODO: fun colors for events such as college nights and Healthy Mondays
  *
  * @author Nick Ivy parkedraccoon@gmail.com
  */
@@ -37,7 +37,7 @@ public class MealViewFragment extends ListFragment{
 	
 	final static String ARG_COLLEGE_NUMBER = "college_number";
 	
-	final int LISTVIEW_ID1 = 12,
+	public static final int LISTVIEW_ID1 = 12,
 			LISTVIEW_ID2 = 13,
 			LISTVIEW_ID3 = 14,
 			SWIPEREF_ID1 = 15,
@@ -49,8 +49,11 @@ public class MealViewFragment extends ListFragment{
 	private ViewPager mViewPager;
 	private SlidingTabLayout mSlidingTabLayout;
 	private ListView mDrawerList;
+	private DrawerLayout mDrawerLayout;
+    private ListView mMealList;
 	
 	private int collegeNum = 0;
+	public static int currentMealPage = -1;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,6 +70,49 @@ public class MealViewFragment extends ListFragment{
 		mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
 		mSlidingTabLayout.setViewPager(mViewPager);
 	}
+	
+    public void selectItem(int position) {
+    	collegeNum = position;
+        // update the main content by replacing listview adapters
+    	if(MenuParser.fullMenuObj.get(position).getIsOpen()){
+/*    		Fragment fragment = new MealViewFragment();
+    		Bundle args = new Bundle();
+    		args.putInt(MealViewFragment.ARG_COLLEGE_NUMBER, currentCollege);
+    		fragment.setArguments(args);*/
+    		if(MenuParser.fullMenuObj.get(position).getIsSet()){
+    	        getActivity().setTitle(MenuParser.collegeList[position]);    		
+
+    	        mMealList = (ListView) getActivity().findViewById(MealViewFragment.LISTVIEW_ID1);    		
+        		ArrayList<String> testedArray = new ArrayList<String>();
+        		testedArray = MenuParser.fullMenuObj.get(position).getBreakfast();
+        		if (testedArray != null && mMealList != null){
+        			mMealList.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
+        					MenuParser.fullMenuObj.get(position).getBreakfast()));
+        		}
+        		mMealList = (ListView) getActivity().findViewById(MealViewFragment.LISTVIEW_ID2);
+        		testedArray = MenuParser.fullMenuObj.get(position).getLunch();
+        		if (testedArray != null && mMealList != null){
+        			mMealList.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
+        					MenuParser.fullMenuObj.get(position).getLunch()));
+        		}
+        		mMealList = (ListView) getActivity().findViewById(MealViewFragment.LISTVIEW_ID3);
+        		testedArray = MenuParser.fullMenuObj.get(position).getDinner();
+        		if (testedArray != null && mMealList != null){
+        			mMealList.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
+        				MenuParser.fullMenuObj.get(position).getDinner()));
+        		}
+    		}
+
+			mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
+	        mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
+	        
+    		// update selected item and title, then close the drawer
+    		mDrawerList.setItemChecked(position, true);
+    		mDrawerLayout.closeDrawer(mDrawerList);
+    	}else{
+    		Toast.makeText(getActivity(), MenuParser.collegeList[position] + " dining hall closed today!", Toast.LENGTH_SHORT).show();
+    	}
+    }
 	
 	private class RetrieveMenuTask extends AsyncTask<Integer, Integer, Long>{
 		
@@ -94,13 +140,13 @@ public class MealViewFragment extends ListFragment{
 			 */
 			if(!MenuParser.fullMenuObj.get(college).getBreakfast().isEmpty() && 
 					MenuParser.fullMenuObj.get(college).getBreakfast().get(0).equals(MenuParser.brunchMessage)){
-				mViewPager.setCurrentItem(1);
+				mViewPager.setCurrentItem(1,false);
 			}
 
 			// If Lunch  and breakfast are empty automatically set to lunch
 			// (rare occurence, pretty much only on return from holidays)
 			if(MenuParser.fullMenuObj.get(college).getBreakfast().isEmpty() && MenuParser.fullMenuObj.get(college).getLunch().isEmpty()){
-				mViewPager.setCurrentItem(2);
+				mViewPager.setCurrentItem(2,false);
 			}
 			
 			mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
@@ -158,7 +204,7 @@ public class MealViewFragment extends ListFragment{
 		
 	}
 	
-	class MenuAdapter extends PagerAdapter {
+	class MenuAdapter extends PagerAdapter {	
 		
         @Override
         public int getCount() {
@@ -248,12 +294,6 @@ public class MealViewFragment extends ListFragment{
         	default:
         		Log.v("ucscdining","We have a problem");
         	}
-        	
-        	if(mealnum == 1 && MenuParser.fullMenuObj.get(collegeNum).getIsSet() &&
-        			MenuParser.fullMenuObj.get(collegeNum).getBreakfast().get(0).equals(MenuParser.brunchMessage)){
-    			mViewPager.setCurrentItem(1);
-        	}
-        	
             return view;
         }
         @Override
