@@ -1,10 +1,13 @@
 package com.nickivy.ucscdining;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.example.android.common.view.SlidingTabLayout;
 import com.nickivy.ucscdining.parser.MenuParser;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 /**
  * Fragment for displaying one meal. Uses sliding tab
@@ -44,6 +48,7 @@ public class MealViewFragment extends ListFragment{
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	private ViewPager mViewPager;
 	private SlidingTabLayout mSlidingTabLayout;
+	private ListView mDrawerList;
 	
 	private int collegeNum = 0;
 	
@@ -97,6 +102,11 @@ public class MealViewFragment extends ListFragment{
 			if(MenuParser.fullMenuObj.get(college).getBreakfast().isEmpty() && MenuParser.fullMenuObj.get(college).getLunch().isEmpty()){
 				mViewPager.setCurrentItem(2);
 			}
+			
+			mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
+			
+			mDrawerList.setAdapter(new ColorAdapter(getActivity(),
+					R.layout.drawer_list_item, MenuParser.collegeList));
 			/*
 			 * only 2 views exist at a time, so the third returns null, but
 			 * we don't know which one it is, so check each one. try catch
@@ -203,14 +213,14 @@ public class MealViewFragment extends ListFragment{
              * we're stuck doing it in a hacky way.
              */
     		if(MenuParser.needsRefresh){
-    	        	Display display = getActivity().getWindowManager().getDefaultDisplay();
-    	            Point size = new Point();
-    	            display.getSize(size);
-    	            int height = size.y;
-    	            // manually try to recreate where the spinner ends up in a normal swipe
-    	            mSwipeRefreshLayout.setProgressViewOffset(false, -50, height / 800);
-    				mSwipeRefreshLayout.setRefreshing(true);
-    	        	new RetrieveMenuTask().execute(collegeNum);
+	        	Display display = getActivity().getWindowManager().getDefaultDisplay();
+	            Point size = new Point();
+	            display.getSize(size);
+	            int height = size.y;
+	            // manually try to recreate where the spinner ends up in a normal swipe
+	            mSwipeRefreshLayout.setProgressViewOffset(false, -50, height / 800);
+				mSwipeRefreshLayout.setRefreshing(true);
+	        	new RetrieveMenuTask().execute(collegeNum);
     	    }
     		ArrayList<String> testedArray = new ArrayList<String>();
         	switch(mealnum){
@@ -238,6 +248,12 @@ public class MealViewFragment extends ListFragment{
         	default:
         		Log.v("ucscdining","We have a problem");
         	}
+        	
+        	if(mealnum == 1 && MenuParser.fullMenuObj.get(collegeNum).getIsSet() &&
+        			MenuParser.fullMenuObj.get(collegeNum).getBreakfast().get(0).equals(MenuParser.brunchMessage)){
+    			mViewPager.setCurrentItem(1);
+        	}
+        	
             return view;
         }
         @Override
@@ -246,5 +262,38 @@ public class MealViewFragment extends ListFragment{
         }
 
     }
+	
+
+    /**
+     * Allows us to set colors of entries in the college list to denote
+     * events
+     */
+	public class ColorAdapter extends ArrayAdapter<String> {
+
+		public ColorAdapter(Context context, int resource, List<String> objects) {
+			super(context, resource, objects);
+		}
+
+		public ColorAdapter(Context context, int resource, String[] objects) {
+			super(context, resource, objects);
+		}
+		
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent){
+			View v = super.getView(position,  convertView,  parent);
+			if(MenuParser.fullMenuObj.get(position).getIsCollegeNight()){
+				((TextView) v).setTextColor(Color.BLUE); // 
+			}
+			if(!MenuParser.fullMenuObj.get(position).getIsOpen()){
+				((TextView) v).setTextColor(Color.LTGRAY); // 
+			}
+			if(MenuParser.fullMenuObj.get(position).getIsFarmFriday() || 
+					MenuParser.fullMenuObj.get(position).getIsFarmFriday()){
+				((TextView) v).setTextColor(Color.rgb(0x4C, 0xC5, 0x52)); // 'Green Apple'
+			}
+			return v;
+		}
+		
+	}
     
 }

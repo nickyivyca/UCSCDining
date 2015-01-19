@@ -21,7 +21,6 @@ import android.widget.Toast;
 import com.nickivy.ucscdining.R;
 import com.nickivy.ucscdining.MealViewFragment;
 import com.nickivy.ucscdining.parser.MenuParser;
-import com.nickivy.ucscdining.util.CollegeMenu;
 
 /**
  * App for viewing UCSC dining menus. Eventually will be able to 
@@ -126,7 +125,7 @@ public class MainActivity extends ActionBarActivity{
     private void selectItem(int position) {
     	currentCollege = position;
         // update the main content by replacing fragments
-    	if(getDiningHallOpen(position)){
+    	if(MenuParser.fullMenuObj.get(position).getIsOpen()){
     		Fragment fragment = new MealViewFragment();
     		Bundle args = new Bundle();
     		args.putInt(MealViewFragment.ARG_COLLEGE_NUMBER, currentCollege);
@@ -141,30 +140,6 @@ public class MainActivity extends ActionBarActivity{
     	}else{
     		Toast.makeText(this, MenuParser.collegeList[position] + " dining hall closed today!", Toast.LENGTH_SHORT).show();
     	}
-    }
-    
-    /**
-     * If the dining hall meal is not null, but contains nothing,
-     * it is closed. If it's null, data hasn't been loaded yet.
-     * 
-     * @param college college number
-     * @return
-     */
-    private boolean getDiningHallOpen(int college) {
-    	/*
-    	 *  If meal is null, collegemenu class will return dummyemptyreturn,
-    	 *  which means no data has been set yet
-    	 *  
-    	 *  For some reason isEmpty() isn't working
-    	 */
-    	if(MenuParser.fullMenuObj.get(college).getIsSet()){
-    		if(MenuParser.fullMenuObj.get(college).getBreakfast().isEmpty() &&
-    				MenuParser.fullMenuObj.get(college).getLunch().isEmpty() &&
-    				MenuParser.fullMenuObj.get(college).getDinner().isEmpty()){
-    			return false;
-    		}
-    	}
-    	return true;
     }
 
 }

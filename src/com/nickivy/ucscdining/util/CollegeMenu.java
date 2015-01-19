@@ -78,5 +78,58 @@ public class CollegeMenu {
 	public boolean getIsSet(){
 		return isSet;
 	}
+	
+	
+	/**
+	 * Get if the dining hall is open
+	 * 
+	 * <p>At this point assume open if nothing has been loaded
+	 * @return
+	 */
+	public boolean getIsOpen(){
+    	if(isSet){
+    		if(getBreakfast().isEmpty() && 	getLunch().isEmpty() && getDinner().isEmpty()){
+    			return false;
+    		}
+    	}
+    	return true;
+	}
+	
+	/**
+	 * If the first entry in Dinner is
+	 * "College Night" then it's a college night	
+	 * @return
+	 */
+	public boolean getIsCollegeNight(){
+    	if(isSet && getDinner().size() > 0 && getDinner().get(0).equals("College Night")){
+    		return true;
+    	}
+    	return false;
+	}
+	
+	/**
+	 * @return If first entry in dinner or lunch is "Healthy Mondays"
+	 */
+	public boolean getIsHealthyMonday(){
+    	if(isSet){
+    		if((getDinner().size() > 0 && getDinner().get(0).equals("Healthy Mondays")) || 
+    			getLunch().size() > 0 && getLunch().get(0).equals("Healthy Mondays")){    			
+    			return true;
+    		}
+    	}
+    	return false;		
+	}
 
+	/**
+	 * @return If first entry in dinner or lunch is "Farm Fridays"
+	 */
+	public boolean getIsFarmFriday(){
+    	if(isSet){
+    		if((getDinner().size() > 0 && getDinner().get(0).equals("Farm Fridays")) || 
+    			getLunch().size() > 0 && getLunch().get(0).equals("Farm Fridays")){    			
+    			return true;
+    		}
+    	}
+    	return false;		
+	}
 }
