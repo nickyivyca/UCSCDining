@@ -47,7 +47,7 @@ public class MenuParser {
     
     public static final String brunchMessage = "See lunch for today\'s brunch menu";
     
-    public static boolean needsRefresh = true;
+    public static boolean needsRefresh = false;
     
     private final static int maxReloads = 3;
     private static int reloadTries = 0;

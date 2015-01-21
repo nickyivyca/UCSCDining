@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.android.common.view.SlidingTabLayout;
+import com.nickivy.ucscdining.parser.MealStorage;
 import com.nickivy.ucscdining.parser.MenuParser;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -53,6 +57,8 @@ public class MealViewFragment extends ListFragment{
     private ListView mMealList;
 	
 	private int collegeNum = 0;
+	
+	private boolean refreshStarted = false;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -119,24 +125,138 @@ public class MealViewFragment extends ListFragment{
 		
 		@Override
 		protected void onPreExecute(){
-			MenuParser.needsRefresh = false;
+			refreshStarted = true;
 		}
 
 		@Override
 		protected Long doInBackground(Integer... arg0) {			
+			// College num is simply for refreshing array adapters once the refreshing is complete
 			college = arg0[0];
-			MenuParser.getMealList();
+			MealStorage breakfastStore = new MealStorage(getActivity());
+			SQLiteDatabase db;
 			
+			if(MenuParser.needsRefresh){
+				MenuParser.getMealList();
+			
+				// Write newly downloaded data to sqlite databases
+				
+				db = breakfastStore.getWritableDatabase();
+				db.delete(MealStorage.TABLE_MEALS, null,null);
+				
+				SQLiteStatement statement = db.compileStatement("INSERT INTO "+ MealStorage.TABLE_MEALS +" VALUES (?,?,?,?);");
+				
+				db.beginTransaction();
+				
+				int accumulatedBreakfast = 0,
+						accumulatedLunch = 0,
+						accumulatedDinner = 0;
+				
+				for(int j = 0; j < 5; j++){
+			
+					statement.clearBindings();
+					for (int i = 0; i < MenuParser.fullMenuObj.get(j).getBreakfast().size(); i++){
+						statement.bindLong(1, i + accumulatedBreakfast + accumulatedLunch + accumulatedDinner);
+						statement.bindLong(2,j);
+						statement.bindLong(3, 0);
+						statement.bindString(4, MenuParser.fullMenuObj.get(j).getBreakfast().get(i));
+						statement.execute();
+					}
+					accumulatedBreakfast += MenuParser.fullMenuObj.get(j).getBreakfast().size();
+					for (int i = 0; i < MenuParser.fullMenuObj.get(j).getLunch().size(); i++){
+						statement.bindLong(1, i + accumulatedBreakfast + accumulatedLunch + accumulatedDinner);
+						statement.bindLong(2,j);
+						statement.bindLong(3, 1);
+						statement.bindString(4, MenuParser.fullMenuObj.get(j).getLunch().get(i));
+						statement.execute();
+					}
+					accumulatedLunch += MenuParser.fullMenuObj.get(j).getLunch().size();
+					for (int i = 0; i < MenuParser.fullMenuObj.get(j).getDinner().size(); i++){
+						statement.bindLong(1, i + accumulatedBreakfast + accumulatedLunch + accumulatedDinner);
+						statement.bindLong(2,j);
+						statement.bindLong(3, 2);
+						statement.bindString(4, MenuParser.fullMenuObj.get(j).getDinner().get(i));
+						statement.execute();
+					}
+					accumulatedDinner += MenuParser.fullMenuObj.get(j).getDinner().size();
+				}
+				db.setTransactionSuccessful();
+				db.endTransaction();
+				db.close();
+				
+			} else {
+			
+				db = breakfastStore.getReadableDatabase();
+			
+				String[] projection = {
+				    MealStorage.COLUMN_MENUITEM,
+				    MealStorage.COLUMN_COLLEGE
+			    };
+				
+			
+				Cursor c;
+				ArrayList<String> breakfastLoaded,
+				lunchLoaded, dinnerLoaded;
+				
+				String selection = MealStorage.COLUMN_COLLEGE + "= ? AND " + MealStorage.COLUMN_MEAL + "= ?";
+				String[] selectionArgs = new String[2];
+			
+				for(int j = 0; j < 5; j++){					
+					selectionArgs[0] = "" + j;
+					
+					selectionArgs[1] = "" + 0;
+			
+					c = db.query(MealStorage.TABLE_MEALS, 
+							projection, selection, selectionArgs, null, null, null);
+					
+					c.moveToFirst();
+					breakfastLoaded = new ArrayList<String>();
+			
+					for(int i = 0; i < c.getCount(); i++){
+						breakfastLoaded.add(c.getString(c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)));
+						c.moveToNext();
+					}			
+					MenuParser.fullMenuObj.get(j).setBreakfast(breakfastLoaded);
+					c.close();
+					
+					selectionArgs[1] = "" + 1;
+			
+					c = db.query(MealStorage.TABLE_MEALS, 
+							projection, selection, selectionArgs, null, null, null);
+					
+					c.moveToFirst();
+					lunchLoaded = new ArrayList<String>();
+			
+					for(int i = 0; i < c.getCount(); i++){
+						lunchLoaded.add(c.getString(c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)));
+						c.moveToNext();
+					}			
+					MenuParser.fullMenuObj.get(j).setLunch(lunchLoaded);
+					c.close();
+					
+					selectionArgs[1] = "" + 2;
+			
+					c = db.query(MealStorage.TABLE_MEALS, 
+							projection, selection, selectionArgs, null, null, null);
+					
+					c.moveToFirst();
+					dinnerLoaded = new ArrayList<String>();
+			
+					for(int i = 0; i < c.getCount(); i++){
+						dinnerLoaded.add(c.getString(c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)));
+						c.moveToNext();
+					}			
+					MenuParser.fullMenuObj.get(j).setDinner(dinnerLoaded);
+					c.close();
+			
+				}
+				db.close();
+				breakfastStore.close();
+
+			}			
 			return null;
 		}
 		
-		protected void onPostExecute(Long result){
-			
-			/*
-			 *  If Breakfast is empty automatically set to lunch,
-			 *  set message in Breakfast about Brunch for if the user 
-			 *  goes there
-			 */
+		protected void onPostExecute(Long result){					
 			if(!MenuParser.fullMenuObj.get(college).getBreakfast().isEmpty() && 
 					MenuParser.fullMenuObj.get(college).getBreakfast().get(0).equals(MenuParser.brunchMessage)){
 				mViewPager.setCurrentItem(1,false);
@@ -176,6 +296,7 @@ public class MealViewFragment extends ListFragment{
 						android.R.layout.simple_list_item_activated_1,
 						MenuParser.fullMenuObj.get(college).getDinner()));
 			}
+			
 			Display display = getActivity().getWindowManager().getDefaultDisplay();
 			Point size = new Point();
 			display.getSize(size);
@@ -241,32 +362,31 @@ public class MealViewFragment extends ListFragment{
             mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
+                	MenuParser.needsRefresh = true;
             		new RetrieveMenuTask().execute(collegeNum);
             	}
             });
             
             /*
-             * Only refresh if actually necessary
-             * I think I have more than enough checks for this,
-             * but I might as well keep them.
+             * ASynctask to load menu, either from web
+             * or from SQLite db.
              * 
-             * If the menu has not been populated yet, load it,
-             * otherwise, there's no need to redownload.
-             * 
-             * Load circle *should* be shown, but currently there's
-             * no proper way to manually trigger the reload animation. So 
+             * Load circle *should* be shown, but currently there's 
+             * no proper way to manually trigger the reload animation. So
              * we're stuck doing it in a hacky way.
              */
-    		if(MenuParser.needsRefresh){
-	        	Display display = getActivity().getWindowManager().getDefaultDisplay();
+    		if(!refreshStarted){
+    			Display display = getActivity().getWindowManager().getDefaultDisplay();
 	            Point size = new Point();
 	            display.getSize(size);
 	            int height = size.y;
 	            // manually try to recreate where the spinner ends up in a normal swipe
 	            mSwipeRefreshLayout.setProgressViewOffset(false, -50, height / 800);
 				mSwipeRefreshLayout.setRefreshing(true);
-	        	new RetrieveMenuTask().execute(collegeNum);
+    	    	new RetrieveMenuTask().execute(collegeNum);
     	    }
+    		
+    		
     		ArrayList<String> testedArray = new ArrayList<String>();
         	switch(mealnum){
         	case 0:
@@ -327,7 +447,7 @@ public class MealViewFragment extends ListFragment{
 				((TextView) v).setTextColor(Color.LTGRAY); // 
 			}
 			if(MenuParser.fullMenuObj.get(position).getIsFarmFriday() || 
-					MenuParser.fullMenuObj.get(position).getIsFarmFriday()){
+					MenuParser.fullMenuObj.get(position).getIsHealthyMonday()){
 				((TextView) v).setTextColor(Color.rgb(0x4C, 0xC5, 0x52)); // 'Green Apple'
 			}
 			return v;
