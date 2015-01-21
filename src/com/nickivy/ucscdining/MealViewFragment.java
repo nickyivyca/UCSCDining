@@ -53,7 +53,6 @@ public class MealViewFragment extends ListFragment{
     private ListView mMealList;
 	
 	private int collegeNum = 0;
-	public static int currentMealPage = -1;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

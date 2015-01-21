@@ -13,10 +13,6 @@ import android.util.Log;
 
 public class CollegeMenu {
 	
-	/*
-	 *  Despite being available via get methods, those do null
-	 *  checking, sometimes we want the raw data
-	 */
 	private ArrayList<String> mBreakfast = new ArrayList<String>();
 	private ArrayList<String> mLunch = new ArrayList<String>();
 	private ArrayList<String> mDinner = new ArrayList<String>();

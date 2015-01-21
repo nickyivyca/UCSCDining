@@ -51,7 +51,6 @@ public class MenuParser {
     
     private final static int maxReloads = 3;
     private static int reloadTries = 0;
-    		
     
     public static ArrayList<CollegeMenu> fullMenuObj = new ArrayList<CollegeMenu>(){{
     	add(new CollegeMenu());
@@ -124,12 +123,13 @@ public class MenuParser {
 		
 		/*
 		 *  If empty breakfast and not empty lunch or dinner, set brunch message
-		 */		
-		if(fullMenuObj.get(k).getBreakfast().isEmpty() && (!(fullMenuObj.get(k).getLunch()).isEmpty()) || !(fullMenuObj.get(k).getDinner().isEmpty())){
+		 */
+		if(fullMenuObj.get(k).getBreakfast().isEmpty() && 
+				(!(fullMenuObj.get(k).getLunch().isEmpty()) || !(fullMenuObj.get(k).getDinner().isEmpty()))){
 			ArrayList<String> breakfastMessage = new ArrayList<String>();
 			breakfastMessage.add(brunchMessage);
 			fullMenuObj.get(k).setBreakfast(breakfastMessage);
-		}    	
+		}
 
 	}
     
