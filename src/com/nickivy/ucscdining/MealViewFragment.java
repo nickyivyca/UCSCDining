@@ -1,6 +1,8 @@
 package com.nickivy.ucscdining;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import com.example.android.common.view.SlidingTabLayout;
@@ -129,21 +131,50 @@ public class MealViewFragment extends ListFragment{
 		}
 
 		@Override
-		protected Long doInBackground(Integer... arg0) {			
+		protected Long doInBackground(Integer... arg0) {
 			// College num is simply for refreshing array adapters once the refreshing is complete
 			college = arg0[0];
-			MealStorage breakfastStore = new MealStorage(getActivity());
+			MealStorage mealStore = new MealStorage(getActivity());
 			SQLiteDatabase db;
 			
-			if(MenuParser.needsRefresh){
+			Date today = new Date();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(today);
+			
+			int month = cal.get(Calendar.MONTH) + 1;
+			int day = cal.get(Calendar.DAY_OF_MONTH);
+			int year = cal.get(Calendar.YEAR);
+			
+			db = mealStore.getReadableDatabase();
+			
+			String selection = MealStorage.COLUMN_MONTH + "= ? AND " + MealStorage.COLUMN_DAY + "= ? AND "
+					+ MealStorage.COLUMN_YEAR + "= ?";
+			String[] selectionArgs = new String[3];
+			
+			selectionArgs[0] = "" + month;
+			selectionArgs[1] = "" + day;
+			selectionArgs[2] = "" + year;
+			
+			String[] projection = {
+				    MealStorage.COLUMN_MONTH,
+				    MealStorage.COLUMN_DAY,
+				    MealStorage.COLUMN_YEAR
+			};
+			
+			Cursor c = db.query(MealStorage.TABLE_MEALS, 
+					projection, selection, selectionArgs, null, null, null);
+			c.moveToFirst();
+			boolean cexists = (c.getCount() == 0);
+			c.close();
+			db.close();
+			if(cexists){
 				MenuParser.getMealList();
 			
 				// Write newly downloaded data to sqlite databases
 				
-				db = breakfastStore.getWritableDatabase();
+				db = mealStore.getWritableDatabase();
 				db.delete(MealStorage.TABLE_MEALS, null,null);
-				
-				SQLiteStatement statement = db.compileStatement("INSERT INTO "+ MealStorage.TABLE_MEALS +" VALUES (?,?,?,?);");
+				SQLiteStatement statement = db.compileStatement("INSERT INTO "+ MealStorage.TABLE_MEALS +" VALUES (?,?,?,?,?,?,?);");
 				
 				db.beginTransaction();
 				
@@ -159,6 +190,9 @@ public class MealViewFragment extends ListFragment{
 						statement.bindLong(2,j);
 						statement.bindLong(3, 0);
 						statement.bindString(4, MenuParser.fullMenuObj.get(j).getBreakfast().get(i));
+						statement.bindLong(5, month);
+						statement.bindLong(6, day);
+						statement.bindLong(7, year);
 						statement.execute();
 					}
 					accumulatedBreakfast += MenuParser.fullMenuObj.get(j).getBreakfast().size();
@@ -167,6 +201,9 @@ public class MealViewFragment extends ListFragment{
 						statement.bindLong(2,j);
 						statement.bindLong(3, 1);
 						statement.bindString(4, MenuParser.fullMenuObj.get(j).getLunch().get(i));
+						statement.bindLong(5, month);
+						statement.bindLong(6, day);
+						statement.bindLong(7, year);
 						statement.execute();
 					}
 					accumulatedLunch += MenuParser.fullMenuObj.get(j).getLunch().size();
@@ -175,6 +212,9 @@ public class MealViewFragment extends ListFragment{
 						statement.bindLong(2,j);
 						statement.bindLong(3, 2);
 						statement.bindString(4, MenuParser.fullMenuObj.get(j).getDinner().get(i));
+						statement.bindLong(5, month);
+						statement.bindLong(6, day);
+						statement.bindLong(7, year);
 						statement.execute();
 					}
 					accumulatedDinner += MenuParser.fullMenuObj.get(j).getDinner().size();
@@ -184,29 +224,37 @@ public class MealViewFragment extends ListFragment{
 				db.close();
 				
 			} else {
+				// I closed this up above, not sure why I have to do it again here
+				db.close();
+				db = mealStore.getReadableDatabase();
 			
-				db = breakfastStore.getReadableDatabase();
-			
-				String[] projection = {
+				String[] mainProjection = {
 				    MealStorage.COLUMN_MENUITEM,
-				    MealStorage.COLUMN_COLLEGE
+				    MealStorage.COLUMN_COLLEGE,
+				    MealStorage.COLUMN_MONTH,
+				    MealStorage.COLUMN_DAY,
+				    MealStorage.COLUMN_YEAR
 			    };
 				
-			
-				Cursor c;
 				ArrayList<String> breakfastLoaded,
 				lunchLoaded, dinnerLoaded;
 				
-				String selection = MealStorage.COLUMN_COLLEGE + "= ? AND " + MealStorage.COLUMN_MEAL + "= ?";
-				String[] selectionArgs = new String[2];
+				selection = MealStorage.COLUMN_COLLEGE + "= ? AND " + MealStorage.COLUMN_MEAL + "= ? AND "
+						+ MealStorage.COLUMN_MONTH + "= ? AND " + MealStorage.COLUMN_DAY + "= ? AND "
+						+ MealStorage.COLUMN_YEAR + "= ?";
+				String[] mainSelectionArgs = new String[5];
 			
-				for(int j = 0; j < 5; j++){					
-					selectionArgs[0] = "" + j;
+				for(int j = 0; j < 5; j++){
+					mainSelectionArgs[0] = "" + j;
 					
-					selectionArgs[1] = "" + 0;
+					mainSelectionArgs[1] = "" + 0;
+					
+					mainSelectionArgs[2] = "" + month;
+					mainSelectionArgs[3] = "" + day;
+					mainSelectionArgs[4] = "" + year;
 			
 					c = db.query(MealStorage.TABLE_MEALS, 
-							projection, selection, selectionArgs, null, null, null);
+							mainProjection, selection, mainSelectionArgs, null, null, null);
 					
 					c.moveToFirst();
 					breakfastLoaded = new ArrayList<String>();
@@ -218,10 +266,10 @@ public class MealViewFragment extends ListFragment{
 					MenuParser.fullMenuObj.get(j).setBreakfast(breakfastLoaded);
 					c.close();
 					
-					selectionArgs[1] = "" + 1;
+					mainSelectionArgs[1] = "" + 1;
 			
 					c = db.query(MealStorage.TABLE_MEALS, 
-							projection, selection, selectionArgs, null, null, null);
+							mainProjection, selection, mainSelectionArgs, null, null, null);
 					
 					c.moveToFirst();
 					lunchLoaded = new ArrayList<String>();
@@ -233,10 +281,10 @@ public class MealViewFragment extends ListFragment{
 					MenuParser.fullMenuObj.get(j).setLunch(lunchLoaded);
 					c.close();
 					
-					selectionArgs[1] = "" + 2;
+					mainSelectionArgs[1] = "" + 2;
 			
 					c = db.query(MealStorage.TABLE_MEALS, 
-							projection, selection, selectionArgs, null, null, null);
+							mainProjection, selection, mainSelectionArgs, null, null, null);
 					
 					c.moveToFirst();
 					dinnerLoaded = new ArrayList<String>();
@@ -244,13 +292,13 @@ public class MealViewFragment extends ListFragment{
 					for(int i = 0; i < c.getCount(); i++){
 						dinnerLoaded.add(c.getString(c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)));
 						c.moveToNext();
-					}			
+					}
 					MenuParser.fullMenuObj.get(j).setDinner(dinnerLoaded);
 					c.close();
 			
 				}
 				db.close();
-				breakfastStore.close();
+				mealStore.close();
 
 			}			
 			return null;
@@ -320,6 +368,17 @@ public class MealViewFragment extends ListFragment{
 				mSwipeRefreshLayout.setProgressViewOffset(false, -100, height / 40);
 				mSwipeRefreshLayout.setRefreshing(false);
 			}
+			
+			Date today = new Date();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(today);
+			
+			int month = cal.get(Calendar.MONTH) + 1;
+			int day = cal.get(Calendar.DAY_OF_MONTH);
+			int year = cal.get(Calendar.YEAR);
+			
+			// Set title to include date
+	        getActivity().setTitle(MenuParser.collegeList[college] + " " + month + "/" + day + "/" + year);
 		}
 		
 	}
