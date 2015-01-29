@@ -86,8 +86,17 @@ public class MealViewFragment extends ListFragment{
     		Bundle args = new Bundle();
     		args.putInt(MealViewFragment.ARG_COLLEGE_NUMBER, currentCollege);
     		fragment.setArguments(args);*/
-    		if(MenuParser.fullMenuObj.get(position).getIsSet()){
-    	        getActivity().setTitle(MenuParser.collegeList[position]);    		
+    		if(MenuParser.fullMenuObj.get(position).getIsSet()){    			
+    			Date today = new Date();
+    			Calendar cal = Calendar.getInstance();
+    			cal.setTime(today);
+    			
+    			int month = cal.get(Calendar.MONTH) + 1;
+    			int day = cal.get(Calendar.DAY_OF_MONTH);
+    			int year = cal.get(Calendar.YEAR);
+    			
+    			// Set title to include date
+    	        getActivity().setTitle(MenuParser.collegeList[position] + " " + month + "/" + day + "/" + year);
 
     	        mMealList = (ListView) getActivity().findViewById(MealViewFragment.LISTVIEW_ID1);    		
         		ArrayList<String> testedArray = new ArrayList<String>();
