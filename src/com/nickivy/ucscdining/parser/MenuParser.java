@@ -51,6 +51,7 @@ public class MenuParser {
     
     private final static int maxReloads = 3;
     private static int reloadTries = 0;
+    private static boolean failed = false;
     
     public static ArrayList<CollegeMenu> fullMenuObj = new ArrayList<CollegeMenu>(){{
     	add(new CollegeMenu());
@@ -66,20 +67,26 @@ public class MenuParser {
     	try{
     		reloadTries++;
     		doc = Jsoup.connect(URLList[k]).get();
+//    		Log.v("ucscdining", "Reloadtries: " + reloadTries);
 	
 			names = doc.select("td[valign=\"top\"]");
     	} catch (IOException e) {
     		Log.w("ucscdining","Unable to download dining menu");
+//    		Log.v("ucscdining", "Reloadtries: " + reloadTries);
     		//needsRefresh = true;
     		e.printStackTrace();
-    		
-    		/*
-    		 * In order to defeat an okhttp error, recurse
-    		 */
-    		if(reloadTries < maxReloads){
-    			getSingleMealList(k);
-    		}
+    		failed = true;
     	}
+		
+		/*
+		 * In order to defeat an okhttp error, recurse
+		 */
+		if(failed && (reloadTries < maxReloads)){
+			getSingleMealList(k);
+		}
+		if (reloadTries >= maxReloads) {
+			return;
+		}
 	
 		ArrayList<String> breakfastList = new ArrayList<String>(),
 				lunchList = new ArrayList<String>(),
@@ -136,6 +143,7 @@ public class MenuParser {
     public static void getMealList() {
     	for(int i = 0; i < 5; i++){
     		reloadTries = 0;
+    		failed = false;
     		getSingleMealList(i);
     	}
     }
