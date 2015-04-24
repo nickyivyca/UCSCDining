@@ -146,13 +146,10 @@ public class MealViewFragment extends ListFragment{
 			MealStorage mealStore = new MealStorage(getActivity());
 			SQLiteDatabase db;
 			
-			Date today = new Date();
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(today);
-			
-			int month = cal.get(Calendar.MONTH) + 1;
-			int day = cal.get(Calendar.DAY_OF_MONTH);
-			int year = cal.get(Calendar.YEAR);
+			// Date info is passed in as argument, to allow user to select a date that is not today
+			int month = arg0[1];
+			int day = arg0[2];
+			int year = arg0[3];
 			
 			db = mealStore.getReadableDatabase();
 			
@@ -176,13 +173,23 @@ public class MealViewFragment extends ListFragment{
 			boolean cexists = (c.getCount() == 0);
 			c.close();
 			db.close();
-			if(cexists){
-				MenuParser.getMealList();
+			if(cexists || MenuParser.needsRefresh){
+				MenuParser.getMealList(month, day, year);
 			
 				// Write newly downloaded data to sqlite databases
 				
 				db = mealStore.getWritableDatabase();
-				db.delete(MealStorage.TABLE_MEALS, null,null);
+				
+				// only delete data from day that matches calling date (this would only be in the case of a manual refresh)
+				db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_MONTH + "=? AND " + MealStorage.COLUMN_DAY + "=? AND " +
+						MealStorage.COLUMN_YEAR + " =?", new String[] {"" + month, "" + day, "" + year});
+				
+				// We need to write at the end of the table - so find size and offset first column by that much				
+				String countQuery = "SELECT * FROM " + MealStorage.TABLE_MEALS;
+				Cursor cursor = db.rawQuery(countQuery, null);
+				int offset = cursor.getCount();
+				cursor.close();
+				
 				SQLiteStatement statement = db.compileStatement("INSERT INTO "+ MealStorage.TABLE_MEALS +" VALUES (?,?,?,?,?,?,?);");
 				
 				db.beginTransaction();
@@ -194,8 +201,8 @@ public class MealViewFragment extends ListFragment{
 				for(int j = 0; j < 5; j++){
 			
 					statement.clearBindings();
-					for (int i = 0; i < MenuParser.fullMenuObj.get(j).getBreakfast().size(); i++){
-						statement.bindLong(1, i + accumulatedBreakfast + accumulatedLunch + accumulatedDinner);
+					for (int i = 0; i < MenuParser.fullMenuObj.get(j).getBreakfast().size(); i++) {
+						statement.bindLong(1, offset + i + accumulatedBreakfast + accumulatedLunch + accumulatedDinner);
 						statement.bindLong(2,j);
 						statement.bindLong(3, 0);
 						statement.bindString(4, MenuParser.fullMenuObj.get(j).getBreakfast().get(i));
@@ -205,8 +212,8 @@ public class MealViewFragment extends ListFragment{
 						statement.execute();
 					}
 					accumulatedBreakfast += MenuParser.fullMenuObj.get(j).getBreakfast().size();
-					for (int i = 0; i < MenuParser.fullMenuObj.get(j).getLunch().size(); i++){
-						statement.bindLong(1, i + accumulatedBreakfast + accumulatedLunch + accumulatedDinner);
+					for (int i = 0; i < MenuParser.fullMenuObj.get(j).getLunch().size(); i++) {
+						statement.bindLong(1, offset + i + accumulatedBreakfast + accumulatedLunch + accumulatedDinner);
 						statement.bindLong(2,j);
 						statement.bindLong(3, 1);
 						statement.bindString(4, MenuParser.fullMenuObj.get(j).getLunch().get(i));
@@ -216,8 +223,8 @@ public class MealViewFragment extends ListFragment{
 						statement.execute();
 					}
 					accumulatedLunch += MenuParser.fullMenuObj.get(j).getLunch().size();
-					for (int i = 0; i < MenuParser.fullMenuObj.get(j).getDinner().size(); i++){
-						statement.bindLong(1, i + accumulatedBreakfast + accumulatedLunch + accumulatedDinner);
+					for (int i = 0; i < MenuParser.fullMenuObj.get(j).getDinner().size(); i++) {
+						statement.bindLong(1, offset + i + accumulatedBreakfast + accumulatedLunch + accumulatedDinner);
 						statement.bindLong(2,j);
 						statement.bindLong(3, 2);
 						statement.bindString(4, MenuParser.fullMenuObj.get(j).getDinner().get(i));
@@ -313,7 +320,7 @@ public class MealViewFragment extends ListFragment{
 			return null;
 		}
 		
-		protected void onPostExecute(Long result){					
+		protected void onPostExecute(Long result){
 			if(!MenuParser.fullMenuObj.get(college).getBreakfast().isEmpty() && 
 					MenuParser.fullMenuObj.get(college).getBreakfast().get(0).equals(MenuParser.brunchMessage)){
 				mViewPager.setCurrentItem(1,false);
@@ -325,6 +332,8 @@ public class MealViewFragment extends ListFragment{
 				mViewPager.setCurrentItem(2,false);
 			}
 			
+			// TODO: if all meals empty, pop open nav drawer (Cowell is usually not completely closed)
+			
 			mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
 			
 			mDrawerList.setAdapter(new ColorAdapter(getActivity(),
@@ -334,7 +343,7 @@ public class MealViewFragment extends ListFragment{
 			 * we don't know which one it is, so check each one. try catch
 			 * would work but is performance-inefficient
 			 */
-			MenuParser.needsRefresh= false;			
+			MenuParser.needsRefresh= false;
 			ListView listView = (ListView) getActivity().findViewById(LISTVIEW_ID1);
 			if(listView != null){
 				listView.setAdapter(new ArrayAdapter<String>(getActivity(),
@@ -377,17 +386,11 @@ public class MealViewFragment extends ListFragment{
 				mSwipeRefreshLayout.setProgressViewOffset(false, -100, height / 40);
 				mSwipeRefreshLayout.setRefreshing(false);
 			}
-			
-			Date today = new Date();
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(today);
-			
-			int month = cal.get(Calendar.MONTH) + 1;
-			int day = cal.get(Calendar.DAY_OF_MONTH);
-			int year = cal.get(Calendar.YEAR);
-			
+
 			// Set title to include date
-	        getActivity().setTitle(MenuParser.collegeList[college] + " " + month + "/" + day + "/" + year);
+			// TODO: make this reflect what the user has currently selected
+			int[] today = getToday();
+	        getActivity().setTitle(MenuParser.collegeList[college] + " " + today[0] + "/" + today[1]);
 		}
 		
 	}
@@ -431,7 +434,8 @@ public class MealViewFragment extends ListFragment{
                 @Override
                 public void onRefresh() {
                 	MenuParser.needsRefresh = true;
-            		new RetrieveMenuTask().execute(collegeNum);
+    				int[] today = getToday();
+        	    	new RetrieveMenuTask().execute(collegeNum, today[0], today[1], today[2]);
             	}
             });
             
@@ -451,7 +455,8 @@ public class MealViewFragment extends ListFragment{
 	            // manually try to recreate where the spinner ends up in a normal swipe
 	            mSwipeRefreshLayout.setProgressViewOffset(false, -50, height / 800);
 				mSwipeRefreshLayout.setRefreshing(true);
-    	    	new RetrieveMenuTask().execute(collegeNum);
+				int[] today = getToday();
+    	    	new RetrieveMenuTask().execute(collegeNum, today[0], today[1], today[2]);
     	    }
     		
     		
@@ -520,6 +525,23 @@ public class MealViewFragment extends ListFragment{
 			}
 			return v;
 		}
+		
+	}
+	
+	/**
+	 * Returns today's date as a 3-number int array. [month, day, year]
+	 */
+	public int[] getToday() {
+		Date today = new Date();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(today);
+		
+		int month = cal.get(Calendar.MONTH) + 1;
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		int year = cal.get(Calendar.YEAR);
+		
+		int ret[] = {month, day, year};
+		return ret;
 		
 	}
     

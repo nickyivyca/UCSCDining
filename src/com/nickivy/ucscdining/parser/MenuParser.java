@@ -7,6 +7,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import com.nickivy.ucscdining.R;
 import com.nickivy.ucscdining.util.CollegeMenu;
 
 import android.util.Log;
@@ -44,6 +45,21 @@ public class MenuParser {
     	"http://nutrition.sa.ucsc.edu/menuSamp.asp?locationNum=30&locationName=College+Eight&sName=&naFlag=",
     	"http://nutrition.sa.ucsc.edu/menuSamp.asp?locationNum=40&locationName=College+Nine+%26+Ten&sName=&naFlag="
     };
+
+    
+    public static final String dateURLPart1 = "http://nutrition.sa.ucsc.edu/menuSamp.asp?myaction=read&sName=&dtdate=";
+    
+    public static final String[] datedURLListParts2 = {
+    	"&locationNum=05&locationName=%20Cowell&naFlag=1",
+    	"&locationNum=20&locationName=Crown+Merrill&sName=&naFlag=1",
+    	"&locationNum=25&locationName=Porter&sName=&naFlag=1",
+    	"&locationNum=30&locationName=College+Eight&sName=&naFlag=1",
+    	"&locationNum=40&locationName=College+Nine+%26+Ten&sName=&naFlag=1"
+    };
+    
+    //4%2F24%2F2015
+    		
+//    public static final String cowellDateURLPart2 = "&locationNum=05&locationName=%20Cowell&naFlag=1";
     
     public static final String brunchMessage = "See lunch for today\'s brunch menu";
     
@@ -61,12 +77,21 @@ public class MenuParser {
     	add(new CollegeMenu());
     }};
     
-    public static void getSingleMealList(int k){
+    public static void getSingleMealList(int k, int month, int day, int year){
     	Document doc = null;
     	Elements names = null;
     	try{
     		reloadTries++;
-    		doc = Jsoup.connect(URLList[k]).get();
+//    		doc = Jsoup.connect(URLList[k]).get();   
+    		doc = Jsoup.connect(dateURLPart1 + month + "%2F" + day + "%2F" + year + datedURLListParts2[k]).get();
+    				
+/*    		if (k == 0) {
+    			doc = Jsoup.connect(cowellDateURLPart1 + 4 + "%2F" + 24 + "%2F" + 2015 + cowellDateURLPart2).get();
+    		} else {
+        		doc = Jsoup.connect(URLList[k]).get();    			
+    		}*/
+    		
+    		
 //    		Log.v("ucscdining", "Reloadtries: " + reloadTries);
 	
 			names = doc.select("td[valign=\"top\"]");
@@ -82,7 +107,7 @@ public class MenuParser {
 		 * In order to defeat an okhttp error, recurse
 		 */
 		if(failed && (reloadTries < maxReloads)){
-			getSingleMealList(k);
+			getSingleMealList(k, month, day, year);
 		}
 		if (reloadTries >= maxReloads) {
 			return;
@@ -140,11 +165,25 @@ public class MenuParser {
 
 	}
     
-    public static void getMealList() {
+/*    public static void getMealList() {
     	for(int i = 0; i < 5; i++){
     		reloadTries = 0;
     		failed = false;
     		getSingleMealList(i);
+    	}
+    }*/
+    
+    /**
+     * Puts downloaded data from specified date (instead of today) into the full menu object.
+     * @param day
+     * @param month
+     * @param year
+     */
+    public static void getMealList(int month, int day, int year) {
+    	for(int i = 0; i < 5; i++){
+    		reloadTries = 0;
+    		failed = false;
+    		getSingleMealList(i, month, day, year);
     	}
     }
 }
