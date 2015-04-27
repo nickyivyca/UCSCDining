@@ -24,6 +24,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,6 +61,9 @@ public class MealViewFragment extends ListFragment{
 	
 	private int collegeNum = 0;
 	
+	private int displayedMonth = 0;
+	private int displayedDay = 0;
+	
 	private boolean refreshStarted = false;
 	
 	@Override
@@ -82,21 +86,9 @@ public class MealViewFragment extends ListFragment{
     	collegeNum = position;
         // update the main content by replacing listview adapters
     	if(MenuParser.fullMenuObj.get(position).getIsOpen()){
-/*    		Fragment fragment = new MealViewFragment();
-    		Bundle args = new Bundle();
-    		args.putInt(MealViewFragment.ARG_COLLEGE_NUMBER, currentCollege);
-    		fragment.setArguments(args);*/
     		if(MenuParser.fullMenuObj.get(position).getIsSet()){    			
-    			Date today = new Date();
-    			Calendar cal = Calendar.getInstance();
-    			cal.setTime(today);
-    			
-    			int month = cal.get(Calendar.MONTH) + 1;
-    			int day = cal.get(Calendar.DAY_OF_MONTH);
-    			int year = cal.get(Calendar.YEAR);
-    			
     			// Set title to include date
-    	        getActivity().setTitle(MenuParser.collegeList[position] + " " + month + "/" + day + "/" + year);
+    	        getActivity().setTitle(MenuParser.collegeList[position] + " " + displayedMonth + "/" + displayedDay);
 
     	        mMealList = (ListView) getActivity().findViewById(MealViewFragment.LISTVIEW_ID1);    		
         		ArrayList<String> testedArray = new ArrayList<String>();
@@ -151,6 +143,10 @@ public class MealViewFragment extends ListFragment{
 			int day = arg0[2];
 			int year = arg0[3];
 			
+			// Keep track of latest date called for displaying in title bar
+			displayedMonth = month;
+			displayedDay = day;
+			
 			db = mealStore.getReadableDatabase();
 			
 			String selection = MealStorage.COLUMN_MONTH + "= ? AND " + MealStorage.COLUMN_DAY + "= ? AND "
@@ -173,15 +169,27 @@ public class MealViewFragment extends ListFragment{
 			boolean cexists = (c.getCount() == 0);
 			c.close();
 			db.close();
+			// If data for today does not exist, or manual refresh is requested, load data from web and store it
 			if(cexists || MenuParser.needsRefresh){
 				MenuParser.getMealList(month, day, year);
-			
-				// Write newly downloaded data to sqlite databases
 				
 				db = mealStore.getWritableDatabase();
 				
-				// only delete data from day that matches calling date (this would only be in the case of a manual refresh)
-				db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_MONTH + "=? AND " + MealStorage.COLUMN_DAY + "=? AND " +
+				/*
+				 * Delete data from today and before, requires a couple different sql commands
+				 * 
+				 * if:
+				 * month is less than, year equal
+				 * year less than current year
+				 * day <= current, year + month equal
+				 */
+				
+				db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_MONTH + "<? AND " + MealStorage.COLUMN_YEAR + " =?",
+						new String[] {"" + month, "" + year});
+				
+				db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_YEAR + " <?", new String[] {"" + year});
+				
+				db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_MONTH + "=? AND " + MealStorage.COLUMN_DAY + "<=? AND " +
 						MealStorage.COLUMN_YEAR + " =?", new String[] {"" + month, "" + day, "" + year});
 				
 				// We need to write at the end of the table - so find size and offset first column by that much				
@@ -190,10 +198,14 @@ public class MealViewFragment extends ListFragment{
 				int offset = cursor.getCount();
 				cursor.close();
 				
+				// Begin writing data
+				
 				SQLiteStatement statement = db.compileStatement("INSERT INTO "+ MealStorage.TABLE_MEALS +" VALUES (?,?,?,?,?,?,?);");
 				
+				// Using sqlite statement keeps the database 'open' and apparently is a bit faster
 				db.beginTransaction();
 				
+				// Accumulate amount of nodes written in
 				int accumulatedBreakfast = 0,
 						accumulatedLunch = 0,
 						accumulatedDinner = 0;
@@ -260,6 +272,7 @@ public class MealViewFragment extends ListFragment{
 						+ MealStorage.COLUMN_YEAR + "= ?";
 				String[] mainSelectionArgs = new String[5];
 			
+				// For each of the 5 colleges, load data into the full menu object
 				for(int j = 0; j < 5; j++){
 					mainSelectionArgs[0] = "" + j;
 					
@@ -321,18 +334,24 @@ public class MealViewFragment extends ListFragment{
 		}
 		
 		protected void onPostExecute(Long result){
+			// If breakfast is in brunch (on weekends), set active tab to lunch - brunch message will be displayed in breakfast tabs
 			if(!MenuParser.fullMenuObj.get(college).getBreakfast().isEmpty() && 
 					MenuParser.fullMenuObj.get(college).getBreakfast().get(0).equals(MenuParser.brunchMessage)){
 				mViewPager.setCurrentItem(1,false);
 			}
 
-			// If Lunch  and breakfast are empty automatically set to lunch
+			// If Lunch  and breakfast are empty automatically set tab to dinner
 			// (rare occurence, pretty much only on return from holidays)
 			if(MenuParser.fullMenuObj.get(college).getBreakfast().isEmpty() && MenuParser.fullMenuObj.get(college).getLunch().isEmpty()){
 				mViewPager.setCurrentItem(2,false);
 			}
 			
-			// TODO: if all meals empty, pop open nav drawer (Cowell is usually not completely closed)
+			// if all meals empty (dining hall closed), pop open nav drawer
+			if(MenuParser.fullMenuObj.get(college).getBreakfast().isEmpty() && MenuParser.fullMenuObj.get(college).getLunch().isEmpty()
+					&& MenuParser.fullMenuObj.get(college).getDinner().isEmpty()){
+				mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
+				mDrawerLayout.openDrawer(Gravity.START);
+			}
 			
 			mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
 			
@@ -388,9 +407,7 @@ public class MealViewFragment extends ListFragment{
 			}
 
 			// Set title to include date
-			// TODO: make this reflect what the user has currently selected
-			int[] today = getToday();
-	        getActivity().setTitle(MenuParser.collegeList[college] + " " + today[0] + "/" + today[1]);
+	        getActivity().setTitle(MenuParser.collegeList[college] + " " + displayedMonth + "/" + displayedDay);
 		}
 		
 	}
@@ -513,12 +530,15 @@ public class MealViewFragment extends ListFragment{
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent){
 			View v = super.getView(position,  convertView,  parent);
+			// Blue text for college night
 			if(MenuParser.fullMenuObj.get(position).getIsCollegeNight()){
 				((TextView) v).setTextColor(Color.BLUE); // 
 			}
+			// Grayed out if dining hall is closed
 			if(!MenuParser.fullMenuObj.get(position).getIsOpen()){
 				((TextView) v).setTextColor(Color.LTGRAY); // 
 			}
+			// Green for Healthy Monday / Farm Friday
 			if(MenuParser.fullMenuObj.get(position).getIsFarmFriday() || 
 					MenuParser.fullMenuObj.get(position).getIsHealthyMonday()){
 				((TextView) v).setTextColor(Color.rgb(0x4C, 0xC5, 0x52)); // 'Green Apple'
