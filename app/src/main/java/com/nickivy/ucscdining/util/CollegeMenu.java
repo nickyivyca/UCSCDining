@@ -97,7 +97,7 @@ public class CollegeMenu {
 	 * @return
 	 */
 	public boolean getIsCollegeNight(){
-    	if(isSet && getDinner().size() > 0 && getDinner().get(0).equals("College Night")){
+    	if(isSet && getDinner().size() > 0 && getDinner().get(0).toLowerCase().contains("college night")){
     		return true;
     	}
     	return false;
@@ -109,7 +109,7 @@ public class CollegeMenu {
 	public boolean getIsHealthyMonday(){
     	if(isSet){
     		if((getDinner().size() > 0 && getDinner().get(0).equals("Healthy Mondays")) || 
-    			getLunch().size() > 0 && getLunch().get(0).equals("Healthy Mondays")){    			
+    			getLunch().size() > 0 && getLunch().get(0).equals("Healthy Mondays")){
     			return true;
     		}
     	}

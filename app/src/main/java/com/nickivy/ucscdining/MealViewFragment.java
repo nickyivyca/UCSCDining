@@ -40,6 +40,7 @@ import android.widget.Toast;
  * @author Nick Ivy parkedraccoon@gmail.com
  */
 
+@SuppressWarnings("ResourceType")
 public class MealViewFragment extends ListFragment{
 	
 	final static String ARG_COLLEGE_NUMBER = "college_number";
@@ -122,9 +123,10 @@ public class MealViewFragment extends ListFragment{
     	}
     }
 	
-	private class RetrieveMenuTask extends AsyncTask<Integer, Integer, Long>{
+	@SuppressWarnings("ResourceType")
+    private class RetrieveMenuTask extends AsyncTask<Integer, Integer, Long>{
 		
-		private int college;
+//		private int college;
 		
 		@Override
 		protected void onPreExecute(){
@@ -133,15 +135,13 @@ public class MealViewFragment extends ListFragment{
 
 		@Override
 		protected Long doInBackground(Integer... arg0) {
-			// College num is simply for refreshing array adapters once the refreshing is complete
-			college = arg0[0];
 			MealStorage mealStore = new MealStorage(getActivity());
 			SQLiteDatabase db;
 			
 			// Date info is passed in as argument, to allow user to select a date that is not today
-			int month = arg0[1];
-			int day = arg0[2];
-			int year = arg0[3];
+			int month = arg0[0];
+			int day = arg0[1];
+			int year = arg0[2];
 			
 			// Keep track of latest date called for displaying in title bar
 			displayedMonth = month;
@@ -343,20 +343,20 @@ public class MealViewFragment extends ListFragment{
 		
 		protected void onPostExecute(Long result){
 			// If breakfast is in brunch (on weekends), set active tab to lunch - brunch message will be displayed in breakfast tabs
-			if(!MenuParser.fullMenuObj.get(college).getBreakfast().isEmpty() && 
-					MenuParser.fullMenuObj.get(college).getBreakfast().get(0).equals(MenuParser.brunchMessage)){
+			if(!MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
+					MenuParser.fullMenuObj.get(collegeNum).getBreakfast().get(0).equals(MenuParser.brunchMessage)){
 				mViewPager.setCurrentItem(1,false);
 			}
 
 			// If Lunch  and breakfast are empty automatically set tab to dinner
 			// (rare occurence, pretty much only on return from holidays)
-			if(MenuParser.fullMenuObj.get(college).getBreakfast().isEmpty() && MenuParser.fullMenuObj.get(college).getLunch().isEmpty()){
+			if(MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() && MenuParser.fullMenuObj.get(collegeNum).getLunch().isEmpty()){
 				mViewPager.setCurrentItem(2,false);
 			}
 			
 			// if all meals empty (dining hall closed), pop open nav drawer
-			if(MenuParser.fullMenuObj.get(college).getBreakfast().isEmpty() && MenuParser.fullMenuObj.get(college).getLunch().isEmpty()
-					&& MenuParser.fullMenuObj.get(college).getDinner().isEmpty()){
+			if(MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() && MenuParser.fullMenuObj.get(collegeNum).getLunch().isEmpty()
+					&& MenuParser.fullMenuObj.get(collegeNum).getDinner().isEmpty()){
 				mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
 				mDrawerLayout.openDrawer(Gravity.START);
 			}
@@ -375,19 +375,19 @@ public class MealViewFragment extends ListFragment{
 			if(listView != null){
 				listView.setAdapter(new ArrayAdapter<String>(getActivity(),
 						android.R.layout.simple_list_item_activated_1,
-						MenuParser.fullMenuObj.get(college).getBreakfast()));
+						MenuParser.fullMenuObj.get(collegeNum).getBreakfast()));
 			}
 			listView = (ListView) getActivity().findViewById(LISTVIEW_ID2);
 			if(listView != null){
 				listView.setAdapter(new ArrayAdapter<String>(getActivity(),
 						android.R.layout.simple_list_item_activated_1,
-						MenuParser.fullMenuObj.get(college).getLunch()));
+						MenuParser.fullMenuObj.get(collegeNum).getLunch()));
 			}
 			listView = (ListView) getActivity().findViewById(LISTVIEW_ID3);
 			if(listView != null){
 				listView.setAdapter(new ArrayAdapter<String>(getActivity(),
 						android.R.layout.simple_list_item_activated_1,
-						MenuParser.fullMenuObj.get(college).getDinner()));
+						MenuParser.fullMenuObj.get(collegeNum).getDinner()));
 			}
 			
 			Display display = getActivity().getWindowManager().getDefaultDisplay();
@@ -415,7 +415,7 @@ public class MealViewFragment extends ListFragment{
 			}
 
 			// Set title to include date
-	        getActivity().setTitle(MenuParser.collegeList[college] + " " + displayedMonth + "/" + displayedDay);
+	        getActivity().setTitle(MenuParser.collegeList[collegeNum] + " " + displayedMonth + "/" + displayedDay);
 		}
 		
 	}
@@ -461,7 +461,7 @@ public class MealViewFragment extends ListFragment{
                 	MenuParser.needsRefresh = true;
     				int[] today = getToday();
     				// When doing swipe refresh, reload to the same day as what is currently displayed
-        	    	new RetrieveMenuTask().execute(collegeNum, displayedMonth, displayedDay, today[2]);
+        	    	new RetrieveMenuTask().execute(displayedMonth, displayedDay, today[2]);
             	}
             });
             
@@ -483,7 +483,7 @@ public class MealViewFragment extends ListFragment{
 				mSwipeRefreshLayout.setRefreshing(true);
 				// Default loading to today
 				int[] today = getToday();
-    	    	new RetrieveMenuTask().execute(collegeNum, today[0], today[1], today[2]);
+    	    	new RetrieveMenuTask().execute(today[0], today[1], today[2]);
     	    }
     		
     		
@@ -584,7 +584,7 @@ public class MealViewFragment extends ListFragment{
 			mSwipeRefreshLayout.setProgressViewOffset(false, -140, height / 800);
 			mSwipeRefreshLayout.setRefreshing(true);
 		}
-    	new RetrieveMenuTask().execute(collegeNum, month, day, year);
+    	new RetrieveMenuTask().execute(month, day, year);
 	}
 	
 	/**
