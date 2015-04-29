@@ -1,6 +1,6 @@
 # IntelliJ for Android
 .gradle
-local.properties
-.idea/workspace.xml
-.idea/libraries
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
 /build
