@@ -1,7 +1,12 @@
 package com.nickivy.ucscdining;
 
+import java.util.Calendar;
+
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -9,6 +14,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -67,7 +74,7 @@ public class MainActivity extends ActionBarActivity{
 					R.layout.drawer_list_item, MenuParser.collegeList));
 			
 	        mActionBar.setDisplayHomeAsUpEnabled(true);
-	        mActionBar.setHomeButtonEnabled(true);
+	        mActionBar.setHomeButtonEnabled(true);	        
 	        
 	        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 	        		R.string.drawer_open, R.string.drawer_close);
@@ -112,11 +119,48 @@ public class MainActivity extends ActionBarActivity{
     }
     
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	MenuInflater inflater = getMenuInflater();
+    	inflater.inflate(R.menu.overflow_menu, menu);
+    	return super.onCreateOptionsMenu(menu);
+    }
+    
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
        if (mDrawerToggle.onOptionsItemSelected(item)) {
            return true;
        }
-       return super.onOptionsItemSelected(item);
+       switch(item.getItemId()) {
+       	case R.id.action_select_date:
+//       		Toast.makeText(this, "Date setter opened", Toast.LENGTH_SHORT).show();
+       		DialogFragment newFragment = new DatePicker();
+       	    newFragment.show(getSupportFragmentManager(), "datePicker");
+       		default:
+       	       return super.onOptionsItemSelected(item);
+       }
+//       return super.onOptionsItemSelected(item);
+   }
+    
+    public static class DatePicker extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+   	
+    	@Override
+   		public Dialog onCreateDialog(Bundle savedInstanceState) {
+           // Use the current date as the default date in the picker
+           final Calendar c = Calendar.getInstance();
+           int year = c.get(Calendar.YEAR);
+
+           // Create a new instance of DatePickerDialog and return it
+           // Default date to what is currently selected by user
+           return new DatePickerDialog(getActivity(), this, year, MealViewFragment.displayedMonth - 1, MealViewFragment.displayedDay);
+   		
+    	}
+
+		@Override
+		public void onDateSet(android.widget.DatePicker view, int year,
+				int monthOfYear, int dayOfMonth) {
+			MealViewFragment meal = (MealViewFragment) getFragmentManager().findFragmentById(R.id.fragment_container);
+			meal.selectNewDate(monthOfYear + 1,  dayOfMonth,  year);				
+		}
    }
 
 }

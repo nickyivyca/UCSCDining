@@ -82,14 +82,7 @@ public class MenuParser {
     	Elements names = null;
     	try{
     		reloadTries++;
-//    		doc = Jsoup.connect(URLList[k]).get();   
     		doc = Jsoup.connect(dateURLPart1 + month + "%2F" + day + "%2F" + year + datedURLListParts2[k]).get();
-    				
-/*    		if (k == 0) {
-    			doc = Jsoup.connect(cowellDateURLPart1 + 4 + "%2F" + 24 + "%2F" + 2015 + cowellDateURLPart2).get();
-    		} else {
-        		doc = Jsoup.connect(URLList[k]).get();    			
-    		}*/
     		
     		
 //    		Log.v("ucscdining", "Reloadtries: " + reloadTries);

@@ -59,10 +59,10 @@ public class MealViewFragment extends ListFragment{
 	private DrawerLayout mDrawerLayout;
     private ListView mMealList;
 	
-	private int collegeNum = 0;
+	private static int collegeNum = 0;
 	
-	private int displayedMonth = 0;
-	private int displayedDay = 0;
+	public static int displayedMonth = 0;
+	public static int displayedDay = 0;
 	
 	private boolean refreshStarted = false;
 	
@@ -177,20 +177,28 @@ public class MealViewFragment extends ListFragment{
 				
 				/*
 				 * Delete data from today and before, requires a couple different sql commands
+				 * Note: today, not date the retrieve menu task was called with
 				 * 
 				 * if:
 				 * month is less than, year equal
 				 * year less than current year
-				 * day <= current, year + month equal
+				 * day < current, year + month equal
+				 * if manual refresh (MenuParser.needsRefresh true), delete all (assume database got messed up somehow)
 				 */
 				
-				db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_MONTH + "<? AND " + MealStorage.COLUMN_YEAR + " =?",
-						new String[] {"" + month, "" + year});
+				int today[] = getToday();
 				
-				db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_YEAR + " <?", new String[] {"" + year});
+				if (MenuParser.needsRefresh) {
+					db.delete(MealStorage.TABLE_MEALS, null,null);
+				} else {				
+					db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_MONTH + "<? AND " + MealStorage.COLUMN_YEAR + " =?",
+							new String[] {"" + today[0], "" + today[2]});
 				
-				db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_MONTH + "=? AND " + MealStorage.COLUMN_DAY + "<=? AND " +
-						MealStorage.COLUMN_YEAR + " =?", new String[] {"" + month, "" + day, "" + year});
+					db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_YEAR + " <?", new String[] {"" + today[2]});
+				
+					db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_MONTH + "=? AND " + MealStorage.COLUMN_DAY + "<? AND " +
+							MealStorage.COLUMN_YEAR + " =?", new String[] {"" + today[0], "" + today[1], "" + today[2]});
+				}
 				
 				// We need to write at the end of the table - so find size and offset first column by that much				
 				String countQuery = "SELECT * FROM " + MealStorage.TABLE_MEALS;
@@ -452,7 +460,8 @@ public class MealViewFragment extends ListFragment{
                 public void onRefresh() {
                 	MenuParser.needsRefresh = true;
     				int[] today = getToday();
-        	    	new RetrieveMenuTask().execute(collegeNum, today[0], today[1], today[2]);
+    				// When doing swipe refresh, reload to the same day as what is currently displayed
+        	    	new RetrieveMenuTask().execute(collegeNum, displayedMonth, displayedDay, today[2]);
             	}
             });
             
@@ -472,6 +481,7 @@ public class MealViewFragment extends ListFragment{
 	            // manually try to recreate where the spinner ends up in a normal swipe
 	            mSwipeRefreshLayout.setProgressViewOffset(false, -50, height / 800);
 				mSwipeRefreshLayout.setRefreshing(true);
+				// Default loading to today
 				int[] today = getToday();
     	    	new RetrieveMenuTask().execute(collegeNum, today[0], today[1], today[2]);
     	    }
@@ -544,14 +554,43 @@ public class MealViewFragment extends ListFragment{
 				((TextView) v).setTextColor(Color.rgb(0x4C, 0xC5, 0x52)); // 'Green Apple'
 			}
 			return v;
+		}		
+	}
+	
+	public void selectNewDate(int month, int day, int year) {
+		//Toast.makeText(getActivity(), month + " " + day + " " + year + "selected", Toast.LENGTH_SHORT).show();
+		Display display = getActivity().getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int height = size.y;
+		/*
+		 *  Manually try to recreate what the swiperefresh layout has by default.
+		 *  No idea which layouts are active, so check for nulls on all.
+		 *  Also no idea why the -140 here is different than the -50 above, 
+		 *  the whole thing makes no sense.
+		 */
+		mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID1);
+		if(mSwipeRefreshLayout != null){
+			mSwipeRefreshLayout.setProgressViewOffset(false, -140, height / 800);
+			mSwipeRefreshLayout.setRefreshing(true);
 		}
-		
+		mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID2);
+		if(mSwipeRefreshLayout != null){
+			mSwipeRefreshLayout.setProgressViewOffset(false, -140, height / 800);
+			mSwipeRefreshLayout.setRefreshing(true);
+		}
+		mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID3);
+		if(mSwipeRefreshLayout != null){
+			mSwipeRefreshLayout.setProgressViewOffset(false, -140, height / 800);
+			mSwipeRefreshLayout.setRefreshing(true);
+		}
+    	new RetrieveMenuTask().execute(collegeNum, month, day, year);
 	}
 	
 	/**
 	 * Returns today's date as a 3-number int array. [month, day, year]
 	 */
-	public int[] getToday() {
+	public static int[] getToday() {
 		Date today = new Date();
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(today);
