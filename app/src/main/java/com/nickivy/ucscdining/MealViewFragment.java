@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.example.android.common.view.SlidingTabLayout;
+import com.nickivy.ucscdining.parser.MealDataFetcher;
 import com.nickivy.ucscdining.parser.MealStorage;
 import com.nickivy.ucscdining.parser.MenuParser;
 
@@ -124,9 +125,17 @@ public class MealViewFragment extends ListFragment{
     }
 	
 	@SuppressWarnings("ResourceType")
-    private class RetrieveMenuTask extends AsyncTask<Integer, Integer, Long>{
+    private class RetrieveMenuInFragmentTask extends AsyncTask<Void, Void, Long>{
 		
 //		private int college;
+
+        private int mYear;
+
+        public RetrieveMenuInFragmentTask(int month, int day, int year) {
+            displayedMonth = month;
+            displayedDay = day;
+            mYear = year;
+        }
 		
 		@Override
 		protected void onPreExecute(){
@@ -134,8 +143,9 @@ public class MealViewFragment extends ListFragment{
 		}
 
 		@Override
-		protected Long doInBackground(Integer... arg0) {
-			MealStorage mealStore = new MealStorage(getActivity());
+		protected Long doInBackground(Void... voids) {
+            MealDataFetcher.fetchData(getActivity(), displayedMonth, displayedDay, mYear);
+/*			MealStorage mealStore = new MealStorage(getActivity());
 			SQLiteDatabase db;
 			
 			// Date info is passed in as argument, to allow user to select a date that is not today
@@ -173,7 +183,7 @@ public class MealViewFragment extends ListFragment{
 			if(cexists || MenuParser.needsRefresh){
 				MenuParser.getMealList(month, day, year);
 				
-				db = mealStore.getWritableDatabase();
+				db = mealStore.getWritableDatabase();*/
 				
 				/*
 				 * Delete data from today and before, requires a couple different sql commands
@@ -186,7 +196,7 @@ public class MealViewFragment extends ListFragment{
 				 * if manual refresh (MenuParser.needsRefresh true), delete all (assume database got messed up somehow)
 				 */
 				
-				int today[] = getToday();
+				/*int today[] = getToday();
 				
 				if (MenuParser.needsRefresh) {
 					db.delete(MealStorage.TABLE_MEALS, null,null);
@@ -337,7 +347,7 @@ public class MealViewFragment extends ListFragment{
 				db.close();
 				mealStore.close();
 
-			}			
+			}*/
 			return null;
 		}
 		
@@ -461,7 +471,7 @@ public class MealViewFragment extends ListFragment{
                 	MenuParser.needsRefresh = true;
     				int[] today = getToday();
     				// When doing swipe refresh, reload to the same day as what is currently displayed
-        	    	new RetrieveMenuTask().execute(displayedMonth, displayedDay, today[2]);
+        	    	new RetrieveMenuInFragmentTask(displayedMonth, displayedDay, today[2]).execute();
             	}
             });
             
@@ -483,7 +493,7 @@ public class MealViewFragment extends ListFragment{
 				mSwipeRefreshLayout.setRefreshing(true);
 				// Default loading to today
 				int[] today = getToday();
-    	    	new RetrieveMenuTask().execute(today[0], today[1], today[2]);
+    	    	new RetrieveMenuInFragmentTask(today[0], today[1], today[2]).execute();
     	    }
     		
     		
@@ -584,7 +594,7 @@ public class MealViewFragment extends ListFragment{
 			mSwipeRefreshLayout.setProgressViewOffset(false, -140, height / 800);
 			mSwipeRefreshLayout.setRefreshing(true);
 		}
-    	new RetrieveMenuTask().execute(month, day, year);
+    	new RetrieveMenuInFragmentTask(month, day, year).execute();
 	}
 	
 	/**
