@@ -1,5 +1,6 @@
 package com.nickivy.ucscdining.widget;
 
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -17,6 +18,8 @@ import com.nickivy.ucscdining.R;
 import com.nickivy.ucscdining.parser.MealDataFetcher;
 import com.nickivy.ucscdining.parser.MenuParser;
 
+import java.util.Calendar;
+
 
 /**
  * Implementation of App Widget functionality.
@@ -24,15 +27,42 @@ import com.nickivy.ucscdining.parser.MenuParser;
 public class MenuWidget extends AppWidgetProvider {
 
     public static final String EXTRA_WORD = "com.nickivy.ucscdining.widget.WORD";
+    private PendingIntent service = null;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+
+        final AlarmManager m = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        final Calendar TIME = Calendar.getInstance();
+        TIME.set(Calendar.MINUTE, 0);
+        TIME.set(Calendar.SECOND, 0);
+        TIME.set(Calendar.MILLISECOND, 0);
+
+        final Intent timeIntent = new Intent(context, WidgetService.class);
+
+        if (service == null) {
+            service = PendingIntent.getService(context, 0, timeIntent,
+                    PendingIntent.FLAG_CANCEL_CURRENT);
+        }
+        // update every hour
+        m.setRepeating(AlarmManager.RTC, TIME.getTime().getTime(), AlarmManager.INTERVAL_HOUR,
+                service);
+
         // There may be multiple widgets active, so update all of them
+        // Above update timing will work for all widgets
         int N = appWidgetIds.length;
         for (int i = 0; i < N; i++) {
             updateAppWidget(context, appWidgetManager, appWidgetIds[i]);
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds);
+    }
+
+    @Override
+    public void onDisabled(Context context) {
+        final AlarmManager m = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        m.cancel(service);
     }
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
@@ -41,8 +71,7 @@ public class MenuWidget extends AppWidgetProvider {
         int today[] = MealViewFragment.getToday();
         new RetrieveMenuInWidgetTask(context, appWidgetManager, appWidgetId, today[0], today[1],
                 today[2]).execute();
-//        Log.v("ucscdining", "retrieve menu in widget task run");
-        Log.v("ucscdining", "updateappwidget completed");
+        // Actual setting of widget data is accomplished in the postexecute of the asynctask
     }
 
     private static class RetrieveMenuInWidgetTask extends AsyncTask<Void, Void, Long> {
@@ -65,8 +94,6 @@ public class MenuWidget extends AppWidgetProvider {
         @Override
         protected Long doInBackground(Void... voids) {
             MealDataFetcher.fetchData(mContext, mMonth, mDay, mYear);
-            Log.v("ucscdining", "do in background");
-//            Log.v("ucscdining", MenuParser.fullMenuObj.get(0).getBreakfast().get(0));
             return null;
         }
 
@@ -83,7 +110,6 @@ public class MenuWidget extends AppWidgetProvider {
             RemoteViews widget = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
             widget.setRemoteAdapter(R.id.widget_list, svcIntent);
             mAppWidgetManager.updateAppWidget(mAppWidgetId, widget);
-            Log.v("ucscdining", "postexecute");
         }
     }
 }

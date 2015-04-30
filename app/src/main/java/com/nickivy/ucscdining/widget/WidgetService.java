@@ -11,18 +11,12 @@ import android.widget.RemoteViewsService;
 import com.nickivy.ucscdining.R;
 import com.nickivy.ucscdining.parser.MenuParser;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+
 /**
  *
  */
-
-/*public class MealWidgetService extends RemoteViewsService {
-
-    @Override
-    public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        Log.v("ucscdining", "getting view factory");
-        return(new MealWidgetViewsFactory(this.getApplicationContext(), intent));
-    }
-} */
 
 public class WidgetService extends RemoteViewsService {
     @Override
@@ -34,22 +28,14 @@ public class WidgetService extends RemoteViewsService {
 
 class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
-/*    private static final String[] items={"lorem", "ipsum", "dolor",
-            "sit", "amet", "consectetuer",
-            "adipiscing", "elit", "morbi",
-            "vel", "ligula", "vitae",
-            "arcu", "aliquet", "mollis",
-            "etiam", "vel", "erat",
-            "placerat", "ante",
-            "porttitor", "sodales",
-            "pellentesque", "augue",
-            "purus"}; */
-
     private Context context = null;
     private int appWidgetId;
 
+    private final int DINNER_SWITCH_TIME = 15; // 3 PM
+    private final int LUNCH_SWITCH_TIME = 11; // 11 AM
+    private final int BREAKFAST_SWITCH_TIME = 0; // 12 AM
+
     public MealWidgetViewsFactory(Context context, Intent intent) {
-        Log.v("ucscdining", "MealWidgetViewsFactory constructor");
         this.context = context;
         appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
@@ -76,21 +62,47 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public RemoteViews getViewAt(int position) {
-        Log.v("ucscdining", "getviewat");
+        Log.v("ucscdining", "get view at");
         RemoteViews row = new RemoteViews(context.getPackageName(), R.layout.widget_row);
-        row.setTextViewText(android.R.id.text1,
-                MenuParser.fullMenuObj.get(0).getBreakfast().get(position));
-//        Log.v("ucscdining", MenuParser.fullMenuObj.get(0).getBreakfast().get(0));
+        row.setTextViewText(android.R.id.text1, getCurrentMenu(0).get(position));
 
         Intent intent = new Intent();
         Bundle extras = new Bundle();
-//        extras.putString(MenuWidget.EXTRA_WORD, MenuParser.fullMenuObj.get(0).getBreakfast().get(i));
-//        extras.putString(MenuWidget.EXTRA_WORD, "pancakes");
-        extras.putString(MenuWidget.EXTRA_WORD,
-                MenuParser.fullMenuObj.get(0).getBreakfast().get(position));
+        extras.putString(MenuWidget.EXTRA_WORD, getCurrentMenu(0).get(position));
         intent.putExtras(extras);
         row.setOnClickFillInIntent(android.R.id.text1, intent);
         return row;
+    }
+
+    /**
+     * Given parameters of current college, decides what meal is current and returns its list
+     * @param college
+     * @return
+     */
+    private ArrayList<String> getCurrentMenu(final int college) {
+        if (!MenuParser.fullMenuObj.get(college).getIsOpen()) {
+            ArrayList<String> ret = new ArrayList<String>();
+            ret.add(MenuParser.collegeList[college] +
+                    "dining hall closed today");
+            return ret;
+        }
+//        Log.v("ucscdining", "yay");
+        Calendar cal = Calendar.getInstance();
+        // Switch to dinner at 5 PM
+        if (cal.get(Calendar.HOUR_OF_DAY) >= DINNER_SWITCH_TIME) {
+            return MenuParser.fullMenuObj.get(college).getDinner();
+        }
+        /*if (cal.get(Calendar.MINUTE) >= 37) {
+            return MenuParser.fullMenuObj.get(college).getBreakfast();
+        } */
+        if (cal.get(Calendar.HOUR_OF_DAY) >= LUNCH_SWITCH_TIME) {
+            return MenuParser.fullMenuObj.get(college).getLunch();
+        }
+        if(cal.get(Calendar.HOUR_OF_DAY) >= BREAKFAST_SWITCH_TIME) {
+            return MenuParser.fullMenuObj.get(college).getBreakfast();
+        }
+        // unreachable here
+        return null;
     }
 
     @Override

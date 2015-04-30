@@ -11,7 +11,7 @@ import com.nickivy.ucscdining.MealViewFragment;
 import java.util.ArrayList;
 
 /**
- * Class for containing the AsyncTasks and related methods for retrieving data.
+ * Methods for managing the data in the SQL database.
  */
 public class MealDataFetcher {
 
