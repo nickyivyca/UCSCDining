@@ -1,39 +1,77 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@android:color/white">
-
+    <ImageButton
+        android:id="@+id/widget_college_leftbutton"
+        android:layout_alignBottom="@+id/widget_collegename_divider"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_arrow_left_grey600_24dp"
+        android:background="#eeeeee"/>
     <TextView android:id="@+id/widget_collegename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
         android:textColor="#000000"
         android:textSize="24sp"
         android:layout_margin="8dp"/>
-    <!-- Can't use a basic View to create a divider line, use LinearLayout instead -->
+    <ImageButton
+        android:id="@+id/widget_college_rightbutton"
+        android:layout_alignParentRight="true"
+        android:layout_alignBottom="@id/widget_collegename_divider"
+        android:layout_width="50dp"
+        android:layout_height="fill_parent"
+        android:src="@drawable/ic_arrow_right_grey600_24dp"
+        android:background="#eeeeee"/>
     <LinearLayout
+        android:id="@id/widget_collegename_divider"
+        android:layout_below="@id/widget_collegename"
         android:layout_width="fill_parent"
         android:layout_height="1dip"
         android:background="#000000"
         android:orientation="horizontal" />
+    <ImageButton
+        android:id="@+id/widget_mealname_leftbutton"
+        android:layout_alignTop="@id/widget_collegename_divider"
+        android:layout_alignBottom="@+id/widget_mealname_divider"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_arrow_left_grey600_24dp"
+        android:background="#eeeeee"/>
     <TextView android:id="@+id/widget_mealname"
+        android:layout_below="@id/widget_collegename_divider"
+        android:layout_centerInParent="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:textColor="#000000"
         android:textSize="24sp"
         android:layout_margin="8dp"/>
+    <ImageButton
+        android:id="@+id/widget_mealname_rightbutton"
+        android:layout_alignTop="@id/widget_collegename_divider"
+        android:layout_alignBottom="@id/widget_mealname_divider"
+        android:layout_alignParentRight="true"
+        android:layout_width="50dp"
+        android:layout_height="fill_parent"
+        android:src="@drawable/ic_arrow_right_grey600_24dp"
+        android:background="#eeeeee"/>
     <LinearLayout
+        android:id="@+id/widget_mealname_divider"
+        android:layout_below="@id/widget_mealname"
         android:layout_width="fill_parent"
         android:layout_height="1dip"
         android:background="#000000"
         android:orientation="horizontal" />
     <ListView
         android:id="@+id/widget_list"
+        android:layout_below="@id/widget_mealname_divider"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="#E5E5E5"
         android:dividerHeight="1dp"/>
 
-</LinearLayout>
+</RelativeLayout>
