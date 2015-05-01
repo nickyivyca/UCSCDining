@@ -31,10 +31,6 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private Context context = null;
     private int appWidgetId;
 
-    private final int DINNER_SWITCH_TIME = 15; // 3 PM
-    private final int LUNCH_SWITCH_TIME = 11; // 11 AM
-    private final int BREAKFAST_SWITCH_TIME = 0; // 12 AM
-
     public MealWidgetViewsFactory(Context context, Intent intent) {
         this.context = context;
         appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
@@ -62,7 +58,7 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public RemoteViews getViewAt(int position) {
-        Log.v("ucscdining", "get view at");
+//        Log.v("ucscdining", "get view at");
         RemoteViews row = new RemoteViews(context.getPackageName(), R.layout.widget_row);
         row.setTextViewText(android.R.id.text1, getCurrentMenu(0).get(position));
 
@@ -86,23 +82,16 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                     "dining hall closed today");
             return ret;
         }
-//        Log.v("ucscdining", "yay");
-        Calendar cal = Calendar.getInstance();
-        // Switch to dinner at 5 PM
-        if (cal.get(Calendar.HOUR_OF_DAY) >= DINNER_SWITCH_TIME) {
-            return MenuParser.fullMenuObj.get(college).getDinner();
+        switch(MenuWidget.getCurrentMeal()) {
+            case MenuWidget.BREAKFAST:
+                return MenuParser.fullMenuObj.get(college).getBreakfast();
+            case MenuWidget.LUNCH:
+                return MenuParser.fullMenuObj.get(college).getLunch();
+            case MenuWidget.DINNER:
+                return MenuParser.fullMenuObj.get(college).getDinner();
+            default:
+                return null;
         }
-        /*if (cal.get(Calendar.MINUTE) >= 37) {
-            return MenuParser.fullMenuObj.get(college).getBreakfast();
-        } */
-        if (cal.get(Calendar.HOUR_OF_DAY) >= LUNCH_SWITCH_TIME) {
-            return MenuParser.fullMenuObj.get(college).getLunch();
-        }
-        if(cal.get(Calendar.HOUR_OF_DAY) >= BREAKFAST_SWITCH_TIME) {
-            return MenuParser.fullMenuObj.get(college).getBreakfast();
-        }
-        // unreachable here
-        return null;
     }
 
     @Override

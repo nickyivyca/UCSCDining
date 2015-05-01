@@ -29,6 +29,13 @@ public class MenuWidget extends AppWidgetProvider {
     public static final String EXTRA_WORD = "com.nickivy.ucscdining.widget.WORD";
     private PendingIntent service = null;
 
+    public static final int DINNER_SWITCH_TIME = 15, // 3 PM
+            LUNCH_SWITCH_TIME = 11, // 11 AM
+            BREAKFAST_SWITCH_TIME = 0,// 12 AM
+            BREAKFAST = 0,
+            LUNCH = 1,
+            DINNER = 2;
+
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 
@@ -70,7 +77,7 @@ public class MenuWidget extends AppWidgetProvider {
 
         int today[] = MealViewFragment.getToday();
         new RetrieveMenuInWidgetTask(context, appWidgetManager, appWidgetId, today[0], today[1],
-                today[2]).execute();
+                today[2], 0).execute();
         // Actual setting of widget data is accomplished in the postexecute of the asynctask
     }
 
@@ -78,17 +85,18 @@ public class MenuWidget extends AppWidgetProvider {
 
         private Context mContext;
         private AppWidgetManager mAppWidgetManager;
-        private int mAppWidgetId, mMonth, mDay, mYear;
+        private int mAppWidgetId, mMonth, mDay, mYear, mCollege;
 
 
         public RetrieveMenuInWidgetTask(Context context, AppWidgetManager appWidgetManager,
-                int appWidgetId, int month, int day, int year) {
+                int appWidgetId, int month, int day, int year, int college) {
             mContext = context;
             mAppWidgetManager = appWidgetManager;
             mAppWidgetId = appWidgetId;
             mMonth = month;
             mDay = day;
             mYear = year;
+            mCollege = college;
         }
 
         @Override
@@ -109,8 +117,27 @@ public class MenuWidget extends AppWidgetProvider {
 
             RemoteViews widget = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
             widget.setRemoteAdapter(R.id.widget_list, svcIntent);
+
+            widget.setTextViewText(R.id.widget_collegename, MenuParser.collegeList[mCollege]);
+            widget.setTextViewText(R.id.widget_mealname,
+                    MenuParser.meals[getCurrentMeal()]);
+
             mAppWidgetManager.updateAppWidget(mAppWidgetId, widget);
         }
+    }
+
+    public static int getCurrentMeal() {
+        Calendar cal = Calendar.getInstance();
+        if (cal.get(Calendar.HOUR_OF_DAY) >= DINNER_SWITCH_TIME) {
+            return DINNER;
+        }
+        if (cal.get(Calendar.HOUR_OF_DAY) >= LUNCH_SWITCH_TIME) {
+            return LUNCH;
+        }
+        if(cal.get(Calendar.HOUR_OF_DAY) >= BREAKFAST_SWITCH_TIME) {
+            return BREAKFAST;
+        }
+        return -1;
     }
 }
 
