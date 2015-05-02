@@ -21,6 +21,7 @@ import java.util.Calendar;
 public class WidgetService extends RemoteViewsService {
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
+        Log.v("ucscdining", "getviewfactory");
         return(new MealWidgetViewsFactory(this.getApplicationContext(),
                 intent));
     }
@@ -53,18 +54,31 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public int getCount() {
-        return MenuParser.fullMenuObj.get(0).getBreakfast().size();
+        Log.v("ucscdining", "meal: " + MenuWidget.currentMeal + " getcount " + MenuParser.fullMenuObj.get(MenuWidget.currentCollege).getDinner().size());
+        switch (MenuWidget.currentMeal) {
+            case MenuWidget.BREAKFAST:
+                return MenuParser.fullMenuObj.get(MenuWidget.currentCollege).getBreakfast().size();
+            case MenuWidget.LUNCH:
+                return MenuParser.fullMenuObj.get(MenuWidget.currentCollege).getLunch().size();
+            case MenuWidget.DINNER:
+                Log.v("ucscdining", "returning dinner size");
+                return MenuParser.fullMenuObj.get(MenuWidget.currentCollege).getDinner().size();
+            default:
+                return -1;
+        }
     }
 
     @Override
     public RemoteViews getViewAt(int position) {
-//        Log.v("ucscdining", "get view at");
+        Log.v("ucscdining", "get view at" + position);
         RemoteViews row = new RemoteViews(context.getPackageName(), R.layout.widget_row);
-        row.setTextViewText(android.R.id.text1, getCurrentMenu(0).get(position));
+        row.setTextViewText(android.R.id.text1,
+                getCurrentMenu(MenuWidget.currentCollege).get(position));
 
         Intent intent = new Intent();
         Bundle extras = new Bundle();
-        extras.putString(MenuWidget.EXTRA_WORD, getCurrentMenu(0).get(position));
+        extras.putString(MenuWidget.EXTRA_WORD,
+                getCurrentMenu(MenuWidget.currentCollege).get(position));
         intent.putExtras(extras);
         row.setOnClickFillInIntent(android.R.id.text1, intent);
         return row;
@@ -82,7 +96,7 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                     "dining hall closed today");
             return ret;
         }
-        switch(MenuWidget.getCurrentMeal()) {
+        switch(MenuWidget.currentMeal) {
             case MenuWidget.BREAKFAST:
                 return MenuParser.fullMenuObj.get(college).getBreakfast();
             case MenuWidget.LUNCH:
