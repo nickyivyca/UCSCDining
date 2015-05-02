@@ -255,11 +255,27 @@ public class MenuWidget extends AppWidgetProvider {
             if (currentMeal == -1) {
                 currentMeal = 2;
             }
+            // Skip ahead of breakfast if brunch message is present
+            if (currentMeal == BREAKFAST &&
+                    MenuParser.fullMenuObj.get(currentCollege).getBreakfast().size() > 0) {
+                if (MenuParser.fullMenuObj.get(currentCollege).getBreakfast().get(0)
+                        .equals(MenuParser.brunchMessage)) {
+                    currentMeal = DINNER;
+                }
+            }
         }
         if (CLICKTAG_MEALRIGHT.equals(intent.getAction())) {
             currentMeal++;
             if (currentMeal == 3) {
                 currentMeal = 0;
+            }
+            // Skip ahead of breakfast if brunch message is present
+            if (currentMeal == BREAKFAST &&
+                    MenuParser.fullMenuObj.get(currentCollege).getBreakfast().size() > 0) {
+                if (MenuParser.fullMenuObj.get(currentCollege).getBreakfast().get(0)
+                        .equals(MenuParser.brunchMessage)) {
+                    currentMeal = LUNCH;
+                }
             }
         }
         if (TAG_TIMEUPDATE.equals(intent.getAction())) {
