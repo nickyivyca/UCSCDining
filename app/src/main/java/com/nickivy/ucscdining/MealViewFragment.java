@@ -151,23 +151,31 @@ public class MealViewFragment extends ListFragment{
 		protected void onPostExecute(Long result){
             // Post-execute: set array adapters, reload animation, set title
 
-			// If breakfast is in brunch (on weekends), set active tab to lunch - brunch message will be displayed in breakfast tabs
+            // if all meals empty (dining hall closed), pop open nav drawer
+            if(MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
+                    MenuParser.fullMenuObj.get(collegeNum).getLunch().isEmpty()
+                    && MenuParser.fullMenuObj.get(collegeNum).getDinner().isEmpty()){
+                mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
+                mDrawerLayout.openDrawer(Gravity.START);
+            }
+
+			/*
+			 * If breakfast is in brunch (on weekends), set active tab to lunch - brunch message
+			 * will be displayed in breakfast tabs
+			 * Also will only move tab if breakfast is selected
+			 */
 			if(!MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
-					MenuParser.fullMenuObj.get(collegeNum).getBreakfast().get(0).equals(MenuParser.brunchMessage)){
+                    mViewPager.getCurrentItem() == 0 &&
+					MenuParser.fullMenuObj.get(collegeNum).getBreakfast().get(0)
+                            .equals(MenuParser.brunchMessage)){
 				mViewPager.setCurrentItem(1,false);
 			}
 
 			// If Lunch  and breakfast are empty automatically set tab to dinner
 			// (rare occurence, pretty much only on return from holidays)
-			if(MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() && MenuParser.fullMenuObj.get(collegeNum).getLunch().isEmpty()){
+			if(MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
+                    MenuParser.fullMenuObj.get(collegeNum).getLunch().isEmpty()){
 				mViewPager.setCurrentItem(2,false);
-			}
-			
-			// if all meals empty (dining hall closed), pop open nav drawer
-			if(MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() && MenuParser.fullMenuObj.get(collegeNum).getLunch().isEmpty()
-					&& MenuParser.fullMenuObj.get(collegeNum).getDinner().isEmpty()){
-				mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
-				mDrawerLayout.openDrawer(Gravity.START);
 			}
 			
 			mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
@@ -380,17 +388,17 @@ public class MealViewFragment extends ListFragment{
 		 */
 		mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID1);
 		if(mSwipeRefreshLayout != null){
-			mSwipeRefreshLayout.setProgressViewOffset(false, -140, height / 800);
+			mSwipeRefreshLayout.setProgressViewOffset(false, -150, height / 800);
 			mSwipeRefreshLayout.setRefreshing(true);
 		}
 		mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID2);
 		if(mSwipeRefreshLayout != null){
-			mSwipeRefreshLayout.setProgressViewOffset(false, -140, height / 800);
+			mSwipeRefreshLayout.setProgressViewOffset(false, -150, height / 800);
 			mSwipeRefreshLayout.setRefreshing(true);
 		}
 		mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID3);
 		if(mSwipeRefreshLayout != null){
-			mSwipeRefreshLayout.setProgressViewOffset(false, -140, height / 800);
+			mSwipeRefreshLayout.setProgressViewOffset(false, -150, height / 800);
 			mSwipeRefreshLayout.setRefreshing(true);
 		}
     	new RetrieveMenuInFragmentTask(month, day, year).execute();

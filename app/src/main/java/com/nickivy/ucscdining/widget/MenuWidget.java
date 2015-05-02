@@ -30,7 +30,7 @@ public class MenuWidget extends AppWidgetProvider {
     public static final String EXTRA_WORD = "com.nickivy.ucscdining.widget.WORD";
     private PendingIntent service = null;
 
-    public static final int DINNER_SWITCH_TIME = 22, // 3 PM
+    public static final int DINNER_SWITCH_TIME = 15, // 3 PM
             LUNCH_SWITCH_TIME = 11, // 11 AM
             BREAKFAST_SWITCH_TIME = 0,// 12 AM
             BREAKFAST = 0,
@@ -40,39 +40,37 @@ public class MenuWidget extends AppWidgetProvider {
     private static final String CLICKTAG_COLLEGELEFT = "COLLEGE_LEFT",
     CLICKTAG_COLLEGERIGHT = "COLLEGE_RIGHT",
     CLICKTAG_MEALLEFT = "MEAL_LEFT",
-    CLICKTAG_MEALRIGHT = "MEAL_RIGHT";
+    CLICKTAG_MEALRIGHT = "MEAL_RIGHT",
+    TAG_TIMEUPDATE="time_update";
 
     public static int currentCollege = -1,
     currentMeal = -1;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        Log.v("ucscdining", "updating widget");
-
-        final AlarmManager m = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
-        final Calendar TIME = Calendar.getInstance();
-        TIME.set(Calendar.MINUTE, 0);
-        TIME.set(Calendar.SECOND, 0);
-        TIME.set(Calendar.MILLISECOND, 0);
-
-        final Intent timeIntent = new Intent(context, WidgetService.class);
-
-        if (service == null) {
-            service = PendingIntent.getService(context, 0, timeIntent,
-                    PendingIntent.FLAG_CANCEL_CURRENT);
-        }
-        // update every hour
-        m.setRepeating(AlarmManager.RTC, TIME.getTime().getTime(), AlarmManager.INTERVAL_FIFTEEN_MINUTES,
-                service);
-
-        // There may be multiple widgets active, so update all of them
-        // Above update timing will work for all widgets
         int N = appWidgetIds.length;
         for (int i = 0; i < N; i++) {
             updateAppWidget(context, appWidgetManager, appWidgetIds[i]);
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds);
+    }
+
+    @Override
+    public void onEnabled(Context context) {
+        final AlarmManager m = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        final Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        final Intent timeIntent = new Intent(context, MenuWidget.class);
+        timeIntent.setAction(TAG_TIMEUPDATE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, timeIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+
+        m.setRepeating(AlarmManager.RTC, calendar.getTime().getTime(), AlarmManager.INTERVAL_HOUR,
+                pendingIntent);
     }
 
     @Override
@@ -89,9 +87,6 @@ public class MenuWidget extends AppWidgetProvider {
         if (currentCollege < 0) {
             currentCollege = 0;
         }
-        if (currentMeal < 0) {
-            currentMeal = getCurrentMeal();
-        }
         new RetrieveMenuInWidgetTask(context, appWidgetManager, appWidgetId, today[0], today[1],
                 today[2], currentCollege).execute();
         // Actual setting of widget data is accomplished in the postexecute of the asynctask
@@ -102,7 +97,6 @@ public class MenuWidget extends AppWidgetProvider {
         private Context mContext;
         private AppWidgetManager mAppWidgetManager;
         private int mAppWidgetId, mMonth, mDay, mYear, mCollege;
-
 
         public RetrieveMenuInWidgetTask(Context context, AppWidgetManager appWidgetManager,
                 int appWidgetId, int month, int day, int year, int college) {
@@ -127,17 +121,36 @@ public class MenuWidget extends AppWidgetProvider {
         }
 
         protected void onPostExecute(Long result) {
-            Log.v("ucscdining", "postexecute");
+            RemoteViews widget = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
+            // Check if all dining halls are closed
+            boolean allClosed = true;
+            for (int i = 0; i < 5; i++) {
+                allClosed = !MenuParser.fullMenuObj.get(i).getIsOpen();
+                if (!allClosed) {
+                    break;
+                }
+            }
+            // If so display 'All Closed' and nothing else
+            if (allClosed) {
+                widget.setTextViewText(R.id.widget_collegename, "All Closed");
+                widget.setTextViewText(R.id.widget_mealname, "");
+                mAppWidgetManager.updateAppWidget(mAppWidgetId, widget);
+                return;
+            }
+            // If currentMeal uninitialized, initialize it here (this way we can check for brunch)
+            if (currentMeal < 0) {
+                currentMeal = getCurrentMeal();
+            }
             Intent svcIntent = new Intent(mContext, WidgetService.class);
             svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
             svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
 
-            RemoteViews widget = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
+            // Set adapter for listview
             widget.setRemoteAdapter(R.id.widget_list, svcIntent);
 
+            // Set view text of college and current meal
             widget.setTextViewText(R.id.widget_collegename, MenuParser.collegeList[mCollege]);
-            widget.setTextViewText(R.id.widget_mealname,
-                    MenuParser.meals[currentMeal]);
+            widget.setTextViewText(R.id.widget_mealname, MenuParser.meals[currentMeal]);
 
             // Set intents on all four buttons
             Intent intent = new Intent(mContext, MenuWidget.class);
@@ -161,11 +174,17 @@ public class MenuWidget extends AppWidgetProvider {
             widget.setOnClickPendingIntent(R.id.widget_mealname_rightbutton,
                     pendingIntent);
 
-
             mAppWidgetManager.updateAppWidget(mAppWidgetId, widget);
         }
     }
 
+    /**
+     * Gets meal based on time of day, based on times at top of file
+     *
+     * Will not return breakfast if brunch message is present
+     *
+     * @return return values are also enumerated at top of file
+     */
     public static int getCurrentMeal() {
         Calendar cal = Calendar.getInstance();
         if (cal.get(Calendar.HOUR_OF_DAY) >= DINNER_SWITCH_TIME) {
@@ -175,37 +194,78 @@ public class MenuWidget extends AppWidgetProvider {
             return LUNCH;
         }
         if(cal.get(Calendar.HOUR_OF_DAY) >= BREAKFAST_SWITCH_TIME) {
+            if (MenuParser.fullMenuObj.get(currentCollege).getBreakfast().size() > 0) {
+                if (MenuParser.fullMenuObj.get(currentCollege).getBreakfast().get(0)
+                        .equals(MenuParser.brunchMessage)) {
+                    return LUNCH;
+                }
+            }
             return BREAKFAST;
         }
         return -1;
     }
 
     public void onReceive(Context context, Intent intent) {
-        Log.v("ucscdining", "onreceive" + intent.getAction());
-        if (CLICKTAG_COLLEGELEFT.equals(intent.getAction())){
+        if (CLICKTAG_COLLEGELEFT.equals(intent.getAction())) {
             currentCollege--;
             if (currentCollege == -1) {
                 currentCollege = 4;
             }
+            /*
+             * If college is not open, cycle until find one that is. Only try five times
+             *
+             * All 5 closed is handled separately
+             */
+            if (!MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
+                for (int i = 0; i < 5; i++) {
+                    currentCollege--;
+                    if (currentCollege == -1) {
+                        currentCollege = 4;
+                    }
+                    if (MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
+                        break;
+                    }
+                }
+            }
         }
-        if (CLICKTAG_COLLEGERIGHT.equals(intent.getAction())){
+        if (CLICKTAG_COLLEGERIGHT.equals(intent.getAction())) {
             currentCollege++;
             if (currentCollege == 5) {
                 currentCollege = 0;
             }
+            /*
+             * If college is not open, cycle until find one that is. Only try five times
+             *
+             * All 5 closed is handled separately
+             */
+            if (!MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
+                for (int i = 0; i < 5; i++) {
+                    currentCollege++;
+                    if (currentCollege == 5) {
+                        currentCollege = 0;
+                    }
+                    if (MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
+                        break;
+                    }
+                }
+            }
         }
-        if (CLICKTAG_MEALLEFT.equals(intent.getAction())){
+        if (CLICKTAG_MEALLEFT.equals(intent.getAction())) {
             currentMeal--;
             if (currentMeal == -1) {
                 currentMeal = 2;
             }
         }
-        if (CLICKTAG_MEALRIGHT.equals(intent.getAction())){
+        if (CLICKTAG_MEALRIGHT.equals(intent.getAction())) {
             currentMeal++;
             if (currentMeal == 3) {
                 currentMeal = 0;
             }
         }
+        if (TAG_TIMEUPDATE.equals(intent.getAction())) {
+            currentMeal = getCurrentMeal();
+        }
+        // Trigger update
         ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
                 MenuWidget.class.getName());
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
