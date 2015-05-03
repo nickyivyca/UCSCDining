@@ -49,6 +49,7 @@ public class MenuWidget extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         int N = appWidgetIds.length;
+        setAlarm(context);
         for (int i = 0; i < N; i++) {
             updateAppWidget(context, appWidgetManager, appWidgetIds[i]);
         }
@@ -57,27 +58,80 @@ public class MenuWidget extends AppWidgetProvider {
 
     @Override
     public void onEnabled(Context context) {
-        final AlarmManager m = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        setAlarm(context);
+        super.onEnabled(context);
+    }
 
-        final Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-
+    /**
+     * Android can be idiotic sometimes and not call the onEnabled method, which means that if the
+     * alarm manager is set up in onEnabled, which would be the proper place to do it since it only
+     * needs to run once, it will not always be enabled. I've noticed that it will work the first
+     * time I install the app, but if I update the app the Alarm manager will not run. With this
+     * method we can call it from both onUpdate and onEnabled.
+     *
+     * However! AlarmManager is stupid. If you reset the alarm, it runs the alarm again in about
+     * a minute. This means that the alarm set to run every hour or every day runs every day. If you
+     * add two or three alarms they can start piling up on top of each other and triggering
+     * constantly. So we have to run checks to make sure that the alarm is not already set before
+     * resetting it. The PendingIntent.FLAG_UPDATE_CURRENT is supposed to take care of this, but it
+     * doesn't.
+     */
+    public void setAlarm(Context context) {
         final Intent timeIntent = new Intent(context, MenuWidget.class);
         timeIntent.setAction(TAG_TIMEUPDATE);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, timeIntent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
 
-        m.setRepeating(AlarmManager.RTC, calendar.getTime().getTime(), AlarmManager.INTERVAL_HOUR,
-                pendingIntent);
+        // If getBroadcast with the NO_CREATE flag returns null for all of these all alarms are set
+        // Don't reset them or else the alarm manager will run off with them
+        boolean alarmEnabled = (PendingIntent.getBroadcast(context, BREAKFAST_SWITCH_TIME,
+                timeIntent, PendingIntent.FLAG_NO_CREATE) != null) &&
+                (PendingIntent.getBroadcast(context, LUNCH_SWITCH_TIME,
+                        timeIntent, PendingIntent.FLAG_NO_CREATE) != null) &&
+                (PendingIntent.getBroadcast(context, DINNER_SWITCH_TIME,
+                        timeIntent, PendingIntent.FLAG_NO_CREATE) != null);
+        if (alarmEnabled) {
+            Log.v("ucscdining", "alarm already set");
+            return;
+        }
+
+        final AlarmManager m = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+
+        PendingIntent breakfastIntent = PendingIntent.getBroadcast(context, BREAKFAST_SWITCH_TIME,
+                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        calendar.set(Calendar.HOUR_OF_DAY, BREAKFAST_SWITCH_TIME);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(calendar.MILLISECOND, 0);
+        m.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, breakfastIntent);
+
+        PendingIntent lunchIntent = PendingIntent.getBroadcast(context, LUNCH_SWITCH_TIME,
+                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        calendar.set(Calendar.HOUR_OF_DAY, LUNCH_SWITCH_TIME);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(calendar.MILLISECOND, 0);
+        m.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, lunchIntent);
+
+        PendingIntent dinnerIntent = PendingIntent.getBroadcast(context, DINNER_SWITCH_TIME,
+                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        calendar.set(Calendar.HOUR_OF_DAY, DINNER_SWITCH_TIME);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(calendar.MILLISECOND, 0);
+        m.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, dinnerIntent);
+        Log.v("ucscdining", "alarm set");
     }
 
     @Override
     public void onDisabled(Context context) {
+        Log.v("ucscdining", "onDisabled");
         final AlarmManager m = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         m.cancel(service);
+        super.onDisabled(context);
     }
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
@@ -147,6 +201,7 @@ public class MenuWidget extends AppWidgetProvider {
 
             // Set adapter for listview
             widget.setRemoteAdapter(R.id.widget_list, svcIntent);
+            mAppWidgetManager.notifyAppWidgetViewDataChanged(mAppWidgetId, R.id.widget_list);
 
             // Set view text of college and current meal
             widget.setTextViewText(R.id.widget_collegename, MenuParser.collegeList[mCollege]);
@@ -208,7 +263,7 @@ public class MenuWidget extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         if (CLICKTAG_COLLEGELEFT.equals(intent.getAction())) {
             currentCollege--;
-            if (currentCollege == -1) {
+            if (currentCollege <= -1) {
                 currentCollege = 4;
             }
             /*
@@ -230,7 +285,7 @@ public class MenuWidget extends AppWidgetProvider {
         }
         if (CLICKTAG_COLLEGERIGHT.equals(intent.getAction())) {
             currentCollege++;
-            if (currentCollege == 5) {
+            if (currentCollege >= 5) {
                 currentCollege = 0;
             }
             /*
@@ -279,6 +334,7 @@ public class MenuWidget extends AppWidgetProvider {
             }
         }
         if (TAG_TIMEUPDATE.equals(intent.getAction())) {
+            Log.v("ucscdining", "timeupdate");
             currentMeal = getCurrentMeal();
         }
         // Trigger update
@@ -287,7 +343,6 @@ public class MenuWidget extends AppWidgetProvider {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
         onUpdate(context, appWidgetManager, appWidgetIds);
-        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_list);
         super.onReceive(context, intent);
     };
 }
