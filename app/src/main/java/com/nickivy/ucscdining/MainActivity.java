@@ -151,15 +151,16 @@ public class MainActivity extends ActionBarActivity{
 
            // Create a new instance of DatePickerDialog and return it
            // Default date to what is currently selected by user
-           return new DatePickerDialog(getActivity(), this, year, MealViewFragment.displayedMonth - 1, MealViewFragment.displayedDay);
-   		
+           return new DatePickerDialog(getActivity(), this, year,
+                   MealViewFragment.displayedMonth - 1, MealViewFragment.displayedDay);
     	}
 
 		@Override
 		public void onDateSet(android.widget.DatePicker view, int year,
 				int monthOfYear, int dayOfMonth) {
-			MealViewFragment meal = (MealViewFragment) getFragmentManager().findFragmentById(R.id.fragment_container);
-			meal.selectNewDate(monthOfYear + 1,  dayOfMonth,  year);				
+			MealViewFragment meal = (MealViewFragment)
+                    getFragmentManager().findFragmentById(R.id.fragment_container);
+			meal.selectNewDate(monthOfYear + 1,  dayOfMonth,  year);
 		}
    }
 

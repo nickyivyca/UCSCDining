@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
+ * RemoteViewsService for the UCSCDining Widget. This only handles the ListView.
  *
+ * @author Nick Ivy parkedraccoon@gmail.com
  */
 
 public class WidgetService extends RemoteViewsService {

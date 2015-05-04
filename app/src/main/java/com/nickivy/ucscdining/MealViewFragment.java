@@ -9,6 +9,7 @@ import com.example.android.common.view.SlidingTabLayout;
 import com.nickivy.ucscdining.parser.MealDataFetcher;
 import com.nickivy.ucscdining.parser.MealStorage;
 import com.nickivy.ucscdining.parser.MenuParser;
+import com.nickivy.ucscdining.widget.MenuWidget;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -130,11 +131,22 @@ public class MealViewFragment extends ListFragment{
 //		private int college;
 
         private int mYear;
+        private boolean mSetPage;
 
-        public RetrieveMenuInFragmentTask(int month, int day, int year) {
+        /**
+         * @param month Month of day to fetch
+         * @param day Day of day to fetch
+         * @param year Year of day to fetch
+         * @param setPage If upon finishing, the currently viewed page should be automatically
+         *                selected. This should be true when the user is freshly loading the app and
+         *                false when they are manually refreshing data or changing the date. Factors
+         *                such as dinner being the only meal available override this setting.
+         */
+        public RetrieveMenuInFragmentTask(int month, int day, int year, boolean setPage) {
             displayedMonth = month;
             displayedDay = day;
             mYear = year;
+            mSetPage = setPage;
         }
 		
 		@Override
@@ -150,6 +162,10 @@ public class MealViewFragment extends ListFragment{
 		
 		protected void onPostExecute(Long result){
             // Post-execute: set array adapters, reload animation, set title
+
+            if (mSetPage) {
+                mViewPager.setCurrentItem(MenuWidget.getCurrentMeal(collegeNum), false);
+            }
 
             // if all meals empty (dining hall closed), pop open nav drawer
             if(MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
@@ -171,10 +187,11 @@ public class MealViewFragment extends ListFragment{
 				mViewPager.setCurrentItem(1,false);
 			}
 
-			// If Lunch  and breakfast are empty automatically set tab to dinner
+			// If only dinner available, set to dinner
 			// (rare occurence, pretty much only on return from holidays)
 			if(MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
-                    MenuParser.fullMenuObj.get(collegeNum).getLunch().isEmpty()){
+                    MenuParser.fullMenuObj.get(collegeNum).getLunch().isEmpty() &&
+                    !MenuParser.fullMenuObj.get(collegeNum).getDinner().isEmpty()) {
 				mViewPager.setCurrentItem(2,false);
 			}
 			
@@ -278,7 +295,8 @@ public class MealViewFragment extends ListFragment{
                 	MenuParser.needsRefresh = true;
     				int[] today = getToday();
     				// When doing swipe refresh, reload to the same day as what is currently displayed
-        	    	new RetrieveMenuInFragmentTask(displayedMonth, displayedDay, today[2]).execute();
+        	    	new RetrieveMenuInFragmentTask(displayedMonth, displayedDay, today[2], false)
+                            .execute();
             	}
             });
             
@@ -300,7 +318,7 @@ public class MealViewFragment extends ListFragment{
 				mSwipeRefreshLayout.setRefreshing(true);
 				// Default loading to today
 				int[] today = getToday();
-    	    	new RetrieveMenuInFragmentTask(today[0], today[1], today[2]).execute();
+    	    	new RetrieveMenuInFragmentTask(today[0], today[1], today[2], true).execute();
     	    }
     		
     		
@@ -401,7 +419,7 @@ public class MealViewFragment extends ListFragment{
 			mSwipeRefreshLayout.setProgressViewOffset(false, -150, height / 800);
 			mSwipeRefreshLayout.setRefreshing(true);
 		}
-    	new RetrieveMenuInFragmentTask(month, day, year).execute();
+    	new RetrieveMenuInFragmentTask(month, day, year, false).execute();
 	}
 	
 	/**

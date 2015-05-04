@@ -83,12 +83,13 @@ public class CollegeMenu {
 	 * @return
 	 */
 	public boolean getIsOpen(){
-    	if(isSet){
-    		if(getBreakfast().isEmpty() && 	getLunch().isEmpty() && getDinner().isEmpty()){
-    			return false;
-    		}
+        //Log.v("ucscdining", "checking open: " getLunch)
+    	if(isSet) {
+            if (!getBreakfast().isEmpty() && !getLunch().isEmpty() && !getDinner().isEmpty()) {
+                return true;
+            }
     	}
-    	return true;
+    	return false;
 	}
 	
 	/**
@@ -97,7 +98,8 @@ public class CollegeMenu {
 	 * @return
 	 */
 	public boolean getIsCollegeNight(){
-    	if(isSet && getDinner().size() > 0 && getDinner().get(0).toLowerCase().contains("college night")){
+    	if(isSet && getDinner().size() > 0 &&
+                getDinner().get(0).toLowerCase().contains("college night")) {
     		return true;
     	}
     	return false;

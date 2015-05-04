@@ -37,16 +37,7 @@ public class MenuParser {
     	"Lunch",
     	"Dinner"
     };
-    
-    public static final String[] URLList = {
-    	"http://nutrition.sa.ucsc.edu/menuSamp.asp?locationNum=05&locationName=Cowell&sName=&naFlag=",
-    	"http://nutrition.sa.ucsc.edu/menuSamp.asp?locationNum=20&locationName=Crown+Merrill&sName=&naFlag=",
-    	"http://nutrition.sa.ucsc.edu/menuSamp.asp?locationNum=25&locationName=Porter&sName=&naFlag=",
-    	"http://nutrition.sa.ucsc.edu/menuSamp.asp?locationNum=30&locationName=College+Eight&sName=&naFlag=",
-    	"http://nutrition.sa.ucsc.edu/menuSamp.asp?locationNum=40&locationName=College+Nine+%26+Ten&sName=&naFlag="
-    };
 
-    
     public static final String dateURLPart1 = "http://nutrition.sa.ucsc.edu/menuSamp.asp?myaction=read&sName=&dtdate=";
     
     public static final String[] datedURLListParts2 = {
@@ -56,11 +47,7 @@ public class MenuParser {
     	"&locationNum=30&locationName=College+Eight&sName=&naFlag=1",
     	"&locationNum=40&locationName=College+Nine+%26+Ten&sName=&naFlag=1"
     };
-    
-    //4%2F24%2F2015
-    		
-//    public static final String cowellDateURLPart2 = "&locationNum=05&locationName=%20Cowell&naFlag=1";
-    
+
     public static final String brunchMessage = "See lunch for today\'s brunch menu";
     
     public static boolean needsRefresh = false;
@@ -82,16 +69,12 @@ public class MenuParser {
     	Elements names = null;
     	try{
     		reloadTries++;
-    		doc = Jsoup.connect(dateURLPart1 + month + "%2F" + day + "%2F" + year + datedURLListParts2[k]).get();
-    		
-    		
-//    		Log.v("ucscdining", "Reloadtries: " + reloadTries);
+    		doc = Jsoup.connect(dateURLPart1 + month + "%2F" + day + "%2F" + year +
+                    datedURLListParts2[k]).get();
 	
 			names = doc.select("td[valign=\"top\"]");
     	} catch (IOException e) {
     		Log.w("ucscdining","Unable to download dining menu");
-//    		Log.v("ucscdining", "Reloadtries: " + reloadTries);
-    		//needsRefresh = true;
     		e.printStackTrace();
     		failed = true;
     	}
@@ -100,6 +83,7 @@ public class MenuParser {
 		 * In order to defeat an okhttp error, recurse
 		 */
 		if(failed && (reloadTries < maxReloads)){
+            failed = false;
 			getSingleMealList(k, month, day, year);
 		}
 		if (reloadTries >= maxReloads) {
@@ -111,8 +95,7 @@ public class MenuParser {
 				dinnerList = new ArrayList<String>();
 	
 		//Catch if the dining hall is closed for that day
-		if(names.size() > 0){
-//			Log.v("ucscdining",collegeList[k] + names.get(0).text());
+		if(names != null && names.size() > 0){
 			for(int j = 0; j < names.size(); j++){
 				//Breakfast
 				if(names.get(j).text().contains("Breakfast")){
@@ -139,7 +122,7 @@ public class MenuParser {
 				}
 			}
 		}else{
-			Log.w("ucscdining","array list empty!");
+			//Log.w("ucscdining","array list empty!");
 		}
 
 		fullMenuObj.get(k).setBreakfast(breakfastList);
@@ -157,14 +140,6 @@ public class MenuParser {
 		}
 
 	}
-    
-/*    public static void getMealList() {
-    	for(int i = 0; i < 5; i++){
-    		reloadTries = 0;
-    		failed = false;
-    		getSingleMealList(i);
-    	}
-    }*/
     
     /**
      * Puts downloaded data from specified date (instead of today) into the full menu object.
