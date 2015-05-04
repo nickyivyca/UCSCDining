@@ -7,6 +7,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -214,7 +215,17 @@ public class MenuWidget extends AppWidgetProvider {
 
             // Set view text of college and current meal
             widget.setTextViewText(R.id.widget_collegename, MenuParser.collegeList[mCollege]);
-            widget.setTextViewText(R.id.widget_mealname, MenuParser.meals[currentMeal]);
+            if (MenuParser.fullMenuObj.get(mCollege).getIsCollegeNight()) {
+                widget.setTextColor(R.id.widget_collegename, Color.BLUE);
+            } else if (MenuParser.fullMenuObj.get(mCollege).getIsFarmFriday() ||
+                    MenuParser.fullMenuObj.get(mCollege).getIsHealthyMonday()) {
+                // 'Green Apple'
+                widget.setTextColor(R.id.widget_collegename, Color.rgb(0x4C, 0xC5, 0x52));
+            } else {
+                widget.setTextColor(R.id.widget_collegename, Color.BLACK);
+            }
+            widget.setTextViewText(R.id.widget_mealname, mMonth + "/" + mDay + " " +
+                    MenuParser.meals[currentMeal]);
 
             // Set intents on all four buttons
             Intent intent = new Intent(mContext, MenuWidget.class);
