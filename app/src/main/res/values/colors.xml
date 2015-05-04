@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="button_released">#eeeeee</color>
+    <color name="button_pressed">#cccccc</color>
+</resources>

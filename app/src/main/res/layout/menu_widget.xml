@@ -9,7 +9,7 @@
         android:layout_width="50dp"
         android:layout_height="match_parent"
         android:src="@drawable/ic_arrow_left_grey600_24dp"
-        android:background="#eeeeee"/>
+        android:background="@drawable/arrow_background"/>
     <TextView android:id="@+id/widget_collegename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
         android:layout_width="50dp"
         android:layout_height="fill_parent"
         android:src="@drawable/ic_arrow_right_grey600_24dp"
-        android:background="#eeeeee"/>
+        android:background="@drawable/arrow_background"/>
     <LinearLayout
         android:id="@id/widget_collegename_divider"
         android:layout_below="@id/widget_collegename"
@@ -40,7 +40,7 @@
         android:layout_width="50dp"
         android:layout_height="match_parent"
         android:src="@drawable/ic_arrow_left_grey600_24dp"
-        android:background="#eeeeee"/>
+        android:background="@drawable/arrow_background"/>
     <TextView android:id="@+id/widget_mealname"
         android:layout_below="@id/widget_collegename_divider"
         android:layout_centerInParent="true"
@@ -58,7 +58,7 @@
         android:layout_width="50dp"
         android:layout_height="fill_parent"
         android:src="@drawable/ic_arrow_right_grey600_24dp"
-        android:background="#eeeeee"/>
+        android:background="@drawable/arrow_background"/>
     <LinearLayout
         android:id="@+id/widget_mealname_divider"
         android:layout_below="@id/widget_mealname"

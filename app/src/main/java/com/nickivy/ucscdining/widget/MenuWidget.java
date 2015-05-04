@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ImageButton;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -226,6 +227,7 @@ public class MenuWidget extends AppWidgetProvider {
             }
             widget.setTextViewText(R.id.widget_mealname, mMonth + "/" + mDay + " " +
                     MenuParser.meals[currentMeal]);
+            //widget.setInt(R.id.widget_college_leftbutton, "setBackgroundColor", Color.BLUE);
 
             // Set intents on all four buttons
             Intent intent = new Intent(mContext, MenuWidget.class);
