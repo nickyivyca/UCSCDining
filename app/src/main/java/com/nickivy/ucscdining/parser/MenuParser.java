@@ -8,8 +8,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import com.nickivy.ucscdining.R;
 import com.nickivy.ucscdining.util.CollegeMenu;
+import com.nickivy.ucscdining.util.Util;
 
 import android.util.Log;
 
@@ -20,47 +20,26 @@ import android.util.Log;
  * CollegeMenu objects. 
  * 
  * @author Nick Ivy parkedraccoon@gmail.com
- *
  */
 
 public class MenuParser {
-    
-    public static final String[] collegeList = {
-    	"Cowell/Stevenson",
-    	"Crown/Merrill",
-    	"Porter/Kresge",
-    	"Eight/Oakes",
-    	"Nine/Ten"
-    };
-    
-    public static final String[] meals = {
-    	"Breakfast",
-    	"Lunch",
-    	"Dinner"
-    };
 
-    public static final String dateURLPart1 = "http://nutrition.sa.ucsc.edu/menuSamp.asp?myaction=read&sName=&dtdate=";
+    private static final String dateURLPart1 = "http://nutrition.sa.ucsc.edu/menuSamp.asp?" +
+            "myaction=read&sName=&dtdate=";
     
-    public static final String[] datedURLListParts2 = {
+    private static final String[] datedURLListParts2 = {
     	"&locationNum=05&locationName=%20Cowell&naFlag=1",
     	"&locationNum=20&locationName=Crown+Merrill&sName=&naFlag=1",
     	"&locationNum=25&locationName=Porter&sName=&naFlag=1",
     	"&locationNum=30&locationName=College+Eight&sName=&naFlag=1",
     	"&locationNum=40&locationName=College+Nine+%26+Ten&sName=&naFlag=1"
     };
-
-    public static final String brunchMessage = "See lunch for today\'s brunch menu";
     
-    public static boolean needsRefresh = false;
+    public static boolean manualRefresh = false;
     
     private final static int maxReloads = 3;
     private static int reloadTries = 0;
     private static boolean failed = false;
-
-    public static final int GETLIST_SUCCESS = 1,
-    GETLIST_INTERNET_FAILURE = 0,
-    GETLIST_FAILURE = -1;
-
     
     public static ArrayList<CollegeMenu> fullMenuObj = new ArrayList<CollegeMenu>(){{
     	add(new CollegeMenu());
@@ -71,7 +50,7 @@ public class MenuParser {
     }};
     
     public static int getSingleMealList(int k, int month, int day, int year){
-    	Document doc = null;
+    	Document doc;
     	Elements names = null;
     	try{
     		reloadTries++;
@@ -82,7 +61,7 @@ public class MenuParser {
     	} catch (UnknownHostException e) {
             Log.v("ucscdining", "Internet connection missing");
             e.printStackTrace();
-            return GETLIST_INTERNET_FAILURE;
+            return Util.GETLIST_INTERNET_FAILURE;
         } catch (IOException e) {
     		Log.w("ucscdining","Unable to download dining menu");
     		e.printStackTrace();
@@ -97,7 +76,7 @@ public class MenuParser {
 			getSingleMealList(k, month, day, year);
 		}
 		if (reloadTries >= maxReloads) {
-			return GETLIST_FAILURE;
+			return Util.GETLIST_DATABASE_FAILURE;
 		}
 	
 		ArrayList<String> breakfastList = new ArrayList<String>(),
@@ -131,9 +110,9 @@ public class MenuParser {
 					}
 				}
 			}
-		}else{
-			//Log.w("ucscdining","array list empty!");
-		}
+		}/*else{
+			Log.w("ucscdining","array list empty!");
+		}*/
 
 		fullMenuObj.get(k).setBreakfast(breakfastList);
 		fullMenuObj.get(k).setLunch(lunchList);
@@ -143,19 +122,17 @@ public class MenuParser {
 		 *  If empty breakfast and not empty lunch or dinner, set brunch message
 		 */
 		if(fullMenuObj.get(k).getBreakfast().isEmpty() && 
-				(!(fullMenuObj.get(k).getLunch().isEmpty()) || !(fullMenuObj.get(k).getDinner().isEmpty()))){
+				(!(fullMenuObj.get(k).getLunch().isEmpty()) ||
+                        !(fullMenuObj.get(k).getDinner().isEmpty()))){
 			ArrayList<String> breakfastMessage = new ArrayList<String>();
-			breakfastMessage.add(brunchMessage);
+			breakfastMessage.add(Util.brunchMessage);
 			fullMenuObj.get(k).setBreakfast(breakfastMessage);
 		}
-        return GETLIST_SUCCESS;
+        return Util.GETLIST_SUCCESS;
 	}
     
     /**
      * Puts downloaded data from specified date (instead of today) into the full menu object.
-     * @param day
-     * @param month
-     * @param year
      */
     public static int getMealList(int month, int day, int year) {
         int res;
@@ -163,10 +140,10 @@ public class MenuParser {
     		reloadTries = 0;
     		failed = false;
     		res = getSingleMealList(i, month, day, year);
-            if (res != GETLIST_SUCCESS) {
+            if (res != Util.GETLIST_SUCCESS) {
                 return res;
             }
     	}
-        return GETLIST_SUCCESS;
+        return Util.GETLIST_SUCCESS;
     }
 }

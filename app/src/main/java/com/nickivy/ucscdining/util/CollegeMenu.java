@@ -2,8 +2,6 @@ package com.nickivy.ucscdining.util;
 
 import java.util.ArrayList;
 
-import android.util.Log;
-
 /**
  * College menu object. Keeps things organized,
  * as I would end up using 3-dimensional arraylists otherwise.
@@ -46,30 +44,26 @@ public class CollegeMenu {
 		if(mBreakfast != null && mBreakfast.size() > 0){
 			return mBreakfast;
 		}
-		ArrayList<String> ret = new ArrayList<String>();
-		return ret;
+		return new ArrayList<String>();
 	}
 	
 	public ArrayList<String> getLunch(){
 		if(mLunch != null && mLunch.size() > 0){
 			return mLunch;
 		}
-		ArrayList<String> ret = new ArrayList<String>();
-		return ret;
+		return new ArrayList<String>();
 	}
 	
 	public ArrayList<String> getDinner(){
 		if(mDinner != null && mDinner.size() > 0){
 			return mDinner;
 		}
-		ArrayList<String> ret = new ArrayList<String>();
-		return ret;
+		return new ArrayList<String>();
 	}
 	
 	/**
 	 * Get if data has been written to the 
 	 * object at all
-	 * @return
 	 */
 	public boolean getIsSet(){
 		return isSet;
@@ -80,10 +74,8 @@ public class CollegeMenu {
 	 * Get if the dining hall is open
 	 * 
 	 * <p>At this point assume open if nothing has been loaded
-	 * @return
 	 */
 	public boolean getIsOpen(){
-        //Log.v("ucscdining", "checking open: " getLunch)
     	if(isSet) {
             if (!getBreakfast().isEmpty() && !getLunch().isEmpty() && !getDinner().isEmpty()) {
                 return true;
@@ -93,17 +85,13 @@ public class CollegeMenu {
 	}
 	
 	/**
-	 * If the first entry in Dinner is
-	 * "College Night" then it's a college night	
-	 * @return
+	 * @return If the first entry in Dinner contains "college night" (case insensitive) then it's
+     * college night
 	 */
 	public boolean getIsCollegeNight(){
-    	if(isSet && getDinner().size() > 0 &&
-                getDinner().get(0).toLowerCase().contains("college night")) {
-    		return true;
-    	}
-    	return false;
-	}
+        return isSet && getDinner().size() > 0 &&
+                getDinner().get(0).toLowerCase().contains("college night");
+    }
 	
 	/**
 	 * @return If first entry in dinner or lunch is "Healthy Mondays"

@@ -14,8 +14,7 @@ public class MealStorage extends SQLiteOpenHelper{
 		  COLUMN_COLLEGE = "college",
 		  COLUMN_MONTH = "month",
 		  COLUMN_DAY = "day",
-		  COLUMN_YEAR = "year",
-		  COLUMN_NULLABLE = "nullcolumn";
+		  COLUMN_YEAR = "year";
 
   private static final String DATABASE_NAME = "menu.db";
   private static final int DATABASE_VERSION = 1;

@@ -1,14 +1,12 @@
 package com.nickivy.ucscdining;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import com.example.android.common.view.SlidingTabLayout;
 import com.nickivy.ucscdining.parser.MealDataFetcher;
 import com.nickivy.ucscdining.parser.MenuParser;
-import com.nickivy.ucscdining.widget.MenuWidget;
+import com.nickivy.ucscdining.util.Util;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -20,7 +18,6 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -43,13 +40,12 @@ public class MealViewFragment extends ListFragment{
 	
 	final static String ARG_COLLEGE_NUMBER = "college_number";
 	
-	public static final int LISTVIEW_ID1 = 12,
+	private static final int LISTVIEW_ID1 = 12,
 			LISTVIEW_ID2 = 13,
 			LISTVIEW_ID3 = 14,
 			SWIPEREF_ID1 = 15,
 			SWIPEREF_ID2 = 16,
 			SWIPEREF_ID3 = 17;
-
 	
 	private SwipeRefreshLayout mSwipeRefreshLayout;
 	private ViewPager mViewPager;
@@ -60,16 +56,18 @@ public class MealViewFragment extends ListFragment{
 	
 	private static int collegeNum = 0;
 	
-	public static int displayedMonth = 0;
-	public static int displayedDay = 0;
+	public static int displayedMonth = 0,
+            displayedDay = 0;
 	
-	private boolean refreshStarted = false;
+	//private boolean refreshStarted = false;
+
+    private RetrieveMenuInFragmentTask task;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState){
 		collegeNum = getArguments().getInt(ARG_COLLEGE_NUMBER);
-        getActivity().setTitle(MenuParser.collegeList[collegeNum]);
+        getActivity().setTitle(Util.collegeList[collegeNum]);
     	
 		return inflater.inflate(R.layout.pager_fragment, container, false);
 	}
@@ -87,26 +85,30 @@ public class MealViewFragment extends ListFragment{
     	if(MenuParser.fullMenuObj.get(position).getIsOpen()){
     		if(MenuParser.fullMenuObj.get(position).getIsSet()){    			
     			// Set title to include date
-    	        getActivity().setTitle(MenuParser.collegeList[position] + " " + displayedMonth + "/" + displayedDay);
+    	        getActivity().setTitle(Util.collegeList[position] + " " + displayedMonth + "/" +
+                        displayedDay);
 
     	        mMealList = (ListView) getActivity().findViewById(MealViewFragment.LISTVIEW_ID1);    		
         		ArrayList<String> testedArray = new ArrayList<String>();
         		testedArray = MenuParser.fullMenuObj.get(position).getBreakfast();
         		if (testedArray != null && mMealList != null){
-        			mMealList.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
+        			mMealList.setAdapter(new ArrayAdapter<String>(getActivity(),
+                            android.R.layout.simple_list_item_1,
         					MenuParser.fullMenuObj.get(position).getBreakfast()));
         		}
         		mMealList = (ListView) getActivity().findViewById(MealViewFragment.LISTVIEW_ID2);
         		testedArray = MenuParser.fullMenuObj.get(position).getLunch();
         		if (testedArray != null && mMealList != null){
-        			mMealList.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
+        			mMealList.setAdapter(new ArrayAdapter<String>(getActivity(),
+                            android.R.layout.simple_list_item_1,
         					MenuParser.fullMenuObj.get(position).getLunch()));
         		}
         		mMealList = (ListView) getActivity().findViewById(MealViewFragment.LISTVIEW_ID3);
         		testedArray = MenuParser.fullMenuObj.get(position).getDinner();
         		if (testedArray != null && mMealList != null){
-        			mMealList.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
-        				MenuParser.fullMenuObj.get(position).getDinner()));
+        			mMealList.setAdapter(new ArrayAdapter<String>(getActivity(),
+                            android.R.layout.simple_list_item_1,
+        				    MenuParser.fullMenuObj.get(position).getDinner()));
         		}
     		}
 
@@ -117,14 +119,13 @@ public class MealViewFragment extends ListFragment{
     		mDrawerList.setItemChecked(position, true);
     		mDrawerLayout.closeDrawer(mDrawerList);
     	}else{
-    		Toast.makeText(getActivity(), MenuParser.collegeList[position] + " dining hall closed today!", Toast.LENGTH_SHORT).show();
+    		Toast.makeText(getActivity(), Util.collegeList[position] + " dining hall closed today!",
+                    Toast.LENGTH_SHORT).show();
     	}
     }
 	
 	@SuppressWarnings("ResourceType")
     private class RetrieveMenuInFragmentTask extends AsyncTask<Void, Void, Long>{
-		
-//		private int college;
 
         private int mYear;
         private boolean mSetPage;
@@ -147,7 +148,6 @@ public class MealViewFragment extends ListFragment{
 		
 		@Override
 		protected void onPreExecute(){
-			refreshStarted = true;
 		}
 
 		@Override
@@ -194,8 +194,8 @@ public class MealViewFragment extends ListFragment{
              * We want the spinners canceled no matter what, but all the other stuff should not
              * be changed in the case of a data load failure
              */
-            if (!result.equals(new Double(MenuParser.GETLIST_SUCCESS).longValue())) {
-                if (result.equals(new Double(MenuParser.GETLIST_FAILURE).longValue())) {
+            if (!result.equals(new Double(Util.GETLIST_SUCCESS).longValue())) {
+                if (result.equals(new Double(Util.GETLIST_DATABASE_FAILURE).longValue())) {
                     Toast.makeText(getActivity(), getString(R.string.database_failed),
                             Toast.LENGTH_SHORT).show();
                 } else {
@@ -206,7 +206,7 @@ public class MealViewFragment extends ListFragment{
             }
 
             if (mSetPage) {
-                mViewPager.setCurrentItem(MenuWidget.getCurrentMeal(collegeNum), false);
+                mViewPager.setCurrentItem(Util.getCurrentMeal(collegeNum), false);
             }
 
             // if all meals empty (dining hall closed), pop open nav drawer
@@ -225,7 +225,7 @@ public class MealViewFragment extends ListFragment{
 			if(!MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
                     mViewPager.getCurrentItem() == 0 &&
 					MenuParser.fullMenuObj.get(collegeNum).getBreakfast().get(0)
-                            .equals(MenuParser.brunchMessage)){
+                            .equals(Util.brunchMessage)){
 				mViewPager.setCurrentItem(1,false);
 			}
 
@@ -240,9 +240,9 @@ public class MealViewFragment extends ListFragment{
 			mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
 			
 			mDrawerList.setAdapter(new ColorAdapter(getActivity(),
-					R.layout.drawer_list_item, MenuParser.collegeList));
+					R.layout.drawer_list_item, Util.collegeList));
 
-			MenuParser.needsRefresh= false;
+			MenuParser.manualRefresh = false;
 			ListView listView = (ListView) getActivity().findViewById(LISTVIEW_ID1);
 			if(listView != null){
 				listView.setAdapter(new ArrayAdapter<String>(getActivity(),
@@ -263,7 +263,11 @@ public class MealViewFragment extends ListFragment{
 			}
 
 			// Set title to include date
-	        getActivity().setTitle(MenuParser.collegeList[collegeNum] + " " + displayedMonth + "/" + displayedDay);
+	        getActivity().setTitle(Util.collegeList[collegeNum] + " " + displayedMonth + "/" +
+                    displayedDay);
+
+            // For keeping track and only allowing one Asynctask to run at once
+            task = null;
 		}
 		
 	}
@@ -282,7 +286,7 @@ public class MealViewFragment extends ListFragment{
         
         @Override
         public CharSequence getPageTitle(int position) {
-            return MenuParser.meals[position];
+            return Util.meals[position];
         }
         
         @Override
@@ -306,11 +310,14 @@ public class MealViewFragment extends ListFragment{
             mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
-                	MenuParser.needsRefresh = true;
-    				int[] today = getToday();
-    				// When doing swipe refresh, reload to the same day as what is currently displayed
-        	    	new RetrieveMenuInFragmentTask(displayedMonth, displayedDay, today[2], false)
-                            .execute();
+                	MenuParser.manualRefresh = true;
+    				int[] today = Util.getToday();
+    				// When doing swipe refresh, reload to the displayed day
+                    if (task == null) {
+                        task = new RetrieveMenuInFragmentTask(displayedMonth, displayedDay,
+                                today[2], false);
+                        task.execute();
+                    }
             	}
             });
             
@@ -322,45 +329,47 @@ public class MealViewFragment extends ListFragment{
              * no proper way to manually trigger the reload animation. So
              * we're stuck doing it in a hacky way.
              */
-    		if(!refreshStarted){
-    			Display display = getActivity().getWindowManager().getDefaultDisplay();
-	            Point size = new Point();
-	            display.getSize(size);
-	            int height = size.y;
-	            // manually try to recreate where the spinner ends up in a normal swipe
-	            mSwipeRefreshLayout.setProgressViewOffset(false, -50, height / 800);
-				mSwipeRefreshLayout.setRefreshing(true);
-				// Default loading to today
-				int[] today = getToday();
-    	    	new RetrieveMenuInFragmentTask(today[0], today[1], today[2], true).execute();
-    	    }
-    		
+            if (task == null) {
+                Display display = getActivity().getWindowManager().getDefaultDisplay();
+                Point size = new Point();
+                display.getSize(size);
+                int height = size.y;
+                // manually try to recreate where the spinner ends up in a normal swipe
+                mSwipeRefreshLayout.setProgressViewOffset(false, -50, height / 800);
+                mSwipeRefreshLayout.setRefreshing(true);
+                // Default loading to today
+                int[] today = Util.getToday();
+                task = new RetrieveMenuInFragmentTask(today[0], today[1], today[2], true);
+                task.execute();
+            }
     		
     		ArrayList<String> testedArray = new ArrayList<String>();
         	switch(mealnum){
         	case 0:
         		testedArray = MenuParser.fullMenuObj.get(collegeNum).getBreakfast();
         		if (testedArray != null){
-        			mealList.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
+        			mealList.setAdapter(new ArrayAdapter<String>(getActivity(),
+                            android.R.layout.simple_list_item_1,
         					MenuParser.fullMenuObj.get(collegeNum).getBreakfast()));
         		}
         		break;
         	case 1:
         		testedArray = MenuParser.fullMenuObj.get(collegeNum).getLunch();
         		if (testedArray != null){
-        			mealList.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
+        			mealList.setAdapter(new ArrayAdapter<String>(getActivity(),
+                            android.R.layout.simple_list_item_1,
         					MenuParser.fullMenuObj.get(collegeNum).getLunch()));
         		}
         		break;
         	case 2:
         		testedArray = MenuParser.fullMenuObj.get(collegeNum).getDinner();
         		if (testedArray != null){
-        			mealList.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1,
+        			mealList.setAdapter(new ArrayAdapter<String>(getActivity(),
+                            android.R.layout.simple_list_item_1,
         				MenuParser.fullMenuObj.get(collegeNum).getDinner()));
         		}
         		break;
         	default:
-        		Log.v("ucscdining","We have a problem");
         	}
             return view;
         }
@@ -368,7 +377,6 @@ public class MealViewFragment extends ListFragment{
         public void destroyItem(ViewGroup container, int position, Object object) {
             container.removeView((View) object);
         }
-
     }
 	
 
@@ -432,24 +440,10 @@ public class MealViewFragment extends ListFragment{
 			mSwipeRefreshLayout.setProgressViewOffset(false, -150, height / 800);
 			mSwipeRefreshLayout.setRefreshing(true);
 		}
-    	new RetrieveMenuInFragmentTask(month, day, year, false).execute();
-	}
-	
-	/**
-	 * Returns today's date as a 3-number int array. [month, day, year]
-	 */
-	public static int[] getToday() {
-		Date today = new Date();
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(today);
-		
-		int month = cal.get(Calendar.MONTH) + 1;
-		int day = cal.get(Calendar.DAY_OF_MONTH);
-		int year = cal.get(Calendar.YEAR);
-		
-		int ret[] = {month, day, year};
-		return ret;
-		
+        if (task == null) {
+            task = new RetrieveMenuInFragmentTask(month, day, year, false);
+            task.execute();
+        }
 	}
     
 }

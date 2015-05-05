@@ -6,6 +6,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -13,7 +14,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,29 +21,21 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import com.nickivy.ucscdining.R;
-import com.nickivy.ucscdining.MealViewFragment;
 import com.nickivy.ucscdining.parser.MenuParser;
+import com.nickivy.ucscdining.util.Util;
 
 /**
  * App for viewing UCSC dining menus. Currently can 
  * read all menus, display them based on time, with special colors displayed 
  * for events such as College Nights, Healthy Mondays, or Farm Fridays.
- * 
- * <p>Will eventually allow the user to fast forward to see planned menus for
- * days in the future.
- * 
- * <p>TODO: smart refresh
+ *
  * <p>TODO: tablet layout (display all 3 meals at once)
  *
  * @author Nick Ivy parkedraccoon@gmail.com
  */
 
 public class MainActivity extends ActionBarActivity{
-	
-	static final int ITEMS = 3;
-	
+
 	private ListView mDrawerList;
 	private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -71,7 +63,7 @@ public class MainActivity extends ActionBarActivity{
 
 	        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 			mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-					R.layout.drawer_list_item, MenuParser.collegeList));
+					R.layout.drawer_list_item, Util.collegeList));
 			
 	        mActionBar.setDisplayHomeAsUpEnabled(true);
 	        mActionBar.setHomeButtonEnabled(true);	        
@@ -113,7 +105,6 @@ public class MainActivity extends ActionBarActivity{
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//            selectItem(position);
         	fragment.selectItem(position);
         }
     }
@@ -132,19 +123,18 @@ public class MainActivity extends ActionBarActivity{
        }
        switch(item.getItemId()) {
        	case R.id.action_select_date:
-//       		Toast.makeText(this, "Date setter opened", Toast.LENGTH_SHORT).show();
        		DialogFragment newFragment = new DatePicker();
        	    newFragment.show(getSupportFragmentManager(), "datePicker");
-       		default:
-       	       return super.onOptionsItemSelected(item);
+        default:
+           return super.onOptionsItemSelected(item);
        }
-//       return super.onOptionsItemSelected(item);
    }
     
-    public static class DatePicker extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+    public static class DatePicker extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
    	
     	@Override
-   		public Dialog onCreateDialog(Bundle savedInstanceState) {
+   		public Dialog onCreateDialog(@NonNull Bundle savedInstanceState) {
            // Use the current date as the default date in the picker
            final Calendar c = Calendar.getInstance();
            int year = c.get(Calendar.YEAR);

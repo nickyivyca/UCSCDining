@@ -1,13 +1,12 @@
 package com.nickivy.ucscdining.parser;
 
-import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
-import com.nickivy.ucscdining.MealViewFragment;
+import com.nickivy.ucscdining.util.Util;
 
 import java.util.ArrayList;
 
@@ -25,8 +24,8 @@ public class MealDataFetcher {
 
         db = mealStore.getReadableDatabase();
 
-        String selection = MealStorage.COLUMN_MONTH + "= ? AND " + MealStorage.COLUMN_DAY + "= ? AND "
-                + MealStorage.COLUMN_YEAR + "= ?";
+        String selection = MealStorage.COLUMN_MONTH + "= ? AND " + MealStorage.COLUMN_DAY +
+                "= ? AND " + MealStorage.COLUMN_YEAR + "= ?";
         String[] selectionArgs = new String[3];
 
         selectionArgs[0] = "" + month;
@@ -45,41 +44,45 @@ public class MealDataFetcher {
         boolean cexists = (c.getCount() == 0);
         c.close();
         db.close();
-        // If data for today does not exist, or manual refresh is requested, load data from web and store it
-        if(cexists || MenuParser.needsRefresh){
+        // If data for today does not exist, or manual refresh is requested, download/store data
+        if(cexists || MenuParser.manualRefresh){
             int res = MenuParser.getMealList(month, day, year);
-            if (res != MenuParser.GETLIST_SUCCESS) {
+            if (res != Util.GETLIST_SUCCESS) {
                 return res;
             }
 
             db = mealStore.getWritableDatabase();
 
-				/*
-				 * Delete data from today and before, requires a couple different sql commands
-				 * Note: today, not date the retrieve menu task was called with
-				 *
-				 * if:
-				 * month is less than, year equal
-				 * year less than current year
-				 * day < current, year + month equal
-				 * if manual refresh (MenuParser.needsRefresh true), delete all (assume database got messed up somehow)
-				 */
+            /*
+             * Delete data from today and before, requires a couple different sql commands
+             * Note: today, not date the retrieve menu task was called with
+             *
+             * if:
+             * month is less than, year equal
+             * year less than current year
+             * day < current, year + month equal
+             * if manual refresh (MenuParser.manualRefresh true), delete all
+             *  (assume database got messed up somehow)
+             */
 
-            int today[] = MealViewFragment.getToday();
+            int today[] = Util.getToday();
 
-            if (MenuParser.needsRefresh) {
+            if (MenuParser.manualRefresh) {
                 db.delete(MealStorage.TABLE_MEALS, null,null);
             } else {
-                db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_MONTH + "<? AND " + MealStorage.COLUMN_YEAR + " =?",
+                db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_MONTH + "<? AND " +
+                        MealStorage.COLUMN_YEAR + " =?",
                         new String[] {"" + today[0], "" + today[2]});
 
-                db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_YEAR + " <?", new String[] {"" + today[2]});
+                db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_YEAR + " <?",
+                        new String[] {"" + today[2]});
 
-                db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_MONTH + "=? AND " + MealStorage.COLUMN_DAY + "<? AND " +
-                        MealStorage.COLUMN_YEAR + " =?", new String[] {"" + today[0], "" + today[1], "" + today[2]});
+                db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_MONTH + "=? AND " +
+                        MealStorage.COLUMN_DAY + "<? AND " + MealStorage.COLUMN_YEAR + " =?",
+                        new String[] {"" + today[0], "" + today[1], "" + today[2]});
             }
 
-            // We need to write at the end of the table - so find size and offset first column by that much
+            // We need to write at the end of the table - so find size and offset first column
             String countQuery = "SELECT * FROM " + MealStorage.TABLE_MEALS;
             Cursor cursor = db.rawQuery(countQuery, null);
             int offset = cursor.getCount();
@@ -87,7 +90,8 @@ public class MealDataFetcher {
 
             // Begin writing data
 
-            SQLiteStatement statement = db.compileStatement("INSERT INTO "+ MealStorage.TABLE_MEALS +" VALUES (?,?,?,?,?,?,?);");
+            SQLiteStatement statement = db.compileStatement("INSERT INTO "+
+                    MealStorage.TABLE_MEALS +" VALUES (?,?,?,?,?,?,?);");
 
             // Using sqlite statement keeps the database 'open' and apparently is a bit faster
             db.beginTransaction();
@@ -101,22 +105,25 @@ public class MealDataFetcher {
 
                 statement.clearBindings();
                 for (int i = 0; i < MenuParser.fullMenuObj.get(j).getBreakfast().size(); i++) {
-                    statement.bindLong(1, offset + i + accumulatedBreakfast + accumulatedLunch + accumulatedDinner);
+                    statement.bindLong(1, offset + i + accumulatedBreakfast + accumulatedLunch +
+                            accumulatedDinner);
                     statement.bindLong(2,j);
                     statement.bindLong(3, 0);
                     statement.bindString(4, MenuParser.fullMenuObj.get(j).getBreakfast().get(i));
                     statement.bindLong(5, month);
                     statement.bindLong(6, day);
                     statement.bindLong(7, year);
+                    // Database error will show up here if there is one. Catch it here.
                     try {
                         statement.execute();
                     } catch (SQLiteConstraintException e) {
-                        return MenuParser.GETLIST_FAILURE;
+                        return Util.GETLIST_DATABASE_FAILURE;
                     }
                 }
                 accumulatedBreakfast += MenuParser.fullMenuObj.get(j).getBreakfast().size();
                 for (int i = 0; i < MenuParser.fullMenuObj.get(j).getLunch().size(); i++) {
-                    statement.bindLong(1, offset + i + accumulatedBreakfast + accumulatedLunch + accumulatedDinner);
+                    statement.bindLong(1, offset + i + accumulatedBreakfast + accumulatedLunch +
+                            accumulatedDinner);
                     statement.bindLong(2,j);
                     statement.bindLong(3, 1);
                     statement.bindString(4, MenuParser.fullMenuObj.get(j).getLunch().get(i));
@@ -127,7 +134,8 @@ public class MealDataFetcher {
                 }
                 accumulatedLunch += MenuParser.fullMenuObj.get(j).getLunch().size();
                 for (int i = 0; i < MenuParser.fullMenuObj.get(j).getDinner().size(); i++) {
-                    statement.bindLong(1, offset + i + accumulatedBreakfast + accumulatedLunch + accumulatedDinner);
+                    statement.bindLong(1, offset + i + accumulatedBreakfast + accumulatedLunch +
+                            accumulatedDinner);
                     statement.bindLong(2,j);
                     statement.bindLong(3, 2);
                     statement.bindString(4, MenuParser.fullMenuObj.get(j).getDinner().get(i));
@@ -158,9 +166,9 @@ public class MealDataFetcher {
             ArrayList<String> breakfastLoaded,
                     lunchLoaded, dinnerLoaded;
 
-            selection = MealStorage.COLUMN_COLLEGE + "= ? AND " + MealStorage.COLUMN_MEAL + "= ? AND "
-                    + MealStorage.COLUMN_MONTH + "= ? AND " + MealStorage.COLUMN_DAY + "= ? AND "
-                    + MealStorage.COLUMN_YEAR + "= ?";
+            selection = MealStorage.COLUMN_COLLEGE + "= ? AND " + MealStorage.COLUMN_MEAL +
+                    "= ? AND " + MealStorage.COLUMN_MONTH + "= ? AND " + MealStorage.COLUMN_DAY +
+                    "= ? AND " + MealStorage.COLUMN_YEAR + "= ?";
             String[] mainSelectionArgs = new String[5];
 
             // For each of the 5 colleges, load data into the full menu object
@@ -180,7 +188,8 @@ public class MealDataFetcher {
                 breakfastLoaded = new ArrayList<String>();
 
                 for(int i = 0; i < c.getCount(); i++){
-                    breakfastLoaded.add(c.getString(c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)));
+                    breakfastLoaded.add(c.getString
+                            (c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)));
                     c.moveToNext();
                 }
                 MenuParser.fullMenuObj.get(j).setBreakfast(breakfastLoaded);
@@ -195,7 +204,8 @@ public class MealDataFetcher {
                 lunchLoaded = new ArrayList<String>();
 
                 for(int i = 0; i < c.getCount(); i++){
-                    lunchLoaded.add(c.getString(c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)));
+                    lunchLoaded.add(c.getString
+                            (c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)));
                     c.moveToNext();
                 }
                 MenuParser.fullMenuObj.get(j).setLunch(lunchLoaded);
@@ -210,7 +220,8 @@ public class MealDataFetcher {
                 dinnerLoaded = new ArrayList<String>();
 
                 for(int i = 0; i < c.getCount(); i++){
-                    dinnerLoaded.add(c.getString(c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)));
+                    dinnerLoaded.add(c.getString
+                            (c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)));
                     c.moveToNext();
                 }
                 MenuParser.fullMenuObj.get(j).setDinner(dinnerLoaded);
@@ -221,6 +232,6 @@ public class MealDataFetcher {
             mealStore.close();
 
         }
-        return MenuParser.GETLIST_SUCCESS;
+        return Util.GETLIST_SUCCESS;
     }
 }

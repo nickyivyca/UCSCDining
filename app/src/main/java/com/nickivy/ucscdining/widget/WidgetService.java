@@ -10,6 +10,7 @@ import android.widget.RemoteViewsService;
 
 import com.nickivy.ucscdining.R;
 import com.nickivy.ucscdining.parser.MenuParser;
+import com.nickivy.ucscdining.util.Util;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -45,22 +46,20 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public void onDataSetChanged() {
-
     }
 
     @Override
     public void onDestroy() {
-
     }
 
     @Override
     public int getCount() {
         switch (MenuWidget.currentMeal) {
-            case MenuWidget.BREAKFAST:
+            case Util.BREAKFAST:
                 return MenuParser.fullMenuObj.get(MenuWidget.currentCollege).getBreakfast().size();
-            case MenuWidget.LUNCH:
+            case Util.LUNCH:
                 return MenuParser.fullMenuObj.get(MenuWidget.currentCollege).getLunch().size();
-            case MenuWidget.DINNER:
+            case Util.DINNER:
                 return MenuParser.fullMenuObj.get(MenuWidget.currentCollege).getDinner().size();
             default:
                 return -1;
@@ -79,7 +78,7 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
         Intent intent = new Intent();
         Bundle extras = new Bundle();
-        extras.putString(MenuWidget.EXTRA_WORD,
+        extras.putString(Util.EXTRA_WORD,
                 getCurrentMenu(MenuWidget.currentCollege).get(position));
         intent.putExtras(extras);
         row.setOnClickFillInIntent(android.R.id.text1, intent);
@@ -94,16 +93,16 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private ArrayList<String> getCurrentMenu(final int college) {
         if (!MenuParser.fullMenuObj.get(college).getIsOpen()) {
             ArrayList<String> ret = new ArrayList<String>();
-            ret.add(MenuParser.collegeList[college] +
+            ret.add(Util.collegeList[college] +
                     "dining hall closed today");
             return ret;
         }
         switch(MenuWidget.currentMeal) {
-            case MenuWidget.BREAKFAST:
+            case Util.BREAKFAST:
                 return MenuParser.fullMenuObj.get(college).getBreakfast();
-            case MenuWidget.LUNCH:
+            case Util.LUNCH:
                 return MenuParser.fullMenuObj.get(college).getLunch();
-            case MenuWidget.DINNER:
+            case Util.DINNER:
                 return MenuParser.fullMenuObj.get(college).getDinner();
             default:
                 return null;
