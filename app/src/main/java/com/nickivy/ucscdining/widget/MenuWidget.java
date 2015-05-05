@@ -223,7 +223,7 @@ public class MenuWidget extends AppWidgetProvider {
             widget.setViewVisibility(R.id.widget_progresscircle, View.INVISIBLE);
 
             if (!result.equals(new Double(MenuParser.GETLIST_SUCCESS).longValue())) {
-                Log.v("ucscdining", "No internet conncetion, not updating widget");
+                Log.v("ucscdining", "No internet connection or database error not updating widget");
                 return;
             }
             // Check if all dining halls are closed

@@ -3,6 +3,7 @@ package com.nickivy.ucscdining.parser;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
@@ -107,7 +108,11 @@ public class MealDataFetcher {
                     statement.bindLong(5, month);
                     statement.bindLong(6, day);
                     statement.bindLong(7, year);
-                    statement.execute();
+                    try {
+                        statement.execute();
+                    } catch (SQLiteConstraintException e) {
+                        return MenuParser.GETLIST_FAILURE;
+                    }
                 }
                 accumulatedBreakfast += MenuParser.fullMenuObj.get(j).getBreakfast().size();
                 for (int i = 0; i < MenuParser.fullMenuObj.get(j).getLunch().size(); i++) {

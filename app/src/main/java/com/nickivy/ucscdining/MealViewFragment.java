@@ -195,8 +195,13 @@ public class MealViewFragment extends ListFragment{
              * be changed in the case of a data load failure
              */
             if (!result.equals(new Double(MenuParser.GETLIST_SUCCESS).longValue())) {
-                Toast.makeText(getActivity(), getString(R.string.internet_failed),
-                        Toast.LENGTH_SHORT).show();
+                if (result.equals(new Double(MenuParser.GETLIST_FAILURE).longValue())) {
+                    Toast.makeText(getActivity(), getString(R.string.database_failed),
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.internet_failed),
+                            Toast.LENGTH_SHORT).show();
+                }
                 return;
             }
 
