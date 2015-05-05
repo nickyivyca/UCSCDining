@@ -70,6 +70,10 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     @Override
     public RemoteViews getViewAt(int position) {
         RemoteViews row = new RemoteViews(context.getPackageName(), R.layout.widget_row);
+        // If user mashes buttons too fast things can crash. This should prevent it
+        if (position >= getCurrentMenu(MenuWidget.currentCollege).size()) {
+            return row;
+        }
         row.setTextViewText(android.R.id.text1,
                 getCurrentMenu(MenuWidget.currentCollege).get(position));
 

@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -54,6 +55,17 @@ public class MenuWidget extends AppWidgetProvider {
 
     public static int currentCollege = -1,
     currentMeal = -1;
+
+    /**
+     * This variable is set going into the AsyncTask by widget buttons, if the day being loaded is
+     * different than the current date being passed in
+     */
+    public static int dayIncrement;
+    // Direction for telling which meal to skip over on brunch days
+    public static boolean directionRight = true;
+
+    private static RetrieveMenuInWidgetTask mTask= null;
+
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -152,8 +164,15 @@ public class MenuWidget extends AppWidgetProvider {
         if (currentCollege < 0) {
             currentCollege = 0;
         }
-        new RetrieveMenuInWidgetTask(context, appWidgetManager, appWidgetId, today[0], today[1],
-                today[2], currentCollege).execute();
+        /*
+         * This here controls the AsyncTask so only one runs at once. If the user presses the
+         * buttons too fast they can get things overlapping on each other and it's not good.
+         */
+        if (mTask == null) {
+            mTask = new RetrieveMenuInWidgetTask(context, appWidgetManager, appWidgetId, today[0], today[1],
+                    today[2], currentCollege);
+            mTask.execute();
+        }
         // Actual setting of widget data is accomplished in the postexecute of the asynctask
     }
 
@@ -168,10 +187,22 @@ public class MenuWidget extends AppWidgetProvider {
             mContext = context;
             mAppWidgetManager = appWidgetManager;
             mAppWidgetId = appWidgetId;
-            mMonth = month;
-            mDay = day;
-            mYear = year;
             mCollege = college;
+            if (dayIncrement != 0) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.MONTH, month - 1);
+                calendar.set(Calendar.DAY_OF_MONTH, day);
+                calendar.set(Calendar.YEAR, year);
+                calendar.add(Calendar.DATE, dayIncrement);
+                mMonth = calendar.get(Calendar.MONTH) + 1;
+                mDay = calendar.get(Calendar.DAY_OF_MONTH);
+                mYear = calendar.get(Calendar.YEAR);
+                //dayIncrement = 0;
+            } else {
+                mMonth = month;
+                mDay = day;
+                mYear = year;
+            }
         }
 
         @Override
@@ -182,15 +213,19 @@ public class MenuWidget extends AppWidgetProvider {
 
         @Override
         protected void onPreExecute() {
-            //refreshStarted = true;
+            RemoteViews widget = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
+            widget.setViewVisibility(R.id.widget_progresscircle, View.VISIBLE);
+            mAppWidgetManager.updateAppWidget(mAppWidgetId, widget);
         }
 
         protected void onPostExecute(Long result) {
+            RemoteViews widget = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
+            widget.setViewVisibility(R.id.widget_progresscircle, View.INVISIBLE);
+
             if (!result.equals(new Double(MenuParser.GETLIST_SUCCESS).longValue())) {
                 Log.v("ucscdining", "No internet conncetion, not updating widget");
                 return;
             }
-            RemoteViews widget = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
             // Check if all dining halls are closed
             boolean allClosed = true;
             for (int i = 0; i < 5; i++) {
@@ -199,39 +234,49 @@ public class MenuWidget extends AppWidgetProvider {
                     break;
                 }
             }
-            // If so display 'All Closed' and nothing else
-            if (allClosed) {
-                widget.setTextViewText(R.id.widget_collegename, "All Closed");
-                widget.setTextViewText(R.id.widget_mealname, "");
-                mAppWidgetManager.updateAppWidget(mAppWidgetId, widget);
-                return;
-            }
+
+            Intent svcIntent = new Intent(mContext, WidgetService.class);
+            svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+            svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
+
             // If currentMeal uninitialized, initialize it here (this way we can check for brunch)
             if (currentMeal < 0) {
                 currentMeal = getCurrentMeal(currentCollege);
             }
-            Intent svcIntent = new Intent(mContext, WidgetService.class);
-            svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-            svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
 
             // Set adapter for listview
             widget.setRemoteAdapter(R.id.widget_list, svcIntent);
             mAppWidgetManager.notifyAppWidgetViewDataChanged(mAppWidgetId, R.id.widget_list);
 
-            // Set view text of college and current meal
-            widget.setTextViewText(R.id.widget_collegename, MenuParser.collegeList[mCollege]);
-            if (MenuParser.fullMenuObj.get(mCollege).getIsCollegeNight()) {
-                widget.setTextColor(R.id.widget_collegename, Color.BLUE);
-            } else if (MenuParser.fullMenuObj.get(mCollege).getIsFarmFriday() ||
-                    MenuParser.fullMenuObj.get(mCollege).getIsHealthyMonday()) {
-                // 'Green Apple'
-                widget.setTextColor(R.id.widget_collegename, Color.rgb(0x4C, 0xC5, 0x52));
-            } else {
-                widget.setTextColor(R.id.widget_collegename, Color.BLACK);
-            }
             widget.setTextViewText(R.id.widget_mealname, mMonth + "/" + mDay + " " +
                     MenuParser.meals[currentMeal]);
-            //widget.setInt(R.id.widget_college_leftbutton, "setBackgroundColor", Color.BLUE);
+            // If so display 'All Closed' and nothing else
+            if (allClosed) {
+                widget.setTextViewText(R.id.widget_collegename, "All Closed");
+                widget.setTextColor(R.id.widget_collegename, Color.BLACK);
+            } else {
+                if (currentMeal == BREAKFAST &&
+                        MenuParser.fullMenuObj.get(currentCollege).getBreakfast().size() > 0) {
+                    if (MenuParser.fullMenuObj.get(currentCollege).getBreakfast().get(0)
+                            .equals(MenuParser.brunchMessage)) {
+                        currentMeal = directionRight ? LUNCH : DINNER;
+                    }
+                }
+
+                // Set view text of college and current meal
+                widget.setTextViewText(R.id.widget_collegename, MenuParser.collegeList[mCollege]);
+                if (MenuParser.fullMenuObj.get(mCollege).getIsCollegeNight()) {
+                    widget.setTextColor(R.id.widget_collegename, Color.BLUE);
+                } else if (MenuParser.fullMenuObj.get(mCollege).getIsFarmFriday() ||
+                        MenuParser.fullMenuObj.get(mCollege).getIsHealthyMonday()) {
+                    // 'Green Apple'
+                    widget.setTextColor(R.id.widget_collegename, Color.rgb(0x4C, 0xC5, 0x52));
+                } else if (!MenuParser.fullMenuObj.get(mCollege).getIsOpen()) {
+                    widget.setTextColor(R.id.widget_collegename, Color.LTGRAY);
+                } else {
+                    widget.setTextColor(R.id.widget_collegename, Color.BLACK);
+                }
+            }
 
             // Set intents on all four buttons
             Intent intent = new Intent(mContext, MenuWidget.class);
@@ -256,6 +301,9 @@ public class MenuWidget extends AppWidgetProvider {
                     pendingIntent);
 
             mAppWidgetManager.updateAppWidget(mAppWidgetId, widget);
+
+            // Set mTask to null so that now we know it can be run again
+            mTask = null;
         }
     }
 
@@ -335,12 +383,16 @@ public class MenuWidget extends AppWidgetProvider {
             currentMeal--;
             if (currentMeal == -1) {
                 currentMeal = 2;
+                // If at breakfast and left button pressed, go to previous day
+                dayIncrement--;
+                directionRight = false;
             }
-            // Skip ahead of breakfast if brunch message is present
+            // In case when button press leads to a weekend breakfast, go to previous day
             if (currentMeal == BREAKFAST &&
                     MenuParser.fullMenuObj.get(currentCollege).getBreakfast().size() > 0) {
                 if (MenuParser.fullMenuObj.get(currentCollege).getBreakfast().get(0)
                         .equals(MenuParser.brunchMessage)) {
+                    dayIncrement--;
                     currentMeal = DINNER;
                 }
             }
@@ -349,19 +401,15 @@ public class MenuWidget extends AppWidgetProvider {
             currentMeal++;
             if (currentMeal == 3) {
                 currentMeal = 0;
-            }
-            // Skip ahead of breakfast if brunch message is present
-            if (currentMeal == BREAKFAST &&
-                    MenuParser.fullMenuObj.get(currentCollege).getBreakfast().size() > 0) {
-                if (MenuParser.fullMenuObj.get(currentCollege).getBreakfast().get(0)
-                        .equals(MenuParser.brunchMessage)) {
-                    currentMeal = LUNCH;
-                }
+                // If at dinner, and right button pressed, advance to next day
+                dayIncrement++;
+                directionRight = true;
             }
         }
         if (TAG_TIMEUPDATE.equals(intent.getAction())) {
             Log.v("ucscdining", "timeupdate");
             currentMeal = getCurrentMeal(currentCollege);
+            dayIncrement = 0;
         }
         // Trigger update
         ComponentName thisAppWidget = new ComponentName(context.getPackageName(),

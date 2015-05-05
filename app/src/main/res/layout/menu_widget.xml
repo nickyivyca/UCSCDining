@@ -66,6 +66,10 @@
         android:layout_height="1dip"
         android:background="#000000"
         android:orientation="horizontal" />
+    <!--RelativeLayout
+        android:paddingTop="20dp"
+        android:layout_below="@id/widget_mealname_divider"-->
+    <!--/RelativeLayout-->
     <ListView
         android:id="@+id/widget_list"
         android:layout_below="@id/widget_mealname_divider"
@@ -73,5 +77,13 @@
         android:layout_height="match_parent"
         android:divider="#E5E5E5"
         android:dividerHeight="1dp"/>
+    <ProgressBar
+        android:id="@+id/widget_progresscircle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:layout_centerInParent="true"
+        android:layout_below="@id/widget_mealname"
+        android:indeterminate="true" />
 
 </RelativeLayout>
