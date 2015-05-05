@@ -1,6 +1,7 @@
 package com.nickivy.ucscdining.parser;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import org.jsoup.Jsoup;
@@ -55,6 +56,11 @@ public class MenuParser {
     private final static int maxReloads = 3;
     private static int reloadTries = 0;
     private static boolean failed = false;
+
+    public static final int GETLIST_SUCCESS = 1,
+    GETLIST_INTERNET_FAILURE = 0,
+    GETLIST_FAILURE = -1;
+
     
     public static ArrayList<CollegeMenu> fullMenuObj = new ArrayList<CollegeMenu>(){{
     	add(new CollegeMenu());
@@ -64,7 +70,7 @@ public class MenuParser {
     	add(new CollegeMenu());
     }};
     
-    public static void getSingleMealList(int k, int month, int day, int year){
+    public static int getSingleMealList(int k, int month, int day, int year){
     	Document doc = null;
     	Elements names = null;
     	try{
@@ -73,7 +79,11 @@ public class MenuParser {
                     datedURLListParts2[k]).get();
 	
 			names = doc.select("td[valign=\"top\"]");
-    	} catch (IOException e) {
+    	} catch (UnknownHostException e) {
+            Log.v("ucscdining", "Internet connection missing");
+            e.printStackTrace();
+            return GETLIST_INTERNET_FAILURE;
+        } catch (IOException e) {
     		Log.w("ucscdining","Unable to download dining menu");
     		e.printStackTrace();
     		failed = true;
@@ -87,7 +97,7 @@ public class MenuParser {
 			getSingleMealList(k, month, day, year);
 		}
 		if (reloadTries >= maxReloads) {
-			return;
+			return GETLIST_FAILURE;
 		}
 	
 		ArrayList<String> breakfastList = new ArrayList<String>(),
@@ -138,7 +148,7 @@ public class MenuParser {
 			breakfastMessage.add(brunchMessage);
 			fullMenuObj.get(k).setBreakfast(breakfastMessage);
 		}
-
+        return GETLIST_SUCCESS;
 	}
     
     /**
@@ -147,11 +157,16 @@ public class MenuParser {
      * @param month
      * @param year
      */
-    public static void getMealList(int month, int day, int year) {
+    public static int getMealList(int month, int day, int year) {
+        int res;
     	for(int i = 0; i < 5; i++){
     		reloadTries = 0;
     		failed = false;
-    		getSingleMealList(i, month, day, year);
+    		res = getSingleMealList(i, month, day, year);
+            if (res != GETLIST_SUCCESS) {
+                return res;
+            }
     	}
+        return GETLIST_SUCCESS;
     }
 }

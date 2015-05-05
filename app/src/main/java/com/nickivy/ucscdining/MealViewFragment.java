@@ -7,13 +7,9 @@ import java.util.List;
 
 import com.example.android.common.view.SlidingTabLayout;
 import com.nickivy.ucscdining.parser.MealDataFetcher;
-import com.nickivy.ucscdining.parser.MealStorage;
 import com.nickivy.ucscdining.parser.MenuParser;
 import com.nickivy.ucscdining.widget.MenuWidget;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteStatement;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -156,12 +152,53 @@ public class MealViewFragment extends ListFragment{
 
 		@Override
 		protected Long doInBackground(Void... voids) {
-            MealDataFetcher.fetchData(getActivity(), displayedMonth, displayedDay, mYear);
-			return null;
+            int res = MealDataFetcher.fetchData(getActivity(), displayedMonth, displayedDay, mYear);
+			return new Double(res).longValue();
 		}
 		
 		protected void onPostExecute(Long result){
+
             // Post-execute: set array adapters, reload animation, set title
+
+
+			/*
+			 *  Manually try to recreate what the swiperefresh layout has by default.
+			 *
+			 * Only 2 views exist at a time, so the third returns null, but
+			 * we don't know which one it is, so check each one. Try-catch
+			 * would work but is performance-inefficient.
+			 */
+
+            Display display = getActivity().getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            int height = size.y;
+
+            mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID1);
+            if(mSwipeRefreshLayout != null){
+                mSwipeRefreshLayout.setProgressViewOffset(false, -100, height / 40);
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+            mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID2);
+            if(mSwipeRefreshLayout != null){
+                mSwipeRefreshLayout.setProgressViewOffset(false, -100, height / 40);
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+            mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID3);
+            if(mSwipeRefreshLayout != null){
+                mSwipeRefreshLayout.setProgressViewOffset(false, -100, height / 40);
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+
+            /*
+             * We want the spinners canceled no matter what, but all the other stuff should not
+             * be changed in the case of a data load failure
+             */
+            if (!result.equals(new Double(MenuParser.GETLIST_SUCCESS).longValue())) {
+                Toast.makeText(getActivity(), getString(R.string.internet_failed),
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             if (mSetPage) {
                 mViewPager.setCurrentItem(MenuWidget.getCurrentMeal(collegeNum), false);
@@ -199,11 +236,7 @@ public class MealViewFragment extends ListFragment{
 			
 			mDrawerList.setAdapter(new ColorAdapter(getActivity(),
 					R.layout.drawer_list_item, MenuParser.collegeList));
-			/*
-			 * only 2 views exist at a time, so the third returns null, but
-			 * we don't know which one it is, so check each one. try catch
-			 * would work but is performance-inefficient
-			 */
+
 			MenuParser.needsRefresh= false;
 			ListView listView = (ListView) getActivity().findViewById(LISTVIEW_ID1);
 			if(listView != null){
@@ -222,30 +255,6 @@ public class MealViewFragment extends ListFragment{
 				listView.setAdapter(new ArrayAdapter<String>(getActivity(),
 						android.R.layout.simple_list_item_activated_1,
 						MenuParser.fullMenuObj.get(collegeNum).getDinner()));
-			}
-			
-			Display display = getActivity().getWindowManager().getDefaultDisplay();
-			Point size = new Point();
-			display.getSize(size);
-			int height = size.y;
-			/*
-			 *  Manually try to recreate what the swiperefresh layout has by default.
-			 *  Same deal as above with nulls.
-			 */
-			mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID1);
-			if(mSwipeRefreshLayout != null){
-				mSwipeRefreshLayout.setProgressViewOffset(false, -100, height / 40);
-				mSwipeRefreshLayout.setRefreshing(false);
-			}
-			mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID2);
-			if(mSwipeRefreshLayout != null){
-				mSwipeRefreshLayout.setProgressViewOffset(false, -100, height / 40);
-				mSwipeRefreshLayout.setRefreshing(false);
-			}
-			mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID3);
-			if(mSwipeRefreshLayout != null){
-				mSwipeRefreshLayout.setProgressViewOffset(false, -100, height / 40);
-				mSwipeRefreshLayout.setRefreshing(false);
 			}
 
 			// Set title to include date
@@ -393,7 +402,6 @@ public class MealViewFragment extends ListFragment{
 	}
 	
 	public void selectNewDate(int month, int day, int year) {
-		//Toast.makeText(getActivity(), month + " " + day + " " + year + "selected", Toast.LENGTH_SHORT).show();
 		Display display = getActivity().getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);

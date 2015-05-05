@@ -176,8 +176,8 @@ public class MenuWidget extends AppWidgetProvider {
 
         @Override
         protected Long doInBackground(Void... voids) {
-            MealDataFetcher.fetchData(mContext, mMonth, mDay, mYear);
-            return null;
+            int res = MealDataFetcher.fetchData(mContext, mMonth, mDay, mYear);
+            return new Double(res).longValue();
         }
 
         @Override
@@ -186,6 +186,10 @@ public class MenuWidget extends AppWidgetProvider {
         }
 
         protected void onPostExecute(Long result) {
+            if (!result.equals(new Double(MenuParser.GETLIST_SUCCESS).longValue())) {
+                Log.v("ucscdining", "No internet conncetion, not updating widget");
+                return;
+            }
             RemoteViews widget = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
             // Check if all dining halls are closed
             boolean allClosed = true;

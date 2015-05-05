@@ -18,7 +18,7 @@ public class MealDataFetcher {
     /**
      * Loads data from database or web into the full menu object.
      */
-    public static void fetchData(Context context, int month, int day, int year) {
+    public static int fetchData(Context context, int month, int day, int year) {
         MealStorage mealStore = new MealStorage(context);
         SQLiteDatabase db;
 
@@ -46,7 +46,10 @@ public class MealDataFetcher {
         db.close();
         // If data for today does not exist, or manual refresh is requested, load data from web and store it
         if(cexists || MenuParser.needsRefresh){
-            MenuParser.getMealList(month, day, year);
+            int res = MenuParser.getMealList(month, day, year);
+            if (res != MenuParser.GETLIST_SUCCESS) {
+                return res;
+            }
 
             db = mealStore.getWritableDatabase();
 
@@ -213,5 +216,6 @@ public class MealDataFetcher {
             mealStore.close();
 
         }
+        return MenuParser.GETLIST_SUCCESS;
     }
 }
