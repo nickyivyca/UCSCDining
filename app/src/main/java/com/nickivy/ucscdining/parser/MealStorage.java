@@ -22,7 +22,7 @@ public class MealStorage extends SQLiteOpenHelper{
   // Database creation sql statement
   private static final String DATABASE_CREATE = "create table "
 		  + TABLE_MEALS + "(" + COLUMN_ID
-		  + " integer primary key," + COLUMN_COLLEGE + " integer," + 
+		  + " integer primary key autoincrement," + COLUMN_COLLEGE + " integer," +
 		  COLUMN_MEAL + " integer," + COLUMN_MENUITEM + " text," + 
 		  COLUMN_MONTH + " integer," + COLUMN_DAY + " integer," + COLUMN_YEAR 
 		  + " integer" + ")";

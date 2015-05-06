@@ -82,37 +82,26 @@ public class MealDataFetcher {
                         new String[] {"" + today[0], "" + today[1], "" + today[2]});
             }
 
-            // We need to write at the end of the table - so find size and offset first column
-            String countQuery = "SELECT * FROM " + MealStorage.TABLE_MEALS;
-            Cursor cursor = db.rawQuery(countQuery, null);
-            int offset = cursor.getCount();
-            cursor.close();
-
             // Begin writing data
 
             SQLiteStatement statement = db.compileStatement("INSERT INTO "+
-                    MealStorage.TABLE_MEALS +" VALUES (?,?,?,?,?,?,?);");
+                    MealStorage.TABLE_MEALS + "(" + MealStorage.COLUMN_COLLEGE + ", " +
+                    MealStorage.COLUMN_MEAL + ", " + MealStorage.COLUMN_MENUITEM + ", " +
+                    MealStorage.COLUMN_MONTH + ", " + MealStorage.COLUMN_DAY + ", " +
+                    MealStorage.COLUMN_YEAR + ") VALUES (?,?,?,?,?,?);");
 
             // Using sqlite statement keeps the database 'open' and apparently is a bit faster
             db.beginTransaction();
 
-            // Accumulate amount of nodes written in
-            int accumulatedBreakfast = 0,
-                    accumulatedLunch = 0,
-                    accumulatedDinner = 0;
-
-            for(int j = 0; j < 5; j++){
-
+            for(int j = 0; j < 5; j++) {
                 statement.clearBindings();
                 for (int i = 0; i < MenuParser.fullMenuObj.get(j).getBreakfast().size(); i++) {
-                    statement.bindLong(1, offset + i + accumulatedBreakfast + accumulatedLunch +
-                            accumulatedDinner);
-                    statement.bindLong(2,j);
-                    statement.bindLong(3, 0);
-                    statement.bindString(4, MenuParser.fullMenuObj.get(j).getBreakfast().get(i));
-                    statement.bindLong(5, month);
-                    statement.bindLong(6, day);
-                    statement.bindLong(7, year);
+                    statement.bindLong(1, j);
+                    statement.bindLong(2, 0);
+                    statement.bindString(3, MenuParser.fullMenuObj.get(j).getBreakfast().get(i));
+                    statement.bindLong(4, month);
+                    statement.bindLong(5, day);
+                    statement.bindLong(6, year);
                     // Database error will show up here if there is one. Catch it here.
                     try {
                         statement.execute();
@@ -120,31 +109,32 @@ public class MealDataFetcher {
                         return Util.GETLIST_DATABASE_FAILURE;
                     }
                 }
-                accumulatedBreakfast += MenuParser.fullMenuObj.get(j).getBreakfast().size();
                 for (int i = 0; i < MenuParser.fullMenuObj.get(j).getLunch().size(); i++) {
-                    statement.bindLong(1, offset + i + accumulatedBreakfast + accumulatedLunch +
-                            accumulatedDinner);
-                    statement.bindLong(2,j);
-                    statement.bindLong(3, 1);
-                    statement.bindString(4, MenuParser.fullMenuObj.get(j).getLunch().get(i));
-                    statement.bindLong(5, month);
-                    statement.bindLong(6, day);
-                    statement.bindLong(7, year);
-                    statement.execute();
+                    statement.bindLong(1, j);
+                    statement.bindLong(2, 1);
+                    statement.bindString(3, MenuParser.fullMenuObj.get(j).getLunch().get(i));
+                    statement.bindLong(4, month);
+                    statement.bindLong(5, day);
+                    statement.bindLong(6, year);
+                    try {
+                        statement.execute();
+                    } catch (SQLiteConstraintException e) {
+                        return Util.GETLIST_DATABASE_FAILURE;
+                    }
                 }
-                accumulatedLunch += MenuParser.fullMenuObj.get(j).getLunch().size();
                 for (int i = 0; i < MenuParser.fullMenuObj.get(j).getDinner().size(); i++) {
-                    statement.bindLong(1, offset + i + accumulatedBreakfast + accumulatedLunch +
-                            accumulatedDinner);
-                    statement.bindLong(2,j);
-                    statement.bindLong(3, 2);
-                    statement.bindString(4, MenuParser.fullMenuObj.get(j).getDinner().get(i));
-                    statement.bindLong(5, month);
-                    statement.bindLong(6, day);
-                    statement.bindLong(7, year);
-                    statement.execute();
+                    statement.bindLong(1,j);
+                    statement.bindLong(2, 2);
+                    statement.bindString(3, MenuParser.fullMenuObj.get(j).getDinner().get(i));
+                    statement.bindLong(4, month);
+                    statement.bindLong(5, day);
+                    statement.bindLong(6, year);
+                    try {
+                        statement.execute();
+                    } catch (SQLiteConstraintException e) {
+                        return Util.GETLIST_DATABASE_FAILURE;
+                    }
                 }
-                accumulatedDinner += MenuParser.fullMenuObj.get(j).getDinner().size();
             }
             db.setTransactionSuccessful();
             db.endTransaction();

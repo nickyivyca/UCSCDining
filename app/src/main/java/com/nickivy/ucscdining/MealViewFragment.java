@@ -18,6 +18,10 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarActivity;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -82,11 +86,25 @@ public class MealViewFragment extends ListFragment{
     public void selectItem(int position) {
     	collegeNum = position;
         // update the main content by replacing listview adapters
-    	if(MenuParser.fullMenuObj.get(position).getIsOpen()){
-    		if(MenuParser.fullMenuObj.get(position).getIsSet()){    			
-    			// Set title to include date
-    	        getActivity().setTitle(Util.collegeList[position] + " " + displayedMonth + "/" +
-                        displayedDay);
+    	if(MenuParser.fullMenuObj.get(position).getIsOpen()) {
+    		if(MenuParser.fullMenuObj.get(position).getIsSet()) {
+                // Set title to include date and color, based on events at the dining hall
+                Spannable text = new SpannableString(
+                        Util.collegeList[position] + " " + displayedMonth + "/" + displayedDay);
+
+                if(MenuParser.fullMenuObj.get(position).getIsCollegeNight()) {
+                    text.setSpan(new ForegroundColorSpan(Color.BLUE), 0, text.length(),
+                            Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                } else if (MenuParser.fullMenuObj.get(position).getIsFarmFriday() ||
+                        MenuParser.fullMenuObj.get(position).getIsHealthyMonday()){
+                    // Green for Healthy Monday / Farm Friday
+                    text.setSpan(new ForegroundColorSpan(Color.rgb(0x4C, 0xC5, 0x52)), 0,
+                            text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE); // 'Green Apple'
+                } else {
+                    text.setSpan(new ForegroundColorSpan(Color.BLACK), 0, text.length(),
+                            Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                }
+                ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle(text);
 
     	        mMealList = (ListView) getActivity().findViewById(MealViewFragment.LISTVIEW_ID1);    		
         		ArrayList<String> testedArray = new ArrayList<String>();

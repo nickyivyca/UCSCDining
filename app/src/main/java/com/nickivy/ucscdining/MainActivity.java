@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -21,7 +22,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import com.nickivy.ucscdining.parser.MenuParser;
 import com.nickivy.ucscdining.util.Util;
 
 /**
@@ -81,6 +81,9 @@ public class MainActivity extends ActionBarActivity{
 	        fragment.setArguments(args);
 	        transaction.replace(R.id.fragment_container, fragment);
 	        transaction.commit();
+
+        FragmentManager m = getSupportFragmentManager();
+        m.executePendingTransactions();
 	        
 /*	        if (savedInstanceState == null) {
 //	            selectItem(0);
