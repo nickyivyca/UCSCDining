@@ -45,7 +45,7 @@ public class MenuWidget extends AppWidgetProvider {
     TAG_TIMEUPDATE="time_update";
 
     public static int currentCollege = -1,
-    currentMeal = -1;
+    currentMeal = -2;
 
     /**
      * This variable is set going into the AsyncTask by widget buttons, if the day being loaded is
