@@ -59,7 +59,7 @@ public class MealViewFragment extends ListFragment{
 	public static int displayedMonth = 0,
             displayedDay = 0;
 	
-	//private boolean refreshStarted = false;
+	private boolean initialRefreshed = false;
 
     private RetrieveMenuInFragmentTask task;
 	
@@ -156,8 +156,7 @@ public class MealViewFragment extends ListFragment{
 			return new Double(res).longValue();
 		}
 		
-		protected void onPostExecute(Long result){
-
+		protected void onPostExecute(Long result) {
             // Post-execute: set array adapters, reload animation, set title
 
 
@@ -329,7 +328,7 @@ public class MealViewFragment extends ListFragment{
              * no proper way to manually trigger the reload animation. So
              * we're stuck doing it in a hacky way.
              */
-            if (task == null) {
+            if (task == null && initialRefreshed == false) {
                 Display display = getActivity().getWindowManager().getDefaultDisplay();
                 Point size = new Point();
                 display.getSize(size);
@@ -338,6 +337,7 @@ public class MealViewFragment extends ListFragment{
                 mSwipeRefreshLayout.setProgressViewOffset(false, -50, height / 800);
                 mSwipeRefreshLayout.setRefreshing(true);
                 // Default loading to today
+                initialRefreshed = true;
                 int[] today = Util.getToday();
                 task = new RetrieveMenuInFragmentTask(today[0], today[1], today[2], true);
                 task.execute();
