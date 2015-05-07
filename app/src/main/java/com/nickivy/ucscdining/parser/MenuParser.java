@@ -71,7 +71,7 @@ public class MenuParser {
 		/*
 		 * In order to defeat an okhttp error, recurse
 		 */
-		if(failed && (reloadTries < maxReloads)){
+		if(failed && (reloadTries < maxReloads)) {
             failed = false;
 			getSingleMealList(k, month, day, year);
 		}
