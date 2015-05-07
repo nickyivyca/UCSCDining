@@ -9,6 +9,8 @@ import java.util.Date;
  * Class for holding static functions and enums such as getting today, getting current meal, etc
  * that were previously scattered around various classes.
  *
+ * Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
+ *
  * @author @author Nicky Ivy parkedraccoon@gmail.com
  */
 public class Util {

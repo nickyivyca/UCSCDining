@@ -3,7 +3,7 @@ package com.nickivy.ucscdining;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.android.common.view.SlidingTabLayout;
+import com.google.samples.apps.iosched.ui.widget.SlidingTabLayout;
 import com.nickivy.ucscdining.parser.MealDataFetcher;
 import com.nickivy.ucscdining.parser.MenuParser;
 import com.nickivy.ucscdining.util.Util;
@@ -30,12 +30,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 /**
  * Fragment for displaying one menu. Uses sliding tab
  * layout from Google's examples.
+ *
+ * Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
  * @author Nick Ivy parkedraccoon@gmail.com
  */
@@ -56,6 +59,7 @@ public class MealViewFragment extends ListFragment{
 	private ViewPager mViewPager;
 	private SlidingTabLayout mSlidingTabLayout;
 	private ListView mDrawerList;
+    private RelativeLayout mDrawer;
 	private DrawerLayout mDrawerLayout;
     private ListView mMealList;
 	
@@ -117,12 +121,13 @@ public class MealViewFragment extends ListFragment{
     		}
 
 			mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
-	        mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
+	        mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer_list);
+            mDrawer = (RelativeLayout) getActivity().findViewById(R.id.left_drawer);
 	        
     		// update selected item and title, then close the drawer
     		mDrawerList.setItemChecked(position, true);
-    		mDrawerLayout.closeDrawer(mDrawerList);
-    	}else{
+    		mDrawerLayout.closeDrawer(mDrawer);
+    	} else {
     		Toast.makeText(getActivity(), Util.collegeList[position] + " dining hall closed today!",
                     Toast.LENGTH_SHORT).show();
     	}
@@ -240,7 +245,7 @@ public class MealViewFragment extends ListFragment{
 				mViewPager.setCurrentItem(2,false);
 			}
 			
-			mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
+			mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer_list);
 			
 			mDrawerList.setAdapter(new ColorAdapter(getActivity(),
 					R.layout.drawer_list_item, Util.collegeList));

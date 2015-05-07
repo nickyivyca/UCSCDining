@@ -11,7 +11,11 @@ import com.nickivy.ucscdining.util.Util;
 import java.util.ArrayList;
 
 /**
- * Methods for managing the data in the SQL database.
+ * Method for pulling data from either database or internet into the full menu object.
+ *
+ * Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
+ *
+ * @author Nick Ivy parkedraccoon@gmail.com
  */
 public class MealDataFetcher {
 

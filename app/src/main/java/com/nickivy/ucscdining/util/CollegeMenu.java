@@ -6,6 +6,8 @@ import java.util.ArrayList;
  * College menu object. Keeps things organized,
  * as I would end up using 3-dimensional arraylists otherwise.
  *
+ * Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
+ *
  * @author Nick Ivy parkedraccoon@gmail.com
  */
 

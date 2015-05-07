@@ -1,9 +1,11 @@
 package com.nickivy.ucscdining;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,21 +24,26 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+
 import com.nickivy.ucscdining.util.Util;
 
 /**
  * App for viewing UCSC dining menus. Currently can
  * read all menus, display them based on time, with special colors displayed
- * for events such as College Nights, Healthy Mondays, or Farm Fridays.
+ * for events such as College Nights, Healthy Mondays, or Farm Fridays. Also allows for
+ * viewing days in the future and there is a widget which displays the same info.
  *
- * <p>TODO: tablet layout (display all 3 meals at once)
+ * Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
- * @author Nick Ivy parkedraccoon@gmail.com
+ * @author Nicky Ivy parkedraccoon@gmail.com
  */
 
 public class MainActivity extends ActionBarActivity{
 
     private ListView mDrawerList;
+    private ListView mAboutList;
+    private RelativeLayout mDrawer;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private ActionBar mActionBar;
@@ -57,12 +64,19 @@ public class MainActivity extends ActionBarActivity{
             }*/
 
             mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-            mDrawerList = (ListView) findViewById(R.id.left_drawer);
+            mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
+            mAboutList = (ListView) findViewById(R.id.drawer_settings_link);
+            mDrawer = (RelativeLayout) findViewById(R.id.left_drawer);
             mActionBar = getSupportActionBar();
 
             mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
             mDrawerList.setAdapter(new ArrayAdapter<String>(this,
                     R.layout.drawer_list_item, Util.collegeList));
+
+            ArrayList<String> infoLink = new ArrayList<String>();
+            infoLink.add(getString(R.string.about));
+            mAboutList.setAdapter(new ArrayAdapter<String>(this,
+                    R.layout.drawer_list_item, infoLink));
 
             mActionBar.setDisplayHomeAsUpEnabled(true);
             mActionBar.setHomeButtonEnabled(true);
@@ -72,6 +86,7 @@ public class MainActivity extends ActionBarActivity{
 
             mDrawerLayout.setDrawerListener(mDrawerToggle);
             mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+            mAboutList.setOnItemClickListener(new InfoItemClickListener());
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             fragment = new MealViewFragment();
@@ -108,6 +123,14 @@ public class MainActivity extends ActionBarActivity{
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             fragment.selectItem(position);
+        }
+    }
+
+    private class InfoItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Intent intent = new Intent(MainActivity.this, PreferencesActivity.class);
+            startActivity(intent);
         }
     }
 

@@ -30,6 +30,8 @@ import java.util.Calendar;
  * The widget itself displays the name of the college, name of the meal and the meal list, along
  * with buttons to shuffle between the meals and the colleges.
  *
+ * Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
+ *
  * @author Nick Ivy parkedraccoon@gmail.com
  */
 public class MenuWidget extends AppWidgetProvider {
@@ -100,7 +102,6 @@ public class MenuWidget extends AppWidgetProvider {
                 (PendingIntent.getBroadcast(context, Util.DINNER_SWITCH_TIME,
                         timeIntent, PendingIntent.FLAG_NO_CREATE) != null);
         if (alarmEnabled) {
-            Log.v("ucscdining", "alarm already set");
             return;
         }
 
@@ -235,8 +236,6 @@ public class MenuWidget extends AppWidgetProvider {
             widget.setRemoteAdapter(R.id.widget_list, svcIntent);
             mAppWidgetManager.notifyAppWidgetViewDataChanged(mAppWidgetId, R.id.widget_list);
 
-            widget.setTextViewText(R.id.widget_mealname, mMonth + "/" + mDay + " " +
-                    Util.meals[currentMeal]);
             // If so display 'All Closed' and nothing else
             if (allClosed) {
                 widget.setTextViewText(R.id.widget_collegename, "All Closed");
@@ -263,6 +262,8 @@ public class MenuWidget extends AppWidgetProvider {
                 } else {
                     widget.setTextColor(R.id.widget_collegename, Color.BLACK);
                 }
+                widget.setTextViewText(R.id.widget_mealname, mMonth + "/" + mDay + " " +
+                        Util.meals[currentMeal]);
             }
 
             // Set intents on all four buttons

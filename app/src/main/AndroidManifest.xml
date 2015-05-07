@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nickivy.ucscdining"
     android:versionCode="1"
-    android:versionName="0.7.7" >
+    android:versionName="0.8" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -24,6 +24,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".PreferencesActivity"
+            android:label="@string/about"
+            android:parentActivityName="com.nickivy.ucscdining.MainActivity"/>
 
         <receiver android:name=".widget.MenuWidget"
             android:exported="true">

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/appinfo" android:key="app_info">
+        <!-- title will have version number set in code in it-->
+        <Preference android:key="mydesc"
+            android:title=""
+            android:summary="@string/desc"
+            />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/licenses" android:key="licences">
+        <Preference android:key="mylicense"
+            android:title="@string/mylicense_title"
+            android:summary="@string/mylicense_desc">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://github.com/parkedraccoon/UCSCDining" />
+        </Preference>
+        <Preference android:key="googlicense"
+            android:title="@string/googlicense_title"
+            android:summary="@string/googlicense_desc"
+            />
+        <Preference android:key="jsouplicense"
+            android:title="@string/jsouplicense_title"
+            android:summary="@string/jsouplicense_desc">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://jsoup.org" />
+        </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>

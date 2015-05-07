@@ -3,7 +3,7 @@
     android:minWidth="250dp"
     android:minHeight="250dp"
     android:updatePeriodMillis="1"
-    android:previewImage="@drawable/example_appwidget_preview"
+    android:previewImage="@drawable/widget_preview"
     android:initialLayout="@layout/menu_widget"
     android:autoAdvanceViewId="@+id/widget_list"
     android:resizeMode="horizontal|vertical"

@@ -66,10 +66,6 @@
         android:layout_height="1dip"
         android:background="#000000"
         android:orientation="horizontal" />
-    <!--RelativeLayout
-        android:paddingTop="20dp"
-        android:layout_below="@id/widget_mealname_divider"-->
-    <!--/RelativeLayout-->
     <ListView
         android:id="@+id/widget_list"
         android:layout_below="@id/widget_mealname_divider"

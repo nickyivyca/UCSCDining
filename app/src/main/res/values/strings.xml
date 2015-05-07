@@ -10,4 +10,19 @@
     <string name="internet_failed">Internet connection failed!</string>
     <string name="database_failed">Database error, please manually refresh</string>
 
+    <string name="about">About</string>
+    <string name="appinfo">Info</string>
+    <string name="licenses">Licenses</string>
+
+    <string name="desc">By Nicky Ivy.</string>
+
+    <string name="mylicense_title">UCSC Dining Main App</string>
+    <string name="mylicense_desc">Released under GPL v2 license. Click here to visit
+    the UCSCDining Github page.</string>
+    <string name="googlicense_title">SlidingTabLayout and SlidingTabStrip</string>
+    <string name="googlicense_desc">Released by Google under the Apache 2.0 license.</string>
+    <string name="jsouplicense_title">Jsoup 1.8.2</string>
+    <string name="jsouplicense_desc">Released under MIT license. Click here to visit the Jsoup
+    webpage.</string>
+
 </resources>
