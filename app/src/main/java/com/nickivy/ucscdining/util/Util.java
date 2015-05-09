@@ -42,10 +42,15 @@ public class Util {
     // Enums for returns of data fetching status
     public static final int GETLIST_SUCCESS = 1,
             GETLIST_INTERNET_FAILURE = 0,
-            GETLIST_DATABASE_FAILURE = -1;
+            GETLIST_DATABASE_FAILURE = -1,
+            GETLIST_OKHTTP_FAILURE = 2;
 
     // Extra word key for intent creation
     public static final String EXTRA_WORD = "com.nickivy.ucscdining.widget.WORD";
+
+    public static final String LOGTAG = "ucscdining";
+
+    public static final String WIDGETSTATE_PREFS = "widgetstate_prefs";
 
     public static final String brunchMessage = "See lunch for today\'s brunch menu";
 

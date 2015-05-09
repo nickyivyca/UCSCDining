@@ -23,6 +23,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -85,6 +86,7 @@ public class MealViewFragment extends ListFragment{
 		mViewPager = (ViewPager) view.findViewById(R.id.viewpager);
         mViewPager.setAdapter(new MenuAdapter());
 		mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
+        mSlidingTabLayout.setDistributeEvenly(true);
 		mSlidingTabLayout.setViewPager(mViewPager);
 	}
 	
@@ -166,6 +168,9 @@ public class MealViewFragment extends ListFragment{
 		}
 		
 		protected void onPostExecute(Long result) {
+            MenuParser.manualRefresh = false;
+            // For keeping track and only allowing one Asynctask to run at once
+            task = null;
             // Post-execute: set array adapters, reload animation, set title
 
 
@@ -250,7 +255,6 @@ public class MealViewFragment extends ListFragment{
 			mDrawerList.setAdapter(new ColorAdapter(getActivity(),
 					R.layout.drawer_list_item, Util.collegeList));
 
-			MenuParser.manualRefresh = false;
 			ListView listView = (ListView) getActivity().findViewById(LISTVIEW_ID1);
 			if(listView != null){
 				listView.setAdapter(new ArrayAdapter<String>(getActivity(),
@@ -272,9 +276,6 @@ public class MealViewFragment extends ListFragment{
 
 			// Set title text
             setTitleText(collegeNum, ((ActionBarActivity)getActivity()).getSupportActionBar());
-
-            // For keeping track and only allowing one Asynctask to run at once
-            task = null;
 		}
 		
 	}

@@ -7,6 +7,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -15,12 +16,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import com.nickivy.ucscdining.MealViewFragment;
 import com.nickivy.ucscdining.R;
 import com.nickivy.ucscdining.parser.MealDataFetcher;
 import com.nickivy.ucscdining.parser.MenuParser;
 import com.nickivy.ucscdining.util.Util;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 
@@ -44,21 +45,21 @@ public class MenuWidget extends AppWidgetProvider {
     CLICKTAG_COLLEGERIGHT = "COLLEGE_RIGHT",
     CLICKTAG_MEALLEFT = "MEAL_LEFT",
     CLICKTAG_MEALRIGHT = "MEAL_RIGHT",
-    TAG_TIMEUPDATE="time_update";
+    TAG_TIMEUPDATE="time_update",
+    TAG_WIDGETID="widget_id",
+    TAG_UPDATEALL="update_all",
+    KEY_COLLEGES="key_colleges",
+    KEY_MEALS="key_meals";
 
-    public static int currentCollege = -1,
-    currentMeal = -2;
+    //public static int currentCollege = -1,
+    //currentMeal = -2;
 
-    /**
-     * This variable is set going into the AsyncTask by widget buttons, if the day being loaded is
-     * different than the current date being passed in
-     */
-    public static int dayIncrement;
+    private static RemoteViews views;
+
+    public static ArrayList<WidgetData> widgetData = new ArrayList<WidgetData>();
+
     // Direction for telling which meal to skip over on brunch days
     public static boolean directionRight = true;
-
-    private static RetrieveMenuInWidgetTask mTask= null;
-
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -146,22 +147,24 @@ public class MenuWidget extends AppWidgetProvider {
         super.onDisabled(context);
     }
 
+    @Override
+    public void onDeleted(Context context, int[] appWidgetIds) {
+        for (int i : appWidgetIds) {
+            widgetData.remove(getWidgetDataById(i));
+        }
+        saveData(context);
+    }
+
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
-
-        int today[] = Util.getToday();
-        if (currentCollege < 0) {
-            currentCollege = 0;
+        WidgetData thisWidgetData = getWidgetDataById(appWidgetId);
+        if (thisWidgetData == null) {
+            thisWidgetData = new WidgetData(appWidgetId, getSavedCollegeData(context,
+                    widgetData.size()));
+            widgetData.add(thisWidgetData);
+            saveData(context);
         }
-        /*
-         * This here controls the AsyncTask so only one runs at once. If the user presses the
-         * buttons too fast they can get things overlapping on each other and it's not good.
-         */
-        if (mTask == null) {
-            mTask = new RetrieveMenuInWidgetTask(context, appWidgetManager, appWidgetId, today[0],
-                    today[1], today[2], currentCollege);
-            mTask.execute();
-        }
+        new RetrieveMenuInWidgetTask(context, appWidgetManager, thisWidgetData).execute();
         // Actual setting of widget data is accomplished in the postexecute of the asynctask
     }
 
@@ -169,49 +172,39 @@ public class MenuWidget extends AppWidgetProvider {
 
         private Context mContext;
         private AppWidgetManager mAppWidgetManager;
-        private int mAppWidgetId, mMonth, mDay, mYear, mCollege;
+        private WidgetData mData;
 
         public RetrieveMenuInWidgetTask(Context context, AppWidgetManager appWidgetManager,
-                int appWidgetId, int month, int day, int year, int college) {
+                WidgetData data) {
             mContext = context;
+            mData = data;
             mAppWidgetManager = appWidgetManager;
-            mAppWidgetId = appWidgetId;
-            mCollege = college;
-            if (dayIncrement != 0) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(Calendar.MONTH, month - 1);
-                calendar.set(Calendar.DAY_OF_MONTH, day);
-                calendar.set(Calendar.YEAR, year);
-                calendar.add(Calendar.DATE, dayIncrement);
-                mMonth = calendar.get(Calendar.MONTH) + 1;
-                mDay = calendar.get(Calendar.DAY_OF_MONTH);
-                mYear = calendar.get(Calendar.YEAR);
-            } else {
-                mMonth = month;
-                mDay = day;
-                mYear = year;
-            }
         }
 
         @Override
         protected Long doInBackground(Void... voids) {
-            int res = MealDataFetcher.fetchData(mContext, mMonth, mDay, mYear);
+            int res = MealDataFetcher.fetchData(mContext, mData.getMonth(),
+                    mData.getDay(), mData.getYear());
             return Double.valueOf(res).longValue();
         }
 
         @Override
         protected void onPreExecute() {
-            RemoteViews widget = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
-            widget.setViewVisibility(R.id.widget_progresscircle, View.VISIBLE);
-            mAppWidgetManager.updateAppWidget(mAppWidgetId, widget);
+            if (views == null) {
+                views = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
+            }
+            views.setViewVisibility(R.id.widget_progresscircle, View.VISIBLE);
+            mAppWidgetManager.updateAppWidget(mData.getWidgetId(), views);
         }
 
         protected void onPostExecute(Long result) {
-            RemoteViews widget = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
-            widget.setViewVisibility(R.id.widget_progresscircle, View.INVISIBLE);
+            if (views == null) {
+                views = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
+            }
+            views.setViewVisibility(R.id.widget_progresscircle, View.INVISIBLE);
 
             if (!result.equals(Double.valueOf(Util.GETLIST_SUCCESS).longValue())) {
-                Log.v("ucscdining", "No internet connection or database error not updating widget");
+                Log.v(Util.LOGTAG, "No internet connection or database error not updating widget");
                 return;
             }
             // Check if all dining halls are closed
@@ -222,165 +215,169 @@ public class MenuWidget extends AppWidgetProvider {
                     break;
                 }
             }
-
             Intent svcIntent = new Intent(mContext, WidgetService.class);
-            svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+            svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mData.getWidgetId());
             svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
 
-            // If currentMeal uninitialized, initialize it here (this way we can check for brunch)
-            if (currentMeal < 0) {
-                currentMeal = Util.getCurrentMeal(currentCollege);
-            }
-
             // Set adapter for listview
-            widget.setRemoteAdapter(R.id.widget_list, svcIntent);
-            mAppWidgetManager.notifyAppWidgetViewDataChanged(mAppWidgetId, R.id.widget_list);
+            views.setRemoteAdapter(R.id.widget_list, svcIntent);
+            mAppWidgetManager.notifyAppWidgetViewDataChanged(mData.getWidgetId(),
+                    R.id.widget_list);
 
             // If so display 'All Closed' and nothing else
             if (allClosed) {
-                widget.setTextViewText(R.id.widget_collegename, "All Closed");
-                widget.setTextColor(R.id.widget_collegename, Color.BLACK);
+                views.setTextViewText(R.id.widget_collegename, "All Closed");
+                views.setTextColor(R.id.widget_collegename, Color.BLACK);
             } else {
-                if (currentMeal == Util.BREAKFAST &&
-                        MenuParser.fullMenuObj.get(currentCollege).getBreakfast().size() > 0) {
-                    if (MenuParser.fullMenuObj.get(currentCollege).getBreakfast().get(0)
+                if (mData.getMeal() == Util.BREAKFAST &&
+                        MenuParser.fullMenuObj.get(mData.getCollege()).getBreakfast().size() > 0) {
+                    if (MenuParser.fullMenuObj.get(mData.getCollege()).getBreakfast().get(0)
                             .equals(Util.brunchMessage)) {
-                        currentMeal = directionRight ? Util.LUNCH : Util.DINNER;
+                        mData.setMeal(directionRight ? Util.LUNCH : Util.DINNER);
                     }
                 }
 
                 // Set view text of college and current meal
-                widget.setTextViewText(R.id.widget_collegename, Util.collegeList[mCollege]);
-                if (MenuParser.fullMenuObj.get(mCollege).getIsCollegeNight()) {
-                    widget.setTextColor(R.id.widget_collegename, Color.BLUE);
-                } else if (MenuParser.fullMenuObj.get(mCollege).getIsFarmFriday() ||
-                        MenuParser.fullMenuObj.get(mCollege).getIsHealthyMonday()) {
+                views.setTextViewText(R.id.widget_collegename,
+                        Util.collegeList[mData.getCollege()]);
+                if (MenuParser.fullMenuObj.get(mData.getCollege()).getIsCollegeNight()) {
+                    views.setTextColor(R.id.widget_collegename, Color.BLUE);
+                } else if (MenuParser.fullMenuObj.get(mData.getCollege()).getIsFarmFriday() ||
+                        MenuParser.fullMenuObj.get(mData.getCollege()).getIsHealthyMonday()) {
                     // 'Green Apple'
-                    widget.setTextColor(R.id.widget_collegename, Color.rgb(0x4C, 0xC5, 0x52));
-                } else if (!MenuParser.fullMenuObj.get(mCollege).getIsOpen()) {
-                    widget.setTextColor(R.id.widget_collegename, Color.LTGRAY);
+                    views.setTextColor(R.id.widget_collegename, Color.rgb(0x4C, 0xC5, 0x52));
+                } else if (!MenuParser.fullMenuObj.get(mData.getCollege()).getIsOpen()) {
+                    views.setTextColor(R.id.widget_collegename, Color.LTGRAY);
                 } else {
-                    widget.setTextColor(R.id.widget_collegename, Color.BLACK);
+                    views.setTextColor(R.id.widget_collegename, Color.BLACK);
                 }
-                widget.setTextViewText(R.id.widget_mealname, mMonth + "/" + mDay + " " +
-                        Util.meals[currentMeal]);
+                views.setTextViewText(R.id.widget_mealname, mData.getMonth() + "/" + mData.getDay()
+                        + " " + Util.meals[mData.getMeal()]);
             }
 
             // Set intents on all four buttons
             Intent intent = new Intent(mContext, MenuWidget.class);
+            // Store the widget tag in it for use in onReceive
+            intent.putExtra(TAG_WIDGETID, mData.getWidgetId());
+            /*
+             * Arrow button presses do not need to update all the widgets, just their own
+             * (alarms update all)
+             */
+            intent.putExtra(TAG_UPDATEALL, false);
+
             intent.setAction(CLICKTAG_COLLEGELEFT);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, 0);
-            widget.setOnClickPendingIntent(R.id.widget_college_leftbutton,
-                    pendingIntent);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, mData.getWidgetId(),
+                    intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            views.setOnClickPendingIntent(R.id.widget_college_leftbutton, pendingIntent);
 
             intent.setAction(CLICKTAG_COLLEGERIGHT);
-            pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, 0);
-            widget.setOnClickPendingIntent(R.id.widget_college_rightbutton,
-                    pendingIntent);
+            pendingIntent = PendingIntent.getBroadcast(mContext, mData.getWidgetId(), intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            views.setOnClickPendingIntent(R.id.widget_college_rightbutton, pendingIntent);
 
             intent.setAction(CLICKTAG_MEALLEFT);
-            pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, 0);
-            widget.setOnClickPendingIntent(R.id.widget_mealname_leftbutton,
-                    pendingIntent);
+            pendingIntent = PendingIntent.getBroadcast(mContext, mData.getWidgetId(), intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            views.setOnClickPendingIntent(R.id.widget_mealname_leftbutton, pendingIntent);
 
             intent.setAction(CLICKTAG_MEALRIGHT);
-            pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, 0);
-            widget.setOnClickPendingIntent(R.id.widget_mealname_rightbutton,
-                    pendingIntent);
+            pendingIntent = PendingIntent.getBroadcast(mContext, mData.getWidgetId(), intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            views.setOnClickPendingIntent(R.id.widget_mealname_rightbutton, pendingIntent);
 
-            mAppWidgetManager.updateAppWidget(mAppWidgetId, widget);
-
-            // Set mTask to null so that now we know it can be run again
-            mTask = null;
+            mAppWidgetManager.updateAppWidget(mData.getWidgetId(), views);
+            saveData(mContext);
         }
     }
 
-
-
     @Override
     public void onReceive(@NonNull Context context, @NonNull Intent intent) {
-        if (CLICKTAG_COLLEGELEFT.equals(intent.getAction())) {
-            currentCollege--;
-            if (currentCollege <= -1) {
-                currentCollege = 4;
-            }
-            /*
-             * If college is not open, cycle until find one that is. Only try five times
-             *
-             * All 5 closed is handled separately
-             */
-            if (!MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
-                for (int i = 0; i < 5; i++) {
-                    currentCollege--;
-                    if (currentCollege == -1) {
-                        currentCollege = 4;
-                    }
-                    if (MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
-                        break;
-                    }
-                }
-            }
+        WidgetData data = getWidgetDataById(intent.getIntExtra(TAG_WIDGETID, -1));
+        if (data == null) {
+            // Trigger update for all
+            ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
+                    MenuWidget.class.getName());
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
+            onUpdate(context, appWidgetManager, appWidgetIds);
+            super.onReceive(context, intent);
+            return;
         }
-        if (CLICKTAG_COLLEGERIGHT.equals(intent.getAction())) {
-            currentCollege++;
-            if (currentCollege >= 5) {
-                currentCollege = 0;
+        int thisDataIndex = widgetData.indexOf(data);
+        if(!intent.getBooleanExtra(TAG_UPDATEALL, true)) {
+            if (CLICKTAG_COLLEGELEFT.equals(intent.getAction())) {
+                widgetData.get(thisDataIndex).decrementCollege();
             }
-            /*
-             * If college is not open, cycle until find one that is. Only try five times
-             *
-             * All 5 closed is handled separately
-             */
-            if (!MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
-                for (int i = 0; i < 5; i++) {
-                    currentCollege++;
-                    if (currentCollege == 5) {
-                        currentCollege = 0;
-                    }
-                    if (MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
-                        break;
-                    }
-                }
+            if (CLICKTAG_COLLEGERIGHT.equals(intent.getAction())) {
+                widgetData.get(thisDataIndex).incrementCollege();
             }
+            if (CLICKTAG_MEALLEFT.equals(intent.getAction())) {
+                widgetData.get(thisDataIndex).decrementMeal();
+            }
+            if (CLICKTAG_MEALRIGHT.equals(intent.getAction())) {
+                widgetData.get(thisDataIndex).incrementMeal();
+            }
+            ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
+                    MenuWidget.class.getName());
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            updateAppWidget(context, appWidgetManager, widgetData.get(thisDataIndex).getWidgetId());
+        } else {
+            if (TAG_TIMEUPDATE.equals(intent.getAction())) {
+                widgetData.get(thisDataIndex).setMeal(Util.getCurrentMeal
+                        (widgetData.get(thisDataIndex).getCollege()));
+                widgetData.get(thisDataIndex).setToToday();
+            }
+            // Trigger update
+            ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
+                    MenuWidget.class.getName());
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
+            onUpdate(context, appWidgetManager, appWidgetIds);
         }
-        if (CLICKTAG_MEALLEFT.equals(intent.getAction())) {
-            currentMeal--;
-            if (currentMeal == -1) {
-                currentMeal = 2;
-                // If at breakfast and left button pressed, go to previous day
-                dayIncrement--;
-                directionRight = false;
-            }
-            // In case when button press leads to a weekend breakfast, go to previous day
-            if (currentMeal == Util.BREAKFAST &&
-                    MenuParser.fullMenuObj.get(currentCollege).getBreakfast().size() > 0) {
-                if (MenuParser.fullMenuObj.get(currentCollege).getBreakfast().get(0)
-                        .equals(Util.brunchMessage)) {
-                    dayIncrement--;
-                    currentMeal = Util.DINNER;
-                }
-            }
-        }
-        if (CLICKTAG_MEALRIGHT.equals(intent.getAction())) {
-            currentMeal++;
-            if (currentMeal == 3) {
-                currentMeal = 0;
-                // If at dinner, and right button pressed, advance to next day
-                dayIncrement++;
-                directionRight = true;
-            }
-        }
-        if (TAG_TIMEUPDATE.equals(intent.getAction())) {
-            currentMeal = Util.getCurrentMeal(currentCollege);
-            dayIncrement = 0;
-        }
-        // Trigger update
-        ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
-                MenuWidget.class.getName());
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
-        onUpdate(context, appWidgetManager, appWidgetIds);
         super.onReceive(context, intent);
+    }
+
+    public static WidgetData getWidgetDataById(int widgetId) {
+        if (widgetData == null) {
+            return null;
+        }
+        for (WidgetData data : widgetData) {
+            if (data.getWidgetId() == widgetId) {
+                return data;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Saves the current colleges and meals of the widgets to sharedprefs. That way if things
+     * fall out of memory, our widget doesn't completely reset.
+     *
+     * <p>Data is stored as a string containing each int in order as one character (since they can be
+     * a max of 4)
+     */
+    private static void saveData(Context context) {
+        String savedCollege = "";//,
+                //savedMeals = "";
+        for (WidgetData data : widgetData) {
+            savedCollege = savedCollege + data.getCollege();
+            //savedMeals = savedMeals + data.getMeal();
+        }
+        SharedPreferences settings = context.getSharedPreferences(Util.WIDGETSTATE_PREFS, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(KEY_COLLEGES, savedCollege);
+        //editor.putString(KEY_MEALS, savedMeals);
+        editor.commit();
+    }
+
+    private static int getSavedCollegeData(Context context, int index) {
+        SharedPreferences settings = context.getSharedPreferences(Util.WIDGETSTATE_PREFS, 0);
+        String collegeData = settings.getString(KEY_COLLEGES, "");
+        try {
+            return collegeData.charAt(index) - '0';
+        } catch (StringIndexOutOfBoundsException e) {
+            return 0;
+        }
     }
 }
 

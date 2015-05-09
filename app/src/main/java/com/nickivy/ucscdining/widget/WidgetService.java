@@ -29,6 +29,12 @@ public class WidgetService extends RemoteViewsService {
         return(new MealWidgetViewsFactory(this.getApplicationContext(),
                 intent));
     }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
+    }
 }
 
 class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
@@ -56,13 +62,19 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public int getCount() {
-        switch (MenuWidget.currentMeal) {
+        if (MenuWidget.getWidgetDataById(appWidgetId) == null) {
+            return -1;
+        }
+        switch (MenuWidget.getWidgetDataById(appWidgetId).getMeal()) {
             case Util.BREAKFAST:
-                return MenuParser.fullMenuObj.get(MenuWidget.currentCollege).getBreakfast().size();
+                return MenuParser.fullMenuObj.get(MenuWidget.getWidgetDataById
+                        (appWidgetId).getCollege()).getBreakfast().size();
             case Util.LUNCH:
-                return MenuParser.fullMenuObj.get(MenuWidget.currentCollege).getLunch().size();
+                return MenuParser.fullMenuObj.get(MenuWidget.getWidgetDataById
+                        (appWidgetId).getCollege()).getLunch().size();
             case Util.DINNER:
-                return MenuParser.fullMenuObj.get(MenuWidget.currentCollege).getDinner().size();
+                return MenuParser.fullMenuObj.get(MenuWidget.getWidgetDataById
+                        (appWidgetId).getCollege()).getDinner().size();
             default:
                 return -1;
         }
@@ -72,16 +84,19 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     public RemoteViews getViewAt(int position) {
         RemoteViews row = new RemoteViews(context.getPackageName(), R.layout.widget_row);
         // If user mashes buttons too fast things can crash. This should prevent it
-        if (position >= getCurrentMenu(MenuWidget.currentCollege).size()) {
+        if (position >= getCurrentMenu(MenuWidget.getWidgetDataById
+                (appWidgetId).getCollege()).size()) {
             return row;
         }
         row.setTextViewText(android.R.id.text1,
-                getCurrentMenu(MenuWidget.currentCollege).get(position));
+                getCurrentMenu(MenuWidget.getWidgetDataById
+                        (appWidgetId).getCollege()).get(position));
 
         Intent intent = new Intent();
         Bundle extras = new Bundle();
         extras.putString(Util.EXTRA_WORD,
-                getCurrentMenu(MenuWidget.currentCollege).get(position));
+                getCurrentMenu(MenuWidget.getWidgetDataById
+                        (appWidgetId).getCollege()).get(position));
         intent.putExtras(extras);
         row.setOnClickFillInIntent(android.R.id.text1, intent);
         return row;
@@ -93,13 +108,13 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
      * @return
      */
     private ArrayList<String> getCurrentMenu(final int college) {
-        if (!MenuParser.fullMenuObj.get(college).getIsOpen()) {
+        /*if (!MenuParser.fullMenuObj.get(college).getIsOpen()) {
             ArrayList<String> ret = new ArrayList<String>();
             ret.add(Util.collegeList[college] +
                     "dining hall closed today");
             return ret;
-        }
-        switch(MenuWidget.currentMeal) {
+        }*/
+        switch(MenuWidget.getWidgetDataById(appWidgetId).getMeal()) {
             case Util.BREAKFAST:
                 return MenuParser.fullMenuObj.get(college).getBreakfast();
             case Util.LUNCH:

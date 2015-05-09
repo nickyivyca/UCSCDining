@@ -39,10 +39,6 @@ public class MenuParser {
     
     public static boolean manualRefresh = false;
     
-    private final static int maxReloads = 3;
-    private static int reloadTries = 0;
-    private static boolean failed = false;
-    
     public static ArrayList<CollegeMenu> fullMenuObj = new ArrayList<CollegeMenu>(){{
     	add(new CollegeMenu());
     	add(new CollegeMenu());
@@ -51,11 +47,10 @@ public class MenuParser {
     	add(new CollegeMenu());
     }};
     
-    public static int getSingleMealList(int k, int month, int day, int year){
+    public static int getSingleMealList(int k, int month, int day, int year) {
     	Document doc;
     	Elements names = null;
-    	try{
-    		reloadTries++;
+    	try {
     		doc = Jsoup.connect(dateURLPart1 + month + "%2F" + day + "%2F" + year +
                     datedURLListParts2[k]).get();
 	
@@ -67,19 +62,8 @@ public class MenuParser {
         } catch (IOException e) {
     		Log.w("ucscdining","Unable to download dining menu");
     		e.printStackTrace();
-    		failed = true;
+            return Util.GETLIST_OKHTTP_FAILURE;
     	}
-		
-		/*
-		 * In order to defeat an okhttp error, recurse
-		 */
-		if(failed && (reloadTries < maxReloads)) {
-            failed = false;
-			getSingleMealList(k, month, day, year);
-		}
-		if (reloadTries >= maxReloads) {
-			return Util.GETLIST_DATABASE_FAILURE;
-		}
 	
 		ArrayList<String> breakfastList = new ArrayList<String>(),
 				lunchList = new ArrayList<String>(),
@@ -137,12 +121,18 @@ public class MenuParser {
      * Puts downloaded data from specified date (instead of today) into the full menu object.
      */
     public static int getMealList(int month, int day, int year) {
-        int res;
-    	for(int i = 0; i < 5; i++){
-    		reloadTries = 0;
-    		failed = false;
-    		res = getSingleMealList(i, month, day, year);
-            if (res != Util.GETLIST_SUCCESS) {
+    	for (int i = 0; i < 5; i++) {
+            int res = getSingleMealList(i, month, day, year);
+            // Try three times to defeat OKHTTP error.
+            if (res == Util.GETLIST_OKHTTP_FAILURE) {
+                res = getSingleMealList(i, month, day, year);
+                if (res == Util.GETLIST_OKHTTP_FAILURE) {
+                    res = getSingleMealList(i, month, day, year);
+                    if (res == Util.GETLIST_OKHTTP_FAILURE) {
+                        return Util.GETLIST_INTERNET_FAILURE;
+                    }
+                }
+            } else if (res != Util.GETLIST_SUCCESS) {
                 return res;
             }
     	}
