@@ -5,7 +5,6 @@ import java.util.Calendar;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -20,7 +19,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -52,6 +50,7 @@ public class MainActivity extends ActionBarActivity{
     private ActionBarDrawerToggle mDrawerToggle;
     private ActionBar mActionBar;
     private MealViewFragment fragment;
+    private MealViewFragmentLarge fragmentLarge;
 
     //private static int currentCollege = 0;
 
@@ -103,7 +102,6 @@ public class MainActivity extends ActionBarActivity{
             mAboutList.setOnItemClickListener(new InfoItemClickListener());
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            fragment = new MealViewFragment();
             Bundle args = new Bundle();
             args.putInt(Util.TAG_COLLEGE, intentCollege);
             args.putInt(Util.TAG_MEAL, intentMeal);
@@ -112,12 +110,30 @@ public class MainActivity extends ActionBarActivity{
             args.putInt(Util.TAG_DAY, intentDay);
             args.putInt(Util.TAG_YEAR, intentYear);
 
-            fragment.setArguments(args);
-            transaction.replace(R.id.fragment_container, fragment);
+            /**
+             * If layout xlarge (nexus 10-sized tablet) or layout large (nexus 7-sized tablet)
+             * and view landscape, use large layout (displays all meals at once), otherwise use
+             * normal layout
+             */
+            if ((getResources().getConfiguration().screenLayout &
+                    Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE
+                    || ( (getResources().getConfiguration().screenLayout &
+                    Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE)
+                    && ((getResources().getConfiguration().orientation ==
+                    Configuration.ORIENTATION_LANDSCAPE))) {
+                fragmentLarge = new MealViewFragmentLarge();
+                fragmentLarge.setArguments(args);
+                transaction.replace(R.id.fragment_container, fragmentLarge);
+            } else {
+                fragment = new MealViewFragment();
+                fragment.setArguments(args);
+                transaction.replace(R.id.fragment_container, fragment);
+            }
+
             transaction.commit();
 
-        FragmentManager m = getSupportFragmentManager();
-        m.executePendingTransactions();
+            FragmentManager m = getSupportFragmentManager();
+            m.executePendingTransactions();
 
 /*	        if (savedInstanceState == null) {
 //	            selectItem(0);
@@ -183,19 +199,37 @@ public class MainActivity extends ActionBarActivity{
             // Use the current date as the default date in the picker
             final Calendar c = Calendar.getInstance();
             int year = c.get(Calendar.YEAR);
+            int today[] = getCurrentDispDate();
 
             // Create a new instance of DatePickerDialog and return it
             // Default date to what is currently selected by user
             return new DatePickerDialog(getActivity(), this, year,
-                MealViewFragment.displayedMonth - 1, MealViewFragment.displayedDay);
+                today[0] - 1, today[1]);
         }
 
         @Override
         public void onDateSet(android.widget.DatePicker view, int year,
             int monthOfYear, int dayOfMonth) {
-            MealViewFragment meal = (MealViewFragment)
-                getFragmentManager().findFragmentById(R.id.fragment_container);
-            meal.selectNewDate(monthOfYear + 1,  dayOfMonth,  year);
+            try {
+                MealViewFragment meal = (MealViewFragment)
+                        getFragmentManager().findFragmentById(R.id.fragment_container);
+                meal.selectNewDate(monthOfYear + 1,  dayOfMonth,  year);
+            } catch (ClassCastException e) {
+                MealViewFragmentLarge meal = (MealViewFragmentLarge)
+                        getFragmentManager().findFragmentById(R.id.fragment_container);
+                meal.selectNewDate(monthOfYear + 1,  dayOfMonth,  year);
+            }
+        }
+    }
+
+    public static int[] getCurrentDispDate() {
+        if (MealViewFragment.displayedMonth == 0 || MealViewFragment.displayedDay == 0 ||
+                MealViewFragment.displayedYear == 0) {
+            int ret[] = {MealViewFragmentLarge.displayedMonth, MealViewFragmentLarge.displayedDay};
+            return ret;
+        } else {
+            int ret[] = {MealViewFragment.displayedMonth, MealViewFragment.displayedDay};
+            return ret;
         }
     }
 

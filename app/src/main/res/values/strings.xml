@@ -27,4 +27,8 @@
     <string name="jsouplicense_desc">Released under MIT license. Click here to visit the jsoup
     webpage.</string>
 
+    <string name="breakfast">Breakfast</string>
+    <string name="lunch">Lunch</string>
+    <string name="dinner">Dinner</string>
+
 </resources>

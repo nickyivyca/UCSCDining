@@ -79,7 +79,6 @@ public class MealViewFragment extends ListFragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
         Bundle savedInstanceState) {
         collegeNum = getArguments().getInt(Util.TAG_COLLEGE);
-        Log.v(Util.LOGTAG, "received college in intent: " + collegeNum);
         getActivity().setTitle(Util.collegeList[collegeNum]);
 
         displayedMonth = getArguments().getInt(Util.TAG_MONTH);
@@ -335,7 +334,6 @@ public class MealViewFragment extends ListFragment{
                 @Override
                 public void onRefresh() {
                     MenuParser.manualRefresh = true;
-                    //int[] today = Util.getToday();
                     // When doing swipe refresh, reload to the displayed day
                     if (task == null) {
                         task = new RetrieveMenuInFragmentTask(displayedMonth, displayedDay,
@@ -410,7 +408,7 @@ public class MealViewFragment extends ListFragment{
      * Allows us to set colors of entries in the college list to denote
      * events
      */
-    public class ColorAdapter extends ArrayAdapter<String> {
+    public static class ColorAdapter extends ArrayAdapter<String> {
 
         public ColorAdapter(Context context, int resource, List<String> objects) {
             super(context, resource, objects);
