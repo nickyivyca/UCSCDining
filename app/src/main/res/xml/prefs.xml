@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/appinfo" android:key="app_info">
+    <PreferenceCategory android:title="@string/settings" android:key="main_settings">
         <!-- title will have version number set in code in it-->
-        <Preference android:key="mydesc"
-            android:title=""
-            android:summary="@string/desc"
+        <ListPreference android:key="default_college"
+            android:title="@string/default_college"
+            android:summary="@string/default_desc"
+            android:entries="@array/colleges_pref"
+            android:entryValues="@array/colleges_values"
             />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/licenses" android:key="licences">

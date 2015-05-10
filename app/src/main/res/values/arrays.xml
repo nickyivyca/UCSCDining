@@ -1,0 +1,16 @@
+<resources>
+    <string-array name="colleges_pref">
+        <item>Cowell/Stevenson</item>
+        <item>Crown/Merrill</item>
+        <item>Porter/Kresge</item>
+        <item>Eight/Oakes</item>
+        <item>Nine/Ten</item>
+    </string-array>
+    <string-array name="colleges_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+</resources>

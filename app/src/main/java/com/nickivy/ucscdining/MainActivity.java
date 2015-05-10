@@ -5,9 +5,12 @@ import java.util.Calendar;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -17,6 +20,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -49,13 +53,23 @@ public class MainActivity extends ActionBarActivity{
     private ActionBar mActionBar;
     private MealViewFragment fragment;
 
-    private static int currentCollege = 0;
+    //private static int currentCollege = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.mainview);
+
+        int today[] = Util.getToday();
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int intentCollege = getIntent().getIntExtra(Util.TAG_COLLEGE,
+                Integer.parseInt(prefs.getString("default_college", "0")));
+        int intentMeal = getIntent().getIntExtra(Util.TAG_MEAL, Util.getCurrentMeal(intentCollege));
+        int intentMonth = getIntent().getIntExtra(Util.TAG_MONTH, today[0]);
+        int intentDay = getIntent().getIntExtra(Util.TAG_DAY, today[1]);
+        int intentYear = getIntent().getIntExtra(Util.TAG_YEAR, today[2]);
 
 //		if(findViewById(R.id.fragment_container) != null) {
 
@@ -91,7 +105,13 @@ public class MainActivity extends ActionBarActivity{
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             fragment = new MealViewFragment();
             Bundle args = new Bundle();
-            args.putInt(MealViewFragment.ARG_COLLEGE_NUMBER, currentCollege);
+            args.putInt(Util.TAG_COLLEGE, intentCollege);
+            args.putInt(Util.TAG_MEAL, intentMeal);
+
+            args.putInt(Util.TAG_MONTH, intentMonth);
+            args.putInt(Util.TAG_DAY, intentDay);
+            args.putInt(Util.TAG_YEAR, intentYear);
+
             fragment.setArguments(args);
             transaction.replace(R.id.fragment_container, fragment);
             transaction.commit();

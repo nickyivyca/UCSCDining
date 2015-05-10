@@ -1,5 +1,7 @@
 package com.nickivy.ucscdining.util;
 
+import android.util.Log;
+
 import com.nickivy.ucscdining.parser.MenuParser;
 
 import java.util.Calendar;
@@ -18,7 +20,7 @@ public class Util {
     // Times that the app decides to switch over to the specified meal.
     public static final int DINNER_SWITCH_TIME = 15, // 3 PM
             LUNCH_SWITCH_TIME = 11, // 11 AM
-            BREAKFAST_SWITCH_TIME = 0;// 12 AM
+            BREAKFAST_SWITCH_TIME = 21;// 9 PM
 
     // Enums for meal constants. They match the indexes in the meals array.
     public static final int BREAKFAST = 0,
@@ -54,13 +56,25 @@ public class Util {
 
     public static final String brunchMessage = "See lunch for today\'s brunch menu";
 
+    // Tags for intent passed to main activity from widget
+    public static final String TAG_COLLEGE = "tag_college",
+    TAG_MEAL = "tag_meal",
+    TAG_MONTH = "tag_month",
+    TAG_DAY = "tag_day",
+    TAG_YEAR = "tag_year";
+
     /**
      * Returns today's date as a 3-number int array. [month, day, year]
+     *
+     * <p>Does not necessarily return 'today' but instead returns the day the app should display.
+     * This happens after the dining hall closes.
      */
     public static int[] getToday() {
-        Date today = new Date();
         Calendar cal = Calendar.getInstance();
-        cal.setTime(today);
+        // If time is past dining hall closing (which is the breakfast switch time) return tomorrow
+        if (cal.get(Calendar.HOUR_OF_DAY) >= BREAKFAST_SWITCH_TIME) {
+            cal.add(Calendar.DATE, 1);
+        }
 
         int month = cal.get(Calendar.MONTH) + 1;
         int day = cal.get(Calendar.DAY_OF_MONTH);
@@ -79,13 +93,15 @@ public class Util {
      */
     public static int getCurrentMeal(int college) {
         Calendar cal = Calendar.getInstance();
-        if (cal.get(Calendar.HOUR_OF_DAY) >= DINNER_SWITCH_TIME) {
+        if (cal.get(Calendar.HOUR_OF_DAY) >= DINNER_SWITCH_TIME &&
+                cal.get(Calendar.HOUR_OF_DAY) < BREAKFAST_SWITCH_TIME) {
             return DINNER;
         }
         if (cal.get(Calendar.HOUR_OF_DAY) >= LUNCH_SWITCH_TIME) {
             return LUNCH;
         }
-        if(cal.get(Calendar.HOUR_OF_DAY) >= BREAKFAST_SWITCH_TIME) {
+        if(cal.get(Calendar.HOUR_OF_DAY) >= BREAKFAST_SWITCH_TIME ||
+                cal.get(Calendar.HOUR_OF_DAY) < LUNCH_SWITCH_TIME) {
             if (MenuParser.fullMenuObj.get(college).getBreakfast().size() > 0) {
                 if (MenuParser.fullMenuObj.get(college).getBreakfast().get(0)
                         .equals(brunchMessage)) {

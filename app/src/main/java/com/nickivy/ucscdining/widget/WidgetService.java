@@ -1,5 +1,6 @@
 package com.nickivy.ucscdining.widget;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.nickivy.ucscdining.MainActivity;
 import com.nickivy.ucscdining.R;
 import com.nickivy.ucscdining.parser.MenuParser;
 import com.nickivy.ucscdining.util.Util;
@@ -97,7 +99,7 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         extras.putString(Util.EXTRA_WORD,
                 getCurrentMenu(MenuWidget.getWidgetDataById
                         (appWidgetId).getCollege()).get(position));
-        intent.putExtras(extras);
+        intent.putExtras(extras);// Set intent on other bits for launching main app
         row.setOnClickFillInIntent(android.R.id.text1, intent);
         return row;
     }

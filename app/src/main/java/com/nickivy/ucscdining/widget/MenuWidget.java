@@ -11,11 +11,13 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
+import com.nickivy.ucscdining.MainActivity;
 import com.nickivy.ucscdining.R;
 import com.nickivy.ucscdining.parser.MealDataFetcher;
 import com.nickivy.ucscdining.parser.MenuParser;
@@ -162,7 +164,7 @@ public class MenuWidget extends AppWidgetProvider {
             thisWidgetData = new WidgetData(appWidgetId, getSavedCollegeData(context,
                     widgetData.size()));
             widgetData.add(thisWidgetData);
-            saveData(context);
+            //saveData(context);
         }
         new RetrieveMenuInWidgetTask(context, appWidgetManager, thisWidgetData).execute();
         // Actual setting of widget data is accomplished in the postexecute of the asynctask
@@ -285,6 +287,21 @@ public class MenuWidget extends AppWidgetProvider {
                     PendingIntent.FLAG_UPDATE_CURRENT);
             views.setOnClickPendingIntent(R.id.widget_mealname_rightbutton, pendingIntent);
 
+            // Set intent on other bits for launching main app
+            Intent launchAppIntent = new Intent(mContext, MainActivity.class);
+            launchAppIntent.putExtra(Util.TAG_MONTH, mData.getMonth());
+            launchAppIntent.putExtra(Util.TAG_DAY, mData.getDay());
+            launchAppIntent.putExtra(Util.TAG_YEAR, mData.getYear());
+            launchAppIntent.putExtra(Util.TAG_COLLEGE, mData.getCollege());
+            launchAppIntent.putExtra(Util.TAG_MEAL, mData.getMeal());
+
+            PendingIntent pendingLaunch = PendingIntent.getActivity(mContext, mData.getWidgetId(),
+                    launchAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            views.setOnClickPendingIntent(R.id.widget_college, pendingLaunch);
+            views.setOnClickPendingIntent(R.id.widget_collegename, pendingLaunch);
+            views.setOnClickPendingIntent(R.id.widget_mealname, pendingLaunch);
+            views.setPendingIntentTemplate(R.id.widget_list, pendingLaunch);
+
             mAppWidgetManager.updateAppWidget(mData.getWidgetId(), views);
             saveData(mContext);
         }
@@ -376,7 +393,9 @@ public class MenuWidget extends AppWidgetProvider {
         try {
             return collegeData.charAt(index) - '0';
         } catch (StringIndexOutOfBoundsException e) {
-            return 0;
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences
+                    (context.getApplicationContext());
+            return Integer.parseInt(prefs.getString("default_college", "0"));
         }
     }
 }
