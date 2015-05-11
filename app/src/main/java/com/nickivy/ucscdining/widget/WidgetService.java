@@ -20,7 +20,7 @@ import java.util.Calendar;
 /**
  * RemoteViewsService for the UCSCDining Widget. This only handles the ListView.
  *
- * Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
+ * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
  * @author Nick Ivy parkedraccoon@gmail.com
  */

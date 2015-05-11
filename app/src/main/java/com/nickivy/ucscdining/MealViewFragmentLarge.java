@@ -36,7 +36,7 @@ import java.util.ArrayList;
 /**
  * Fragment for displaying all three menus at once - tablet layout.
  *
- * Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
+ * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
  * @author Nicky Ivy parkedraccoon@gmail.com
  */

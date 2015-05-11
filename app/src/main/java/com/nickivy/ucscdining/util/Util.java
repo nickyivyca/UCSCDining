@@ -11,7 +11,7 @@ import java.util.Date;
  * Class for holding static functions and enums such as getting today, getting current meal, etc
  * that were previously scattered around various classes.
  *
- * Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
+ * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
  * @author @author Nicky Ivy parkedraccoon@gmail.com
  */
@@ -85,8 +85,7 @@ public class Util {
     }
 
     /**
-     * Gets meal based on time of day, based on times at top of file
-     *
+     * Gets meal based on time of day, based on times at top of file.
      * Will not return breakfast if brunch message is present
      *
      * @return return values are also enumerated at top of file

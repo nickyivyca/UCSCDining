@@ -36,9 +36,10 @@ import com.nickivy.ucscdining.util.Util;
  * App for viewing UCSC dining menus. Currently can
  * read all menus, display them based on time, with special colors displayed
  * for events such as College Nights, Healthy Mondays, or Farm Fridays. Also allows for
- * viewing days in the future and there is a widget which displays the same info.
+ * viewing days in the future and there is an automatically updating widget which displays the
+ * same info.
  *
- * Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
+ * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
  * @author Nicky Ivy parkedraccoon@gmail.com
  */

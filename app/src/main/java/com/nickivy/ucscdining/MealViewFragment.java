@@ -40,9 +40,9 @@ import android.widget.Toast;
  * Fragment for displaying one menu. Uses sliding tab
  * layout from Google's examples.
  *
- * Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
+ * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
- * @author Nick Ivy parkedraccoon@gmail.com
+ * @author Nicky Ivy parkedraccoon@gmail.com
  */
 
 @SuppressWarnings("ResourceType")

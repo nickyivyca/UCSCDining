@@ -19,7 +19,7 @@ import android.util.Log;
  * <p>Data is stored in the static fullMenu arraylist of 
  * CollegeMenu objects.
  *
- * Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
+ * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  * 
  * @author Nick Ivy parkedraccoon@gmail.com
  */

@@ -1,9 +1,11 @@
 package com.nickivy.ucscdining.widget;
 
 
+import android.content.Context;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.nickivy.ucscdining.R;
 import com.nickivy.ucscdining.parser.MenuParser;
 import com.nickivy.ucscdining.util.Util;
 
@@ -12,7 +14,7 @@ import java.util.Calendar;
 /**
  * Object for storing widget data, helps make each widget able to be independent.
  *
- * Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
+ * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
  * @author Nick Ivy parkedraccoon@gmail.com
  */
@@ -27,11 +29,11 @@ public class WidgetData {
 
     private RemoteViews views;
 
-    public WidgetData(int widgetId) {
-        this(widgetId, 0);
+    public WidgetData(int widgetId, Context context) {
+        this(widgetId, 0, context);
     }
 
-    public WidgetData(int widgetId, int initialCollege) {
+    public WidgetData(int widgetId, int initialCollege, Context context) {
         this.widgetId = widgetId;
         this.currentCollege = initialCollege;
         currentMeal = Util.getCurrentMeal(this.currentCollege);
@@ -40,6 +42,7 @@ public class WidgetData {
         currentMonth = today[0];
         currentDay = today[1];
         currentYear = today[2];
+        views = new RemoteViews(context.getPackageName(), R.layout.menu_widget);
     }
 
     public int getWidgetId() {
@@ -47,7 +50,6 @@ public class WidgetData {
     }
 
     public int getCollege() {
-        //Log.v("ucscdining", "id when getting college: " + widgetId);
         return currentCollege;
     }
 
@@ -65,6 +67,10 @@ public class WidgetData {
 
     public int getYear() {
         return currentYear;
+    }
+
+    public RemoteViews getViews() {
+        return views;
     }
 
 

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 /**
  * Method for pulling data from either database or internet into the full menu object.
  *
- * Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
+ * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
  * @author Nick Ivy parkedraccoon@gmail.com
  */

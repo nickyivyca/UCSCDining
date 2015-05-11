@@ -30,10 +30,10 @@ import java.util.Calendar;
 /**
  * Implementation of App Widget functionality.
  *
- * The widget itself displays the name of the college, name of the meal and the meal list, along
+ * <p>The widget itself displays the name of the college, name of the meal and the meal list, along
  * with buttons to shuffle between the meals and the colleges.
  *
- * Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
+ * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
  * @author Nick Ivy parkedraccoon@gmail.com
  */
@@ -56,7 +56,7 @@ public class MenuWidget extends AppWidgetProvider {
     //public static int currentCollege = -1,
     //currentMeal = -2;
 
-    private static RemoteViews views;
+    //private static RemoteViews views;
 
     public static ArrayList<WidgetData> widgetData = new ArrayList<WidgetData>();
 
@@ -162,7 +162,7 @@ public class MenuWidget extends AppWidgetProvider {
         WidgetData thisWidgetData = getWidgetDataById(appWidgetId);
         if (thisWidgetData == null) {
             thisWidgetData = new WidgetData(appWidgetId, getSavedCollegeData(context,
-                    widgetData.size()));
+                    widgetData.size()), context);
             widgetData.add(thisWidgetData);
             //saveData(context);
         }
@@ -192,18 +192,18 @@ public class MenuWidget extends AppWidgetProvider {
 
         @Override
         protected void onPreExecute() {
-            if (views == null) {
+            /*if (views == null) {
                 views = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
-            }
-            views.setViewVisibility(R.id.widget_progresscircle, View.VISIBLE);
-            mAppWidgetManager.updateAppWidget(mData.getWidgetId(), views);
+            }*/
+            mData.getViews().setViewVisibility(R.id.widget_progresscircle, View.VISIBLE);
+            mAppWidgetManager.updateAppWidget(mData.getWidgetId(), mData.getViews());
         }
 
         protected void onPostExecute(Long result) {
-            if (views == null) {
+            /*if (views == null) {
                 views = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
-            }
-            views.setViewVisibility(R.id.widget_progresscircle, View.INVISIBLE);
+            }*/
+            mData.getViews().setViewVisibility(R.id.widget_progresscircle, View.INVISIBLE);
 
             if (!result.equals(Double.valueOf(Util.GETLIST_SUCCESS).longValue())) {
                 Log.v(Util.LOGTAG, "No internet connection or database error not updating widget");
@@ -222,14 +222,14 @@ public class MenuWidget extends AppWidgetProvider {
             svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
 
             // Set adapter for listview
-            views.setRemoteAdapter(R.id.widget_list, svcIntent);
+            mData.getViews().setRemoteAdapter(R.id.widget_list, svcIntent);
             mAppWidgetManager.notifyAppWidgetViewDataChanged(mData.getWidgetId(),
                     R.id.widget_list);
 
             // If so display 'All Closed' and nothing else
             if (allClosed) {
-                views.setTextViewText(R.id.widget_collegename, "All Closed");
-                views.setTextColor(R.id.widget_collegename, Color.BLACK);
+                mData.getViews().setTextViewText(R.id.widget_collegename, "All Closed");
+                mData.getViews().setTextColor(R.id.widget_collegename, Color.BLACK);
             } else {
                 if (mData.getMeal() == Util.BREAKFAST &&
                         MenuParser.fullMenuObj.get(mData.getCollege()).getBreakfast().size() > 0) {
@@ -240,20 +240,21 @@ public class MenuWidget extends AppWidgetProvider {
                 }
 
                 // Set view text of college and current meal
-                views.setTextViewText(R.id.widget_collegename,
+                mData.getViews().setTextViewText(R.id.widget_collegename,
                         Util.collegeList[mData.getCollege()]);
+                //Log.v(Util.LOGTAG, "college name set");
                 if (MenuParser.fullMenuObj.get(mData.getCollege()).getIsCollegeNight()) {
-                    views.setTextColor(R.id.widget_collegename, Color.BLUE);
+                    mData.getViews().setTextColor(R.id.widget_collegename, Color.BLUE);
                 } else if (MenuParser.fullMenuObj.get(mData.getCollege()).getIsFarmFriday() ||
                         MenuParser.fullMenuObj.get(mData.getCollege()).getIsHealthyMonday()) {
                     // 'Green Apple'
-                    views.setTextColor(R.id.widget_collegename, Color.rgb(0x4C, 0xC5, 0x52));
+                    mData.getViews().setTextColor(R.id.widget_collegename, Color.rgb(0x4C, 0xC5, 0x52));
                 } else if (!MenuParser.fullMenuObj.get(mData.getCollege()).getIsOpen()) {
-                    views.setTextColor(R.id.widget_collegename, Color.LTGRAY);
+                    mData.getViews().setTextColor(R.id.widget_collegename, Color.LTGRAY);
                 } else {
-                    views.setTextColor(R.id.widget_collegename, Color.BLACK);
+                    mData.getViews().setTextColor(R.id.widget_collegename, Color.BLACK);
                 }
-                views.setTextViewText(R.id.widget_mealname, mData.getMonth() + "/" + mData.getDay()
+                mData.getViews().setTextViewText(R.id.widget_mealname, mData.getMonth() + "/" + mData.getDay()
                         + " " + Util.meals[mData.getMeal()]);
             }
 
@@ -270,22 +271,22 @@ public class MenuWidget extends AppWidgetProvider {
             intent.setAction(CLICKTAG_COLLEGELEFT);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, mData.getWidgetId(),
                     intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            views.setOnClickPendingIntent(R.id.widget_college_leftbutton, pendingIntent);
+            mData.getViews().setOnClickPendingIntent(R.id.widget_college_leftbutton, pendingIntent);
 
             intent.setAction(CLICKTAG_COLLEGERIGHT);
             pendingIntent = PendingIntent.getBroadcast(mContext, mData.getWidgetId(), intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
-            views.setOnClickPendingIntent(R.id.widget_college_rightbutton, pendingIntent);
+            mData.getViews().setOnClickPendingIntent(R.id.widget_college_rightbutton, pendingIntent);
 
             intent.setAction(CLICKTAG_MEALLEFT);
             pendingIntent = PendingIntent.getBroadcast(mContext, mData.getWidgetId(), intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
-            views.setOnClickPendingIntent(R.id.widget_mealname_leftbutton, pendingIntent);
+            mData.getViews().setOnClickPendingIntent(R.id.widget_mealname_leftbutton, pendingIntent);
 
             intent.setAction(CLICKTAG_MEALRIGHT);
             pendingIntent = PendingIntent.getBroadcast(mContext, mData.getWidgetId(), intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
-            views.setOnClickPendingIntent(R.id.widget_mealname_rightbutton, pendingIntent);
+            mData.getViews().setOnClickPendingIntent(R.id.widget_mealname_rightbutton, pendingIntent);
 
             // Set intent on other bits for launching main app
             Intent launchAppIntent = new Intent(mContext, MainActivity.class);
@@ -297,12 +298,12 @@ public class MenuWidget extends AppWidgetProvider {
 
             PendingIntent pendingLaunch = PendingIntent.getActivity(mContext, mData.getWidgetId(),
                     launchAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            views.setOnClickPendingIntent(R.id.widget_college, pendingLaunch);
-            views.setOnClickPendingIntent(R.id.widget_collegename, pendingLaunch);
-            views.setOnClickPendingIntent(R.id.widget_mealname, pendingLaunch);
-            views.setPendingIntentTemplate(R.id.widget_list, pendingLaunch);
+            mData.getViews().setOnClickPendingIntent(R.id.widget_college, pendingLaunch);
+            mData.getViews().setOnClickPendingIntent(R.id.widget_collegename, pendingLaunch);
+            mData.getViews().setOnClickPendingIntent(R.id.widget_mealname, pendingLaunch);
+            mData.getViews().setPendingIntentTemplate(R.id.widget_list, pendingLaunch);
 
-            mAppWidgetManager.updateAppWidget(mData.getWidgetId(), views);
+            mAppWidgetManager.updateAppWidget(mData.getWidgetId(), mData.getViews());
             saveData(mContext);
         }
     }
