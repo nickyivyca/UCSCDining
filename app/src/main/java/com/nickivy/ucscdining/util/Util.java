@@ -97,7 +97,8 @@ public class Util {
                 cal.get(Calendar.HOUR_OF_DAY) < BREAKFAST_SWITCH_TIME) {
             return DINNER;
         }
-        if (cal.get(Calendar.HOUR_OF_DAY) >= LUNCH_SWITCH_TIME) {
+        if (cal.get(Calendar.HOUR_OF_DAY) >= LUNCH_SWITCH_TIME &&
+                cal.get(Calendar.HOUR_OF_DAY) < DINNER_SWITCH_TIME) {
             return LUNCH;
         }
         if(cal.get(Calendar.HOUR_OF_DAY) >= BREAKFAST_SWITCH_TIME ||

@@ -20,6 +20,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -104,7 +105,7 @@ public class MealViewFragment extends ListFragment{
         if (MenuParser.fullMenuObj.get(position).getIsOpen()) {
             if (MenuParser.fullMenuObj.get(position).getIsSet()) {
                 // Set title to include date and color, based on events at the dining hall
-                setTitleText(position, ((ActionBarActivity)getActivity()).getSupportActionBar());
+                setTitleText(position, ((AppCompatActivity)getActivity()).getSupportActionBar());
 
                 mMealList = (ListView) getActivity().findViewById(MealViewFragment.LISTVIEW_ID1);
                 ArrayList<String> testedArray = new ArrayList<String>();
@@ -290,7 +291,7 @@ public class MealViewFragment extends ListFragment{
             }
 
             // Set title text
-            setTitleText(collegeNum, ((ActionBarActivity)getActivity()).getSupportActionBar());
+            setTitleText(collegeNum, ((AppCompatActivity)getActivity()).getSupportActionBar());
         }
 
     }

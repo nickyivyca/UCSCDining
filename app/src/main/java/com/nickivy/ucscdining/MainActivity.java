@@ -13,12 +13,14 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -41,7 +43,7 @@ import com.nickivy.ucscdining.util.Util;
  * @author Nicky Ivy parkedraccoon@gmail.com
  */
 
-public class MainActivity extends ActionBarActivity{
+public class MainActivity extends AppCompatActivity{
 
     private ListView mDrawerList;
     private ListView mAboutList;
@@ -158,7 +160,16 @@ public class MainActivity extends ActionBarActivity{
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            fragment.selectItem(position);
+            //fragment.selectItem(position);
+            try {
+                MealViewFragment meal = (MealViewFragment)
+                        getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                meal.selectItem(position);
+            } catch (ClassCastException e) {
+                MealViewFragmentLarge meal = (MealViewFragmentLarge)
+                        getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                meal.selectItem(position);
+            }
         }
     }
 

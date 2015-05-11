@@ -9,6 +9,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -30,6 +31,8 @@ import com.nickivy.ucscdining.parser.MealDataFetcher;
 import com.nickivy.ucscdining.parser.MenuParser;
 import com.nickivy.ucscdining.util.Util;
 
+import java.util.ArrayList;
+
 /**
  * Fragment for displaying all three menus at once - tablet layout.
  *
@@ -49,6 +52,7 @@ public class MealViewFragmentLarge extends Fragment {
     private ListView mDrawerList;
     private RelativeLayout mDrawer;
     private DrawerLayout mDrawerLayout;
+    private ListView mMealList;
     private Bundle instance;
 
     private RetrieveMenuInLargeFragmentTask task;
@@ -82,7 +86,7 @@ public class MealViewFragmentLarge extends Fragment {
                 // When doing swipe refresh, reload to the displayed day
                 if (task == null) {
                     task = new RetrieveMenuInLargeFragmentTask(displayedMonth, displayedDay,
-                        displayedYear, false, 0);
+                            displayedYear, false, 0);
                     task.execute();
                 }
             }
@@ -159,6 +163,51 @@ public class MealViewFragmentLarge extends Fragment {
             task = new RetrieveMenuInLargeFragmentTask(today[0], today[1], today[2], true,
                     initialMeal);
             task.execute();
+        }
+    }
+
+    public void selectItem(int position) {
+        collegeNum = position;
+        // update the main content by replacing listview adapters
+        if (MenuParser.fullMenuObj.get(position).getIsOpen()) {
+            if (MenuParser.fullMenuObj.get(position).getIsSet()) {
+                // Set title to include date and color, based on events at the dining hall
+                setTitleText(position, ((AppCompatActivity)getActivity()).getSupportActionBar());
+
+                mMealList = (ListView) getActivity().findViewById(R.id.breakfast_list);
+                ArrayList<String> testedArray = new ArrayList<String>();
+                testedArray = MenuParser.fullMenuObj.get(position).getBreakfast();
+                if (testedArray != null && mMealList != null) {
+                    mMealList.setAdapter(new ArrayAdapter<String>(getActivity(),
+                            android.R.layout.simple_list_item_1,
+                            MenuParser.fullMenuObj.get(position).getBreakfast()));
+                }
+                mMealList = (ListView) getActivity().findViewById(R.id.lunch_list);
+                testedArray = MenuParser.fullMenuObj.get(position).getLunch();
+                if (testedArray != null && mMealList != null) {
+                    mMealList.setAdapter(new ArrayAdapter<String>(getActivity(),
+                            android.R.layout.simple_list_item_1,
+                            MenuParser.fullMenuObj.get(position).getLunch()));
+                }
+                mMealList = (ListView) getActivity().findViewById(R.id.dinner_list);
+                testedArray = MenuParser.fullMenuObj.get(position).getDinner();
+                if (testedArray != null && mMealList != null) {
+                    mMealList.setAdapter(new ArrayAdapter<String>(getActivity(),
+                            android.R.layout.simple_list_item_1,
+                            MenuParser.fullMenuObj.get(position).getDinner()));
+                }
+            }
+
+            mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
+            mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer_list);
+            mDrawer = (RelativeLayout) getActivity().findViewById(R.id.left_drawer);
+
+            // update selected item and title, then close the drawer
+            mDrawerList.setItemChecked(position, true);
+            mDrawerLayout.closeDrawer(mDrawer);
+        } else {
+            Toast.makeText(getActivity(), Util.collegeList[position] + " dining hall closed today!",
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -285,7 +334,7 @@ public class MealViewFragmentLarge extends Fragment {
                     MenuParser.fullMenuObj.get(collegeNum).getDinner()));
 
             // Set title text
-            setTitleText(collegeNum, ((ActionBarActivity)getActivity()).getSupportActionBar());
+            setTitleText(collegeNum, ((AppCompatActivity)getActivity()).getSupportActionBar());
         }
 
     }

@@ -24,11 +24,6 @@
             android:paddingBottom="16dp"
             android:paddingTop="16dp"
             android:background="#dddddd"/>
-        <!--LinearLayout
-            android:layout_width="1dip"
-            android:layout_height="fill_parent"
-            android:background="#cccccc"
-            android:orientation="vertical" /-->
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -56,12 +51,6 @@
             android:paddingTop="16dp"
             android:background="#dddddd"/>
     </LinearLayout>
-
-    <!--LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="1dip"
-        android:background="#cccccc"
-        android:orientation="horizontal" /-->
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
