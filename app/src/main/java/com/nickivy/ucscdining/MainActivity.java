@@ -21,6 +21,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -161,7 +162,6 @@ public class MainActivity extends AppCompatActivity{
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            //fragment.selectItem(position);
             try {
                 MealViewFragment meal = (MealViewFragment)
                         getSupportFragmentManager().findFragmentById(R.id.fragment_container);
@@ -225,11 +225,11 @@ public class MainActivity extends AppCompatActivity{
             try {
                 MealViewFragment meal = (MealViewFragment)
                         getFragmentManager().findFragmentById(R.id.fragment_container);
-                meal.selectNewDate(monthOfYear + 1,  dayOfMonth,  year);
+                meal.selectNewDate(monthOfYear + 1, dayOfMonth, year);
             } catch (ClassCastException e) {
                 MealViewFragmentLarge meal = (MealViewFragmentLarge)
                         getFragmentManager().findFragmentById(R.id.fragment_container);
-                meal.selectNewDate(monthOfYear + 1,  dayOfMonth,  year);
+                meal.selectNewDate(monthOfYear + 1, dayOfMonth, year);
             }
         }
     }

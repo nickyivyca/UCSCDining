@@ -45,8 +45,7 @@ public class MealViewFragmentLarge extends Fragment {
     public static int collegeNum,
     displayedMonth,
     displayedDay,
-    displayedYear,
-    initialMeal;
+    displayedYear;
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ListView mDrawerList;
@@ -63,7 +62,6 @@ public class MealViewFragmentLarge extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         collegeNum = getArguments().getInt(Util.TAG_COLLEGE);
-        Log.v(Util.LOGTAG, "received college in intent: " + collegeNum);
         getActivity().setTitle(Util.collegeList[collegeNum]);
 
         displayedMonth = getArguments().getInt(Util.TAG_MONTH);
@@ -71,8 +69,6 @@ public class MealViewFragmentLarge extends Fragment {
         displayedYear = getArguments().getInt(Util.TAG_YEAR);
 
         instance = savedInstanceState;
-
-        initialMeal = getArguments().getInt(Util.TAG_MEAL);
 
         return inflater.inflate(R.layout.meal_fragment, container, false);
     }
@@ -86,7 +82,7 @@ public class MealViewFragmentLarge extends Fragment {
                 // When doing swipe refresh, reload to the displayed day
                 if (task == null) {
                     task = new RetrieveMenuInLargeFragmentTask(displayedMonth, displayedDay,
-                            displayedYear, false, 0);
+                            displayedYear);
                     task.execute();
                 }
             }
@@ -160,8 +156,7 @@ public class MealViewFragmentLarge extends Fragment {
             // Default loading to today
             initialRefreshed = true;
             int[] today = Util.getToday();
-            task = new RetrieveMenuInLargeFragmentTask(today[0], today[1], today[2], true,
-                    initialMeal);
+            task = new RetrieveMenuInLargeFragmentTask(today[0], today[1], today[2]);
             task.execute();
         }
     }
@@ -186,12 +181,13 @@ public class MealViewFragmentLarge extends Fragment {
                     mMealList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
-                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                            intent.setData(Uri.parse("http://nutrition.sa.ucsc.edu/label.asp" +
+                            Intent intent = new Intent(getActivity().getApplicationContext(),
+                                    NutritionWebpageActivity.class);
+                            intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                                     MenuParser.URLPart2s[collegePos] + displayedMonth +
                                     "%2F" + displayedDay + "%2F" + displayedYear +
                                     "&RecNumAndPort=" + MenuParser.fullMenuObj.get(collegePos)
-                                    .getBreakfast().get(pos).getCode()));
+                                    .getBreakfast().get(pos).getCode());
                             startActivity(intent);
                         }
                     });
@@ -205,12 +201,13 @@ public class MealViewFragmentLarge extends Fragment {
                     mMealList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
-                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                            intent.setData(Uri.parse("http://nutrition.sa.ucsc.edu/label.asp" +
+                            Intent intent = new Intent(getActivity().getApplicationContext(),
+                                    NutritionWebpageActivity.class);
+                            intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                                     MenuParser.URLPart2s[collegePos] + displayedMonth +
                                     "%2F" + displayedDay + "%2F" + displayedYear +
                                     "&RecNumAndPort=" + MenuParser.fullMenuObj.get(collegePos)
-                                    .getLunch().get(pos).getCode()));
+                                    .getLunch().get(pos).getCode());
                             startActivity(intent);
                         }
                     });
@@ -224,12 +221,13 @@ public class MealViewFragmentLarge extends Fragment {
                     mMealList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
-                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                            intent.setData(Uri.parse("http://nutrition.sa.ucsc.edu/label.asp" +
+                            Intent intent = new Intent(getActivity().getApplicationContext(),
+                                    NutritionWebpageActivity.class);
+                            intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                                     MenuParser.URLPart2s[collegePos] + displayedMonth +
                                     "%2F" + displayedDay + "%2F" + displayedYear +
                                     "&RecNumAndPort=" + MenuParser.fullMenuObj.get(collegePos)
-                                    .getDinner().get(pos).getCode()));
+                                    .getDinner().get(pos).getCode());
                             startActivity(intent);
                         }
                     });
@@ -252,24 +250,19 @@ public class MealViewFragmentLarge extends Fragment {
     @SuppressWarnings("ResourceType")
     private class RetrieveMenuInLargeFragmentTask extends AsyncTask<Void, Void, Long> {
 
-        private boolean mSetPage;
-        private int mInitialMeal;
+        private int mAttemptedMonth,
+                mAttemptedDay,
+                mAttemptedYear;
 
         /**
          * @param month Month of day to fetch
          * @param day Day of day to fetch
          * @param year Year of day to fetch
-         * @param setPage If true, date will be set based on initMeal param, see below
-         * @param initMeal Meal that should be viewed after data is loaded. Value will only be used
-         *                 if setPage is true. Set to -1 to set date automatically (by getToday())
          */
-        public RetrieveMenuInLargeFragmentTask(int month, int day, int year, boolean setPage,
-                                          int initMeal) {
-            displayedMonth = month;
-            displayedDay = day;
-            displayedYear = year;
-            mSetPage = setPage;
-            mInitialMeal = initMeal;
+        public RetrieveMenuInLargeFragmentTask(int month, int day, int year) {
+            mAttemptedMonth = month;
+            mAttemptedDay = day;
+            mAttemptedYear = year;
         }
 
         @Override
@@ -277,8 +270,8 @@ public class MealViewFragmentLarge extends Fragment {
 
         @Override
         protected Long doInBackground(Void... voids) {
-            int res = MealDataFetcher.fetchData(getActivity(), displayedMonth, displayedDay,
-                    displayedYear);
+            int res = MealDataFetcher.fetchData(getActivity(), mAttemptedMonth, mAttemptedDay,
+                    mAttemptedYear);
             return new Double(res).longValue();
         }
 
@@ -320,6 +313,10 @@ public class MealViewFragmentLarge extends Fragment {
                 }
                 return;
             }
+            // Only set displayed day to what we attempted once data fetch successful
+            displayedMonth = mAttemptedMonth;
+            displayedDay = mAttemptedDay;
+            displayedYear = mAttemptedYear;
 
             // if all meals empty (dining hall closed), pop open nav drawer
             if(MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
@@ -367,12 +364,13 @@ public class MealViewFragmentLarge extends Fragment {
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse("http://nutrition.sa.ucsc.edu/label.asp" +
+                    Intent intent = new Intent(getActivity().getApplicationContext(),
+                            NutritionWebpageActivity.class);
+                    intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                             MenuParser.URLPart2s[collegePos] + displayedMonth +
                             "%2F" + displayedDay + "%2F" + displayedYear +
                             "&RecNumAndPort=" + MenuParser.fullMenuObj.get(collegePos)
-                            .getBreakfast().get(pos).getCode()));
+                            .getBreakfast().get(pos).getCode());
                     startActivity(intent);
                 }
             });
@@ -383,12 +381,13 @@ public class MealViewFragmentLarge extends Fragment {
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse("http://nutrition.sa.ucsc.edu/label.asp" +
+                    Intent intent = new Intent(getActivity().getApplicationContext(),
+                            NutritionWebpageActivity.class);
+                    intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                             MenuParser.URLPart2s[collegePos] + displayedMonth +
                             "%2F" + displayedDay + "%2F" + displayedYear +
                             "&RecNumAndPort=" + MenuParser.fullMenuObj.get(collegePos)
-                            .getLunch().get(pos).getCode()));
+                            .getLunch().get(pos).getCode());
                     startActivity(intent);
                 }
             });
@@ -399,12 +398,13 @@ public class MealViewFragmentLarge extends Fragment {
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse("http://nutrition.sa.ucsc.edu/label.asp" +
+                    Intent intent = new Intent(getActivity().getApplicationContext(),
+                            NutritionWebpageActivity.class);
+                    intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                             MenuParser.URLPart2s[collegePos] + displayedMonth +
                             "%2F" + displayedDay + "%2F" + displayedYear +
                             "&RecNumAndPort=" + MenuParser.fullMenuObj.get(collegePos)
-                            .getDinner().get(pos).getCode()));
+                            .getDinner().get(pos).getCode());
                     startActivity(intent);
                 }
             });
@@ -430,15 +430,15 @@ public class MealViewFragmentLarge extends Fragment {
             mSwipeRefreshLayout.setProgressViewOffset(false, -150, height / 800);
             mSwipeRefreshLayout.setRefreshing(true);
         if (task == null) {
-            task = new RetrieveMenuInLargeFragmentTask(month, day, year, false, 0);
+            task = new RetrieveMenuInLargeFragmentTask(month, day, year);
             task.execute();
         }
     }
 
     private void setTitleText(int college, ActionBar bar) {
         // Set title to include date and color, based on events at the dining hall
-        Spannable text = new SpannableString(
-                Util.collegeList[college] + " " + displayedMonth + "/" + displayedDay);
+        Spannable text = new SpannableString(displayedMonth + "/" + displayedDay + " " +
+                Util.collegeList[college]);
 
         if (MenuParser.fullMenuObj.get(college).getIsCollegeNight()) {
             // Blue for College Night

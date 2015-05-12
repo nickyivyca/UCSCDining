@@ -27,6 +27,8 @@ public class WidgetData {
     currentDay,
     currentYear;
 
+    private boolean directionRight;
+
     private RemoteViews views;
 
     public WidgetData(int widgetId, Context context) {
@@ -73,6 +75,9 @@ public class WidgetData {
         return views;
     }
 
+    public boolean getDirectionRight() {
+        return directionRight;
+    }
 
     public void setCollege(int currentCollege) {
         this.currentCollege = currentCollege;
@@ -92,6 +97,10 @@ public class WidgetData {
 
     public void setYear(int currentYear) {
         this.currentYear = currentYear;
+    }
+
+    public void setDirectionRight(boolean direction) {
+        this.directionRight = direction;
     }
 
     public void incrementCollege() {
@@ -141,15 +150,21 @@ public class WidgetData {
     }
 
     public void incrementMeal() {
+        directionRight = true;
         currentMeal++;
         if (currentMeal == 3) {
             currentMeal = 0;
             // If at dinner, and right button pressed, advance to next day
             changeDay(1);
+            /*
+             * Skipping brunch checks must be done in Asynctask because we don't actually have
+             * the new menu containing the brunch message yet
+             */
         }
     }
 
     public void decrementMeal() {
+        directionRight = false;
         currentMeal--;
         if (currentMeal == -1) {
             currentMeal = 2;
@@ -158,7 +173,7 @@ public class WidgetData {
         }
         if (currentMeal == Util.BREAKFAST &&
                 MenuParser.fullMenuObj.get(currentCollege).getBreakfast().size() > 0) {
-            if (MenuParser.fullMenuObj.get(currentCollege).getBreakfast().get(0)
+            if (MenuParser.fullMenuObj.get(currentCollege).getBreakfast().get(0).getItemName()
                     .equals(Util.brunchMessage)) {
                 changeDay(-1);
                 currentMeal = Util.DINNER;

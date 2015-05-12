@@ -217,45 +217,38 @@ public class MenuWidget extends AppWidgetProvider {
                     break;
                 }
             }
-            Intent svcIntent = new Intent(mContext, WidgetService.class);
-            svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mData.getWidgetId());
-            svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
-
-            // Set adapter for listview
-            mData.getViews().setRemoteAdapter(R.id.widget_list, svcIntent);
-            mAppWidgetManager.notifyAppWidgetViewDataChanged(mData.getWidgetId(),
-                    R.id.widget_list);
 
             // If so display 'All Closed' and nothing else
             if (allClosed) {
                 mData.getViews().setTextViewText(R.id.widget_collegename, "All Closed");
                 mData.getViews().setTextColor(R.id.widget_collegename, Color.BLACK);
             } else {
+                // Check if brunch message present - if so skip past it
                 if (mData.getMeal() == Util.BREAKFAST &&
                         MenuParser.fullMenuObj.get(mData.getCollege()).getBreakfast().size() > 0) {
                     if (MenuParser.fullMenuObj.get(mData.getCollege()).getBreakfast().get(0)
-                            .equals(Util.brunchMessage)) {
-                        mData.setMeal(directionRight ? Util.LUNCH : Util.DINNER);
+                            .getItemName().equals(Util.brunchMessage)) {
+                        mData.setMeal(mData.getDirectionRight() ? Util.LUNCH : Util.DINNER);
                     }
                 }
 
                 // Set view text of college and current meal
                 mData.getViews().setTextViewText(R.id.widget_collegename,
                         Util.collegeList[mData.getCollege()]);
-                //Log.v(Util.LOGTAG, "college name set");
                 if (MenuParser.fullMenuObj.get(mData.getCollege()).getIsCollegeNight()) {
                     mData.getViews().setTextColor(R.id.widget_collegename, Color.BLUE);
                 } else if (MenuParser.fullMenuObj.get(mData.getCollege()).getIsFarmFriday() ||
                         MenuParser.fullMenuObj.get(mData.getCollege()).getIsHealthyMonday()) {
                     // 'Green Apple'
-                    mData.getViews().setTextColor(R.id.widget_collegename, Color.rgb(0x4C, 0xC5, 0x52));
+                    mData.getViews().setTextColor(R.id.widget_collegename,
+                            Color.rgb(0x4C, 0xC5, 0x52));
                 } else if (!MenuParser.fullMenuObj.get(mData.getCollege()).getIsOpen()) {
                     mData.getViews().setTextColor(R.id.widget_collegename, Color.LTGRAY);
                 } else {
                     mData.getViews().setTextColor(R.id.widget_collegename, Color.BLACK);
                 }
-                mData.getViews().setTextViewText(R.id.widget_mealname, mData.getMonth() + "/" + mData.getDay()
-                        + " " + Util.meals[mData.getMeal()]);
+                mData.getViews().setTextViewText(R.id.widget_mealname, mData.getMonth() + "/" +
+                        mData.getDay() + " " + Util.meals[mData.getMeal()]);
             }
 
             // Set intents on all four buttons
@@ -302,6 +295,15 @@ public class MenuWidget extends AppWidgetProvider {
             mData.getViews().setOnClickPendingIntent(R.id.widget_collegename, pendingLaunch);
             mData.getViews().setOnClickPendingIntent(R.id.widget_mealname, pendingLaunch);
             mData.getViews().setPendingIntentTemplate(R.id.widget_list, pendingLaunch);
+
+            Intent svcIntent = new Intent(mContext, WidgetService.class);
+            svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mData.getWidgetId());
+            svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
+
+            // Set adapter for listview
+            mData.getViews().setRemoteAdapter(R.id.widget_list, svcIntent);
+            mAppWidgetManager.notifyAppWidgetViewDataChanged(mData.getWidgetId(),
+                    R.id.widget_list);
 
             mAppWidgetManager.updateAppWidget(mData.getWidgetId(), mData.getViews());
             saveData(mContext);
