@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
+import com.nickivy.ucscdining.util.MenuItem;
 import com.nickivy.ucscdining.util.Util;
 
 import java.util.ArrayList;
@@ -91,8 +92,9 @@ public class MealDataFetcher {
             SQLiteStatement statement = db.compileStatement("INSERT INTO "+
                     MealStorage.TABLE_MEALS + "(" + MealStorage.COLUMN_COLLEGE + ", " +
                     MealStorage.COLUMN_MEAL + ", " + MealStorage.COLUMN_MENUITEM + ", " +
-                    MealStorage.COLUMN_MONTH + ", " + MealStorage.COLUMN_DAY + ", " +
-                    MealStorage.COLUMN_YEAR + ") VALUES (?,?,?,?,?,?);");
+                    MealStorage.COLUMN_NUTID + ", " + MealStorage.COLUMN_MONTH + ", " +
+                    MealStorage.COLUMN_DAY + ", " + MealStorage.COLUMN_YEAR +
+                    ") VALUES (?,?,?,?,?,?,?);");
 
             // Using sqlite statement keeps the database 'open' and apparently is a bit faster
             db.beginTransaction();
@@ -102,10 +104,13 @@ public class MealDataFetcher {
                 for (int i = 0; i < MenuParser.fullMenuObj.get(j).getBreakfast().size(); i++) {
                     statement.bindLong(1, j);
                     statement.bindLong(2, 0);
-                    statement.bindString(3, MenuParser.fullMenuObj.get(j).getBreakfast().get(i));
-                    statement.bindLong(4, month);
-                    statement.bindLong(5, day);
-                    statement.bindLong(6, year);
+                    statement.bindString(3, MenuParser.fullMenuObj.get(j).getBreakfast().get(i)
+                            .getItemName());
+                    statement.bindString(4, MenuParser.fullMenuObj.get(j).getBreakfast().get(i)
+                            .getCode());
+                    statement.bindLong(5, month);
+                    statement.bindLong(6, day);
+                    statement.bindLong(7, year);
                     // Database error will show up here if there is one. Catch it here.
                     try {
                         statement.execute();
@@ -116,10 +121,13 @@ public class MealDataFetcher {
                 for (int i = 0; i < MenuParser.fullMenuObj.get(j).getLunch().size(); i++) {
                     statement.bindLong(1, j);
                     statement.bindLong(2, 1);
-                    statement.bindString(3, MenuParser.fullMenuObj.get(j).getLunch().get(i));
-                    statement.bindLong(4, month);
-                    statement.bindLong(5, day);
-                    statement.bindLong(6, year);
+                    statement.bindString(3, MenuParser.fullMenuObj.get(j).getLunch().get(i)
+                            .getItemName());
+                    statement.bindString(4, MenuParser.fullMenuObj.get(j).getLunch().get(i)
+                            .getCode());
+                    statement.bindLong(5, month);
+                    statement.bindLong(6, day);
+                    statement.bindLong(7, year);
                     try {
                         statement.execute();
                     } catch (SQLiteConstraintException e) {
@@ -129,10 +137,13 @@ public class MealDataFetcher {
                 for (int i = 0; i < MenuParser.fullMenuObj.get(j).getDinner().size(); i++) {
                     statement.bindLong(1,j);
                     statement.bindLong(2, 2);
-                    statement.bindString(3, MenuParser.fullMenuObj.get(j).getDinner().get(i));
-                    statement.bindLong(4, month);
-                    statement.bindLong(5, day);
-                    statement.bindLong(6, year);
+                    statement.bindString(3, MenuParser.fullMenuObj.get(j).getDinner().get(i)
+                            .getItemName());
+                    statement.bindString(4, MenuParser.fullMenuObj.get(j).getDinner().get(i)
+                            .getCode());
+                    statement.bindLong(5, month);
+                    statement.bindLong(6, day);
+                    statement.bindLong(7, year);
                     try {
                         statement.execute();
                     } catch (SQLiteConstraintException e) {
@@ -151,18 +162,19 @@ public class MealDataFetcher {
 
             String[] mainProjection = {
                     MealStorage.COLUMN_MENUITEM,
+                    MealStorage.COLUMN_NUTID,
                     MealStorage.COLUMN_COLLEGE,
                     MealStorage.COLUMN_MONTH,
                     MealStorage.COLUMN_DAY,
                     MealStorage.COLUMN_YEAR
             };
 
-            ArrayList<String> breakfastLoaded,
+            ArrayList<MenuItem> breakfastLoaded,
                     lunchLoaded, dinnerLoaded;
 
-            selection = MealStorage.COLUMN_COLLEGE + "= ? AND " + MealStorage.COLUMN_MEAL +
-                    "= ? AND " + MealStorage.COLUMN_MONTH + "= ? AND " + MealStorage.COLUMN_DAY +
-                    "= ? AND " + MealStorage.COLUMN_YEAR + "= ?";
+                    selection = MealStorage.COLUMN_COLLEGE + "= ? AND " + MealStorage.COLUMN_MEAL +
+                            "= ? AND " + MealStorage.COLUMN_MONTH + "= ? AND " +
+                            MealStorage.COLUMN_DAY + "= ? AND " + MealStorage.COLUMN_YEAR + "= ?";
             String[] mainSelectionArgs = new String[5];
 
             // For each of the 5 colleges, load data into the full menu object
@@ -179,11 +191,12 @@ public class MealDataFetcher {
                         mainProjection, selection, mainSelectionArgs, null, null, null);
 
                 c.moveToFirst();
-                breakfastLoaded = new ArrayList<String>();
+                breakfastLoaded = new ArrayList<MenuItem>();
 
                 for(int i = 0; i < c.getCount(); i++){
-                    breakfastLoaded.add(c.getString
-                            (c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)));
+                    breakfastLoaded.add(new MenuItem(c.getString
+                            (c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)),
+                            c.getString(c.getColumnIndexOrThrow(MealStorage.COLUMN_NUTID))));
                     c.moveToNext();
                 }
                 MenuParser.fullMenuObj.get(j).setBreakfast(breakfastLoaded);
@@ -195,11 +208,12 @@ public class MealDataFetcher {
                         mainProjection, selection, mainSelectionArgs, null, null, null);
 
                 c.moveToFirst();
-                lunchLoaded = new ArrayList<String>();
+                lunchLoaded = new ArrayList<MenuItem>();
 
                 for(int i = 0; i < c.getCount(); i++){
-                    lunchLoaded.add(c.getString
-                            (c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)));
+                    lunchLoaded.add(new MenuItem(c.getString
+                            (c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)),
+                            c.getString(c.getColumnIndexOrThrow(MealStorage.COLUMN_NUTID))));
                     c.moveToNext();
                 }
                 MenuParser.fullMenuObj.get(j).setLunch(lunchLoaded);
@@ -211,11 +225,12 @@ public class MealDataFetcher {
                         mainProjection, selection, mainSelectionArgs, null, null, null);
 
                 c.moveToFirst();
-                dinnerLoaded = new ArrayList<String>();
+                dinnerLoaded = new ArrayList<MenuItem>();
 
                 for(int i = 0; i < c.getCount(); i++){
-                    dinnerLoaded.add(c.getString
-                            (c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)));
+                    dinnerLoaded.add(new MenuItem(c.getString
+                            (c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)),
+                            c.getString(c.getColumnIndexOrThrow(MealStorage.COLUMN_NUTID))));
                     c.moveToNext();
                 }
                 MenuParser.fullMenuObj.get(j).setDinner(dinnerLoaded);

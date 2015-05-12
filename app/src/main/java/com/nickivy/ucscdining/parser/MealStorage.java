@@ -18,6 +18,7 @@ public class MealStorage extends SQLiteOpenHelper{
 	  
   public static final String COLUMN_ID = "_id",
 		  COLUMN_MENUITEM = "menuitem",
+          COLUMN_NUTID = "nutid",
 		  COLUMN_MEAL = "meal",
 		  COLUMN_COLLEGE = "college",
 		  COLUMN_MONTH = "month",
@@ -31,7 +32,7 @@ public class MealStorage extends SQLiteOpenHelper{
   private static final String DATABASE_CREATE = "create table "
 		  + TABLE_MEALS + "(" + COLUMN_ID
 		  + " integer primary key autoincrement," + COLUMN_COLLEGE + " integer," +
-		  COLUMN_MEAL + " integer," + COLUMN_MENUITEM + " text," + 
+		  COLUMN_MEAL + " integer," + COLUMN_MENUITEM + " text," + COLUMN_NUTID + " text," +
 		  COLUMN_MONTH + " integer," + COLUMN_DAY + " integer," + COLUMN_YEAR 
 		  + " integer" + ")";
 

@@ -1,14 +1,15 @@
 package com.nickivy.ucscdining;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -19,9 +20,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewManager;
-import android.view.ViewParent;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -175,26 +175,64 @@ public class MealViewFragmentLarge extends Fragment {
                 setTitleText(position, ((AppCompatActivity)getActivity()).getSupportActionBar());
 
                 mMealList = (ListView) getActivity().findViewById(R.id.breakfast_list);
+                final int collegePos = position;
                 ArrayList<String> testedArray = new ArrayList<String>();
-                testedArray = MenuParser.fullMenuObj.get(position).getBreakfast();
+                testedArray = MenuParser.fullMenuObj.get(position).getBreakfastList();
                 if (testedArray != null && mMealList != null) {
                     mMealList.setAdapter(new ArrayAdapter<String>(getActivity(),
                             android.R.layout.simple_list_item_1,
-                            MenuParser.fullMenuObj.get(position).getBreakfast()));
+                            MenuParser.fullMenuObj.get(position).getBreakfastList()));
+                    // Set link to nutrition info
+                    mMealList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setData(Uri.parse("http://nutrition.sa.ucsc.edu/label.asp" +
+                                    MenuParser.URLPart2s[collegePos] + displayedMonth +
+                                    "%2F" + displayedDay + "%2F" + displayedYear +
+                                    "&RecNumAndPort=" + MenuParser.fullMenuObj.get(collegePos)
+                                    .getBreakfast().get(pos).getCode()));
+                            startActivity(intent);
+                        }
+                    });
                 }
                 mMealList = (ListView) getActivity().findViewById(R.id.lunch_list);
-                testedArray = MenuParser.fullMenuObj.get(position).getLunch();
+                testedArray = MenuParser.fullMenuObj.get(position).getLunchList();
                 if (testedArray != null && mMealList != null) {
                     mMealList.setAdapter(new ArrayAdapter<String>(getActivity(),
                             android.R.layout.simple_list_item_1,
-                            MenuParser.fullMenuObj.get(position).getLunch()));
+                            MenuParser.fullMenuObj.get(position).getLunchList()));
+                    mMealList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setData(Uri.parse("http://nutrition.sa.ucsc.edu/label.asp" +
+                                    MenuParser.URLPart2s[collegePos] + displayedMonth +
+                                    "%2F" + displayedDay + "%2F" + displayedYear +
+                                    "&RecNumAndPort=" + MenuParser.fullMenuObj.get(collegePos)
+                                    .getLunch().get(pos).getCode()));
+                            startActivity(intent);
+                        }
+                    });
                 }
                 mMealList = (ListView) getActivity().findViewById(R.id.dinner_list);
-                testedArray = MenuParser.fullMenuObj.get(position).getDinner();
+                testedArray = MenuParser.fullMenuObj.get(position).getDinnerList();
                 if (testedArray != null && mMealList != null) {
                     mMealList.setAdapter(new ArrayAdapter<String>(getActivity(),
                             android.R.layout.simple_list_item_1,
-                            MenuParser.fullMenuObj.get(position).getDinner()));
+                            MenuParser.fullMenuObj.get(position).getDinnerList()));
+                    mMealList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setData(Uri.parse("http://nutrition.sa.ucsc.edu/label.asp" +
+                                    MenuParser.URLPart2s[collegePos] + displayedMonth +
+                                    "%2F" + displayedDay + "%2F" + displayedYear +
+                                    "&RecNumAndPort=" + MenuParser.fullMenuObj.get(collegePos)
+                                    .getDinner().get(pos).getCode()));
+                            startActivity(intent);
+                        }
+                    });
                 }
             }
 
@@ -298,7 +336,7 @@ public class MealViewFragmentLarge extends Fragment {
              */
             ListView listView = (ListView) getActivity().findViewById(R.id.breakfast_list);
             if (!MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
-                    MenuParser.fullMenuObj.get(collegeNum).getBreakfast().get(0)
+                    MenuParser.fullMenuObj.get(collegeNum).getBreakfast().get(0).getItemName()
                             .equals(Util.brunchMessage)) {
                 // hide breakfast?
                 listView.setVisibility(View.INVISIBLE);
@@ -320,18 +358,56 @@ public class MealViewFragmentLarge extends Fragment {
             mDrawerList.setAdapter(new MealViewFragment.ColorAdapter(getActivity(),
                     R.layout.drawer_list_item, Util.collegeList));
 
+            final int collegePos = collegeNum;
+
             listView = (ListView) getActivity().findViewById(R.id.breakfast_list);
             listView.setAdapter(new ArrayAdapter<String>(getActivity(),
                     android.R.layout.simple_list_item_activated_1,
-                    MenuParser.fullMenuObj.get(collegeNum).getBreakfast()));
+                    MenuParser.fullMenuObj.get(collegeNum).getBreakfastList()));
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse("http://nutrition.sa.ucsc.edu/label.asp" +
+                            MenuParser.URLPart2s[collegePos] + displayedMonth +
+                            "%2F" + displayedDay + "%2F" + displayedYear +
+                            "&RecNumAndPort=" + MenuParser.fullMenuObj.get(collegePos)
+                            .getBreakfast().get(pos).getCode()));
+                    startActivity(intent);
+                }
+            });
             listView = (ListView) getActivity().findViewById(R.id.lunch_list);
             listView.setAdapter(new ArrayAdapter<String>(getActivity(),
                     android.R.layout.simple_list_item_activated_1,
-                    MenuParser.fullMenuObj.get(collegeNum).getLunch()));
+                    MenuParser.fullMenuObj.get(collegeNum).getLunchList()));
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse("http://nutrition.sa.ucsc.edu/label.asp" +
+                            MenuParser.URLPart2s[collegePos] + displayedMonth +
+                            "%2F" + displayedDay + "%2F" + displayedYear +
+                            "&RecNumAndPort=" + MenuParser.fullMenuObj.get(collegePos)
+                            .getLunch().get(pos).getCode()));
+                    startActivity(intent);
+                }
+            });
             listView = (ListView) getActivity().findViewById(R.id.dinner_list);
             listView.setAdapter(new ArrayAdapter<String>(getActivity(),
                     android.R.layout.simple_list_item_activated_1,
-                    MenuParser.fullMenuObj.get(collegeNum).getDinner()));
+                    MenuParser.fullMenuObj.get(collegeNum).getDinnerList()));
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse("http://nutrition.sa.ucsc.edu/label.asp" +
+                            MenuParser.URLPart2s[collegePos] + displayedMonth +
+                            "%2F" + displayedDay + "%2F" + displayedYear +
+                            "&RecNumAndPort=" + MenuParser.fullMenuObj.get(collegePos)
+                            .getDinner().get(pos).getCode()));
+                    startActivity(intent);
+                }
+            });
 
             // Set title text
             setTitleText(collegeNum, ((AppCompatActivity)getActivity()).getSupportActionBar());

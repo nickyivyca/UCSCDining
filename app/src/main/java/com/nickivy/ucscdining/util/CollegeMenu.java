@@ -13,55 +13,94 @@ import java.util.ArrayList;
 
 public class CollegeMenu {
 	
-	private ArrayList<String> mBreakfast = new ArrayList<String>();
-	private ArrayList<String> mLunch = new ArrayList<String>();
-	private ArrayList<String> mDinner = new ArrayList<String>();
+	private ArrayList<MenuItem> mBreakfast = new ArrayList<MenuItem>();
+	private ArrayList<MenuItem> mLunch = new ArrayList<MenuItem>();
+	private ArrayList<MenuItem> mDinner = new ArrayList<MenuItem>();
 	
 	private boolean isSet = false;
 	
 	public CollegeMenu(){}
 	
-	public CollegeMenu(ArrayList<String> breakfast, ArrayList<String> lunch, ArrayList<String> dinner){
+	public CollegeMenu(ArrayList<MenuItem> breakfast, ArrayList<MenuItem> lunch, ArrayList<MenuItem> dinner){
 		mBreakfast = breakfast;
 		mLunch = lunch;
 		mDinner = dinner;
 	}
 	
-	public void setBreakfast(ArrayList<String> meal){
+	public void setBreakfast(ArrayList<MenuItem> meal){
 		mBreakfast = meal;
 		isSet = true;
 	}
 	
-	public void setLunch(ArrayList<String> meal){
+	public void setLunch(ArrayList<MenuItem> meal){
 		mLunch = meal;
 		isSet = true;
 	}
 	
-	public void setDinner(ArrayList<String> meal){
+	public void setDinner(ArrayList<MenuItem> meal){
 		mDinner = meal;
 		isSet = true;
 	}
 	
-	public ArrayList<String> getBreakfast(){
+	public ArrayList<MenuItem> getBreakfast(){
 		if(mBreakfast != null && mBreakfast.size() > 0){
 			return mBreakfast;
 		}
-		return new ArrayList<String>();
+		return new ArrayList<MenuItem>();
 	}
 	
-	public ArrayList<String> getLunch(){
+	public ArrayList<MenuItem> getLunch(){
 		if(mLunch != null && mLunch.size() > 0){
 			return mLunch;
 		}
-		return new ArrayList<String>();
+		return new ArrayList<MenuItem>();
 	}
 	
-	public ArrayList<String> getDinner(){
+	public ArrayList<MenuItem> getDinner(){
 		if(mDinner != null && mDinner.size() > 0){
 			return mDinner;
 		}
-		return new ArrayList<String>();
+		return new ArrayList<MenuItem>();
 	}
+
+    /**
+     * @return Titles of meals as arraylist of strings
+     */
+    public ArrayList<String> getBreakfastList(){
+        ArrayList<String> ret = new ArrayList<String>();
+        if(mBreakfast != null && mBreakfast.size() > 0){
+            for (MenuItem m : mBreakfast) {
+                ret.add(m.getItemName());
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * @return Titles of meals as arraylist of strings
+     */
+    public ArrayList<String> getLunchList(){
+        ArrayList<String> ret = new ArrayList<String>();
+        if(mLunch != null && mLunch.size() > 0){
+            for (MenuItem m : mLunch) {
+                ret.add(m.getItemName());
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * @return Titles of meals as arraylist of strings
+     */
+    public ArrayList<String> getDinnerList(){
+        ArrayList<String> ret = new ArrayList<String>();
+        if(mDinner != null && mDinner.size() > 0){
+            for (MenuItem m : mDinner) {
+                ret.add(m.getItemName());
+            }
+        }
+        return ret;
+    }
 	
 	/**
 	 * Get if data has been written to the 
@@ -92,7 +131,7 @@ public class CollegeMenu {
 	 */
 	public boolean getIsCollegeNight(){
         return isSet && getDinner().size() > 0 &&
-                getDinner().get(0).toLowerCase().contains("college night");
+                getDinner().get(0).getItemName().toLowerCase().contains("college night");
     }
 	
 	/**
@@ -100,8 +139,8 @@ public class CollegeMenu {
 	 */
 	public boolean getIsHealthyMonday(){
     	if(isSet){
-    		if((getDinner().size() > 0 && getDinner().get(0).equals("Healthy Mondays")) || 
-    			getLunch().size() > 0 && getLunch().get(0).equals("Healthy Mondays")){
+    		if((getDinner().size() > 0 && getDinner().get(0).getItemName().equals("Healthy Mondays")) ||
+    			getLunch().size() > 0 && getLunch().get(0).getItemName().equals("Healthy Mondays")){
     			return true;
     		}
     	}
@@ -113,8 +152,8 @@ public class CollegeMenu {
 	 */
 	public boolean getIsFarmFriday(){
     	if(isSet){
-    		if((getDinner().size() > 0 && getDinner().get(0).equals("Farm Fridays")) || 
-    			getLunch().size() > 0 && getLunch().get(0).equals("Farm Fridays")){    			
+    		if((getDinner().size() > 0 && getDinner().get(0).getItemName().equals("Farm Fridays")) ||
+    			getLunch().size() > 0 && getLunch().get(0).getItemName().equals("Farm Fridays")){
     			return true;
     		}
     	}

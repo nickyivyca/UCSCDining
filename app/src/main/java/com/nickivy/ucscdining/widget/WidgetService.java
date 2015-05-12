@@ -118,11 +118,11 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         }*/
         switch(MenuWidget.getWidgetDataById(appWidgetId).getMeal()) {
             case Util.BREAKFAST:
-                return MenuParser.fullMenuObj.get(college).getBreakfast();
+                return MenuParser.fullMenuObj.get(college).getBreakfastList();
             case Util.LUNCH:
-                return MenuParser.fullMenuObj.get(college).getLunch();
+                return MenuParser.fullMenuObj.get(college).getLunchList();
             case Util.DINNER:
-                return MenuParser.fullMenuObj.get(college).getDinner();
+                return MenuParser.fullMenuObj.get(college).getDinnerList();
             default:
                 return null;
         }
