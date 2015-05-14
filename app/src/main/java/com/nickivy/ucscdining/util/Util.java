@@ -62,7 +62,8 @@ public class Util {
     TAG_MONTH = "tag_month",
     TAG_DAY = "tag_day",
     TAG_YEAR = "tag_year",
-    TAG_URL = "tag_url";
+    TAG_URL = "tag_url",
+    TAG_USESAVED = "tag_usesaved";
 
     /**
      * Returns today's date as a 3-number int array. [month, day, year]

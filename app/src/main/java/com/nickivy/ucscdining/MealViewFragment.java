@@ -11,10 +11,10 @@ import com.nickivy.ucscdining.util.Util;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -25,7 +25,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.view.Display;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -75,19 +76,21 @@ public class MealViewFragment extends ListFragment{
 
     private boolean initialRefreshed = false;
 
-    private RetrieveMenuInFragmentTask task;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
         Bundle savedInstanceState) {
-        collegeNum = getArguments().getInt(Util.TAG_COLLEGE);
-        getActivity().setTitle(Util.collegeList[collegeNum]);
 
-        displayedMonth = getArguments().getInt(Util.TAG_MONTH);
-        displayedDay = getArguments().getInt(Util.TAG_DAY);
-        displayedYear = getArguments().getInt(Util.TAG_YEAR);
+        // If USESAVED true this means we are returning to view the fragment without changing it
+        if (!getArguments().getBoolean(Util.TAG_USESAVED)) {
+            collegeNum = getArguments().getInt(Util.TAG_COLLEGE);
+            getActivity().setTitle(Util.collegeList[collegeNum]);
 
-        initialMeal = getArguments().getInt(Util.TAG_MEAL);
+            displayedMonth = getArguments().getInt(Util.TAG_MONTH);
+            displayedDay = getArguments().getInt(Util.TAG_DAY);
+            displayedYear = getArguments().getInt(Util.TAG_YEAR);
+
+            initialMeal = getArguments().getInt(Util.TAG_MEAL);
+        }
 
         return inflater.inflate(R.layout.pager_fragment, container, false);
     }
@@ -216,13 +219,17 @@ public class MealViewFragment extends ListFragment{
         protected Long doInBackground(Void... voids) {
             int res = MealDataFetcher.fetchData(getActivity(), mAttemptedMonth, mAttemptedDay,
                 mAttemptedYear);
-            return new Double(res).longValue();
+            return Double.valueOf(res).longValue();
         }
 
         protected void onPostExecute(Long result) {
+            if (getActivity() == null) {
+                // Rotation or something must have happened, etc.
+                return;
+            }
             MenuParser.manualRefresh = false;
-            // For keeping track and only allowing one Asynctask to run at once
-            task = null;
+
+
             // Post-execute: set array adapters, reload animation, set title
 
 
@@ -234,24 +241,16 @@ public class MealViewFragment extends ListFragment{
              * would work but is performance-inefficient.
              */
 
-            Display display = getActivity().getWindowManager().getDefaultDisplay();
-            Point size = new Point();
-            display.getSize(size);
-            int height = size.y;
-
             mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID1);
             if (mSwipeRefreshLayout != null) {
-                mSwipeRefreshLayout.setProgressViewOffset(false, -100, height / 40);
                 mSwipeRefreshLayout.setRefreshing(false);
             }
             mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID2);
             if (mSwipeRefreshLayout != null) {
-                mSwipeRefreshLayout.setProgressViewOffset(false, -100, height / 40);
                 mSwipeRefreshLayout.setRefreshing(false);
             }
             mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID3);
             if (mSwipeRefreshLayout != null) {
-                mSwipeRefreshLayout.setProgressViewOffset(false, -100, height / 40);
                 mSwipeRefreshLayout.setRefreshing(false);
             }
 
@@ -259,8 +258,8 @@ public class MealViewFragment extends ListFragment{
              * We want the spinners canceled no matter what, but all the other stuff should not
              * be changed in the case of a data load failure
              */
-            if (!result.equals(new Double(Util.GETLIST_SUCCESS).longValue())) {
-                if (result.equals(new Double(Util.GETLIST_DATABASE_FAILURE).longValue())) {
+            if (!result.equals(Double.valueOf(Util.GETLIST_SUCCESS).longValue())) {
+                if (result.equals(Double.valueOf(Util.GETLIST_DATABASE_FAILURE).longValue())) {
                     Toast.makeText(getActivity(), getString(R.string.database_failed),
                         Toast.LENGTH_SHORT).show();
                 } else {
@@ -423,11 +422,8 @@ public class MealViewFragment extends ListFragment{
                 public void onRefresh() {
                     MenuParser.manualRefresh = true;
                     // When doing swipe refresh, reload to the displayed day
-                    if (task == null) {
-                        task = new RetrieveMenuInFragmentTask(displayedMonth, displayedDay,
-                            displayedYear, false, 0);
-                        task.execute();
-                    }
+                    new RetrieveMenuInFragmentTask(displayedMonth, displayedDay,
+                            displayedYear, false, 0).execute();
                 }
             });
 
@@ -439,20 +435,22 @@ public class MealViewFragment extends ListFragment{
              * no proper way to manually trigger the reload animation. So
              * we're stuck doing it in a hacky way.
              */
-            if (task == null && initialRefreshed == false) {
-                Display display = getActivity().getWindowManager().getDefaultDisplay();
-                Point size = new Point();
-                display.getSize(size);
-                int height = size.y;
-                // manually try to recreate where the spinner ends up in a normal swipe
-                mSwipeRefreshLayout.setProgressViewOffset(false, -50, height / 800);
-                mSwipeRefreshLayout.setRefreshing(true);
-                // Default loading to today
+            if (!initialRefreshed) {
+                Handler handler = new Handler();
+                final int nummeal = mealnum;
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity()
+                                .findViewById(nummeal + SWIPEREF_ID1);
+                        if (mSwipeRefreshLayout != null) {
+                            mSwipeRefreshLayout.setRefreshing(true);
+                        }
+                    }
+                });
                 initialRefreshed = true;
-                int[] today = Util.getToday();
-                task = new RetrieveMenuInFragmentTask(today[0], today[1], today[2], true,
-                        initialMeal);
-                task.execute();
+                new RetrieveMenuInFragmentTask(displayedMonth, displayedDay, displayedYear, true,
+                        initialMeal).execute();
             }
 
             ArrayList<String> testedArray = new ArrayList<String>();
@@ -567,35 +565,36 @@ public class MealViewFragment extends ListFragment{
     }
 
     public void selectNewDate(int month, int day, int year) {
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int height = size.y;
-        /*
-         *  Manually try to recreate what the swiperefresh layout has by default.
-         *  No idea which layouts are active, so check for nulls on all.
-         *  Also no idea why the -140 here is different than the -50 above,
-         *  the whole thing makes no sense.
-         */
-        mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID1);
-        if (mSwipeRefreshLayout != null) {
-            mSwipeRefreshLayout.setProgressViewOffset(false, -150, height / 800);
-            mSwipeRefreshLayout.setRefreshing(true);
-        }
-        mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID2);
-        if (mSwipeRefreshLayout != null) {
-            mSwipeRefreshLayout.setProgressViewOffset(false, -150, height / 800);
-            mSwipeRefreshLayout.setRefreshing(true);
-        }
-        mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID3);
-        if (mSwipeRefreshLayout != null) {
-            mSwipeRefreshLayout.setProgressViewOffset(false, -150, height / 800);
-            mSwipeRefreshLayout.setRefreshing(true);
-        }
-        if (task == null) {
-            task = new RetrieveMenuInFragmentTask(month, day, year, false, 0);
-            task.execute();
-        }
+        Handler handler = new Handler();
+        // We have to use the runnable method, otherwise the spinner will not show up
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID1);
+                if (mSwipeRefreshLayout != null) {
+                    mSwipeRefreshLayout.setRefreshing(true);
+                }
+            }
+        });
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID2);
+                if (mSwipeRefreshLayout != null) {
+                    mSwipeRefreshLayout.setRefreshing(true);
+                }
+            }
+        });
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID3);
+                if (mSwipeRefreshLayout != null) {
+                    mSwipeRefreshLayout.setRefreshing(true);
+                }
+            }
+        });
+        new RetrieveMenuInFragmentTask(month, day, year, false, 0).execute();
     }
 
     /**

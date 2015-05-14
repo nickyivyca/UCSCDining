@@ -56,29 +56,60 @@ public class MainActivity extends AppCompatActivity{
     private MealViewFragment fragment;
     private MealViewFragmentLarge fragmentLarge;
 
-    //private static int currentCollege = 0;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.mainview);
 
-        int today[] = Util.getToday();
+        int intentCollege = -1, intentMeal = -1, intentMonth = -1, intentDay = -1, intentYear = -1;
+        boolean useSaved = false;
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        int intentCollege = getIntent().getIntExtra(Util.TAG_COLLEGE,
-                Integer.parseInt(prefs.getString("default_college", "0")));
-        int intentMeal = getIntent().getIntExtra(Util.TAG_MEAL, Util.getCurrentMeal(intentCollege));
-        int intentMonth = getIntent().getIntExtra(Util.TAG_MONTH, today[0]);
-        int intentDay = getIntent().getIntExtra(Util.TAG_DAY, today[1]);
-        int intentYear = getIntent().getIntExtra(Util.TAG_YEAR, today[2]);
+		//if(getFragmentManager().findFragmentById(R.id.fragment_container) == null) {
 
-//		if(findViewById(R.id.fragment_container) != null) {
+            /*
+             * Three possible ways to launch activity:
+             *
+             * Intent is launch intent:
+             * get data from today[], prefs
+             *
+             * Intent is from widget:
+             * get data from intent
+             *
+             * savedinstancestate is not null:
+             * use saved data in fragment
+             *
+             * solution:
+             *
+             * priority:
+             * 1. from widget
+             *  - the onNewIntent overriding makes sure that a launch from the widget overrides the
+             *    saved state.
+             * 2. savedinstancestate
+             * 3. nothing (launch intent, get from [today[], prefs
+             *
+             */
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-/*			if (savedInstanceState != null) {
-                return;
-            }*/
+            // If data in intent, it's from the widget. Highest priority
+            if (!(getIntent().getIntExtra(Util.TAG_COLLEGE, -1) == -1)) {
+                int today[] = Util.getToday();
+                intentCollege = getIntent().getIntExtra(Util.TAG_COLLEGE,
+                        Integer.parseInt(prefs.getString("default_college", "0")));
+                intentMeal = getIntent().getIntExtra(Util.TAG_MEAL, Util.getCurrentMeal(intentCollege));
+                intentMonth = getIntent().getIntExtra(Util.TAG_MONTH, today[0]);
+                intentDay = getIntent().getIntExtra(Util.TAG_DAY, today[1]);
+                intentYear = getIntent().getIntExtra(Util.TAG_YEAR, today[2]);
+            } else if (savedInstanceState != null) {
+                useSaved = true;
+            } else {
+                int today[] = Util.getToday();
+                intentCollege = Integer.parseInt(prefs.getString("default_college", "0"));
+                intentMeal = Util.getCurrentMeal(intentCollege);
+                intentMonth = today[0];
+                intentDay = today[1];
+                intentYear = today[2];
+            }
 
             mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
             mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
@@ -113,13 +144,14 @@ public class MainActivity extends AppCompatActivity{
             args.putInt(Util.TAG_MONTH, intentMonth);
             args.putInt(Util.TAG_DAY, intentDay);
             args.putInt(Util.TAG_YEAR, intentYear);
+            args.putBoolean(Util.TAG_USESAVED, useSaved);
 
             /**
              * If layout xlarge (nexus 10-sized tablet) or layout large (nexus 7-sized tablet)
              * and view landscape, use large layout (displays all meals at once), otherwise use
              * normal layout
              */
-            if ((getResources().getConfiguration().screenLayout &
+          if ((getResources().getConfiguration().screenLayout &
                     Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE
                     || ( (getResources().getConfiguration().screenLayout &
                     Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE)
@@ -143,7 +175,7 @@ public class MainActivity extends AppCompatActivity{
 //	            selectItem(0);
                 fragment.selectItem(0);
             }*/
-//		}
+		//}
 
     }
 
@@ -157,6 +189,13 @@ public class MainActivity extends AppCompatActivity{
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        recreate();
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {

@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nickivy.ucscdining"
     android:versionCode="1"
-    android:versionName="0.9.1" >
+    android:versionName="0.9.2" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -17,23 +17,30 @@
         android:theme="@style/Theme.AppCompat.Light" >
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".PreferencesActivity"
             android:label="@string/about"
-            android:parentActivityName="com.nickivy.ucscdining.MainActivity"
-            android:launchMode="singleInstance"/>
+            android:parentActivityName="com.nickivy.ucscdining.MainActivity">
+            <!-- Include metadata for ICS compatibility -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nickivy.ucscdining.MainActivity" />
+        </activity>
         <activity
             android:name=".NutritionWebpageActivity"
             android:label="@string/nutinfo"
-            android:parentActivityName="com.nickivy.ucscdining.MainActivity"
-            android:launchMode="singleInstance"/>
+            android:parentActivityName="com.nickivy.ucscdining.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nickivy.ucscdining.MainActivity" />
+        </activity>
 
         <receiver android:name=".widget.MenuWidget"
             android:exported="true">

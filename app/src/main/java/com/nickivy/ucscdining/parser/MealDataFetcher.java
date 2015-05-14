@@ -27,6 +27,10 @@ public class MealDataFetcher {
         MealStorage mealStore = new MealStorage(context);
         SQLiteDatabase db;
 
+        if (mealStore == null) {
+            return Util.GETLIST_DATABASE_FAILURE;
+        }
+
         db = mealStore.getReadableDatabase();
 
         String selection = MealStorage.COLUMN_MONTH + "= ? AND " + MealStorage.COLUMN_DAY +

@@ -288,6 +288,7 @@ public class MenuWidget extends AppWidgetProvider {
             launchAppIntent.putExtra(Util.TAG_YEAR, mData.getYear());
             launchAppIntent.putExtra(Util.TAG_COLLEGE, mData.getCollege());
             launchAppIntent.putExtra(Util.TAG_MEAL, mData.getMeal());
+            launchAppIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
             PendingIntent pendingLaunch = PendingIntent.getActivity(mContext, mData.getWidgetId(),
                     launchAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);

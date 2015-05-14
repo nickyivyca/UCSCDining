@@ -2,10 +2,9 @@ package com.nickivy.ucscdining;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Point;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -14,8 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
-import android.view.Display;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,39 +50,54 @@ public class MealViewFragmentLarge extends Fragment {
     private RelativeLayout mDrawer;
     private DrawerLayout mDrawerLayout;
     private ListView mMealList;
-    private Bundle instance;
-
-    private RetrieveMenuInLargeFragmentTask task;
 
     private boolean initialRefreshed = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        collegeNum = getArguments().getInt(Util.TAG_COLLEGE);
-        getActivity().setTitle(Util.collegeList[collegeNum]);
+        // If USESAVED true this means we are returning to view the fragment without changing it
+        if (!getArguments().getBoolean(Util.TAG_USESAVED)) {
+            collegeNum = getArguments().getInt(Util.TAG_COLLEGE);
+            getActivity().setTitle(Util.collegeList[collegeNum]);
 
-        displayedMonth = getArguments().getInt(Util.TAG_MONTH);
-        displayedDay = getArguments().getInt(Util.TAG_DAY);
-        displayedYear = getArguments().getInt(Util.TAG_YEAR);
-
-        instance = savedInstanceState;
+            displayedMonth = getArguments().getInt(Util.TAG_MONTH);
+            displayedDay = getArguments().getInt(Util.TAG_DAY);
+            displayedYear = getArguments().getInt(Util.TAG_YEAR);
+        }
+        initialRefreshed = false;
 
         return inflater.inflate(R.layout.meal_fragment, container, false);
     }
 
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        if (!initialRefreshed) {
+            /*
+             * For some strange reason the runnable method used in other places does NOT work for
+             * initial refresh on the large layout. It works fine in select new date.
+             */
+            mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity()
+                    .findViewById(R.id.large_refresh_layout);
+            TypedValue typed_value = new TypedValue();
+            getActivity().getTheme().
+                    resolveAttribute(android.support.v7.appcompat.R.attr.actionBarSize, typed_value,
+                            true);
+            mSwipeRefreshLayout.setProgressViewOffset(false, 0,
+                    getResources().getDimensionPixelSize(typed_value.resourceId));
+            mSwipeRefreshLayout.setRefreshing(true);
+            // Default loading to today
+            initialRefreshed = true;
+            new RetrieveMenuInLargeFragmentTask(displayedMonth, displayedDay, displayedYear)
+                    .execute();
+        }
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.large_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 MenuParser.manualRefresh = true;
                 // When doing swipe refresh, reload to the displayed day
-                if (task == null) {
-                    task = new RetrieveMenuInLargeFragmentTask(displayedMonth, displayedDay,
-                            displayedYear);
-                    task.execute();
-                }
+                new RetrieveMenuInLargeFragmentTask(displayedMonth, displayedDay,
+                        displayedYear).execute();
             }
         });
 
@@ -144,21 +157,6 @@ public class MealViewFragmentLarge extends Fragment {
                         topRowVerticalPosition >= 0);
             }
         });
-
-        if (task == null && initialRefreshed == false) {
-            Display display = getActivity().getWindowManager().getDefaultDisplay();
-            Point size = new Point();
-            display.getSize(size);
-            int height = size.y;
-            // manually try to recreate where the spinner ends up in a normal swipe
-            mSwipeRefreshLayout.setProgressViewOffset(false, -50, height / 800);
-            mSwipeRefreshLayout.setRefreshing(true);
-            // Default loading to today
-            initialRefreshed = true;
-            int[] today = Util.getToday();
-            task = new RetrieveMenuInLargeFragmentTask(today[0], today[1], today[2]);
-            task.execute();
-        }
     }
 
     public void selectItem(int position) {
@@ -272,39 +270,27 @@ public class MealViewFragmentLarge extends Fragment {
         protected Long doInBackground(Void... voids) {
             int res = MealDataFetcher.fetchData(getActivity(), mAttemptedMonth, mAttemptedDay,
                     mAttemptedYear);
-            return new Double(res).longValue();
+            return Double.valueOf(res).longValue();
         }
 
         protected void onPostExecute(Long result) {
+            if (getActivity() == null) {
+                // Rotation or something must have happened, etc. Spinners are gone.
+                return;
+            }
             MenuParser.manualRefresh = false;
-            // For keeping track and only allowing one Asynctask to run at once
-            task = null;
             // Post-execute: set array adapters, reload animation, set title
 
-
-            /*
-             *  Manually try to recreate what the swiperefresh layout has by default.
-             *
-             * Only 2 views exist at a time, so the third returns null, but
-             * we don't know which one it is, so check each one. Try-catch
-             * would work but is performance-inefficient.
-             */
-
-            Display display = getActivity().getWindowManager().getDefaultDisplay();
-            Point size = new Point();
-            display.getSize(size);
-            int height = size.y;
-
-            mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.large_refresh_layout);
-            mSwipeRefreshLayout.setProgressViewOffset(false, -100, height / 40);
-            mSwipeRefreshLayout.setRefreshing(false);
 
             /*
              * We want the spinners canceled no matter what, but all the other stuff should not
              * be changed in the case of a data load failure
              */
-            if (!result.equals(new Double(Util.GETLIST_SUCCESS).longValue())) {
-                if (result.equals(new Double(Util.GETLIST_DATABASE_FAILURE).longValue())) {
+            mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity()
+                    .findViewById(R.id.large_refresh_layout);
+            mSwipeRefreshLayout.setRefreshing(false);
+            if (!result.equals(Double.valueOf(Util.GETLIST_SUCCESS).longValue())) {
+                if (result.equals(Double.valueOf(Util.GETLIST_DATABASE_FAILURE).longValue())) {
                     Toast.makeText(getActivity(), getString(R.string.database_failed),
                             Toast.LENGTH_SHORT).show();
                 } else {
@@ -328,14 +314,10 @@ public class MealViewFragmentLarge extends Fragment {
                 mDrawerLayout.openDrawer(Gravity.START);
             }
 
-            /*
-             *
-             */
             ListView listView = (ListView) getActivity().findViewById(R.id.breakfast_list);
             if (!MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
                     MenuParser.fullMenuObj.get(collegeNum).getBreakfast().get(0).getItemName()
                             .equals(Util.brunchMessage)) {
-                // hide breakfast?
                 listView.setVisibility(View.INVISIBLE);
             } else {
                 listView = (ListView) getActivity().findViewById(R.id.breakfast_list);
@@ -344,11 +326,11 @@ public class MealViewFragmentLarge extends Fragment {
 
             // If only dinner available, set to dinner
             // (rare occurence, pretty much only on return from holidays)
-            if (MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
+            /*if (MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
                     MenuParser.fullMenuObj.get(collegeNum).getLunch().isEmpty() &&
                     !MenuParser.fullMenuObj.get(collegeNum).getDinner().isEmpty()) {
-                // hide breakfast and lunch?
-            }
+                // hide breakfast and lunch? there is already nothing in the lists
+            }*/
 
             mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer_list);
 
@@ -416,23 +398,18 @@ public class MealViewFragmentLarge extends Fragment {
     }
 
     public void selectNewDate(int month, int day, int year) {
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int height = size.y;
-        /*
-         *  Manually try to recreate what the swiperefresh layout has by default.
-         *  No idea which layouts are active, so check for nulls on all.
-         *  Also no idea why the -140 here is different than the -50 above,
-         *  the whole thing makes no sense.
-         */
-        mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(R.id.large_refresh_layout);
-            mSwipeRefreshLayout.setProgressViewOffset(false, -150, height / 800);
-            mSwipeRefreshLayout.setRefreshing(true);
-        if (task == null) {
-            task = new RetrieveMenuInLargeFragmentTask(month, day, year);
-            task.execute();
-        }
+        Handler handler = new Handler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity()
+                        .findViewById(R.id.large_refresh_layout);
+                if (mSwipeRefreshLayout != null) {
+                    mSwipeRefreshLayout.setRefreshing(true);
+                }
+            }
+        });
+        new RetrieveMenuInLargeFragmentTask(month, day, year).execute();
     }
 
     private void setTitleText(int college, ActionBar bar) {
