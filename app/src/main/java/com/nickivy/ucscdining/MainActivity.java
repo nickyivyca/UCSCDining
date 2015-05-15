@@ -194,8 +194,13 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        setIntent(intent);
-        recreate();
+        if (intent.getExtras() == null) {
+            return;
+        }
+        if (intent.getExtras().getInt(Util.TAG_COLLEGE, -1) != -1) {
+            setIntent(intent);
+            recreate();
+        }
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {

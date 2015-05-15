@@ -47,6 +47,18 @@ public class WidgetData {
         views = new RemoteViews(context.getPackageName(), R.layout.menu_widget);
     }
 
+    // Constructor used for recreating data
+    public WidgetData(int widgetId, int initialCollege, int[] date, int meal, Context context) {
+        this.widgetId = widgetId;
+        this.currentCollege = initialCollege;
+        currentMeal = meal;
+        // Set current day to parameter
+        currentMonth = date[0];
+        currentDay = date[1];
+        currentYear = date[2];
+        views = new RemoteViews(context.getPackageName(), R.layout.menu_widget);
+    }
+
     public int getWidgetId() {
         return widgetId;
     }
@@ -113,7 +125,7 @@ public class WidgetData {
              *
              * All 5 closed is handled separately
              */
-        if (!MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
+        /*if (!MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
             for (int i = 0; i < 5; i++) {
                 currentCollege++;
                 if (currentCollege == 5) {
@@ -123,7 +135,7 @@ public class WidgetData {
                     break;
                 }
             }
-        }
+        }*/
     }
 
     public void decrementCollege() {
@@ -136,7 +148,7 @@ public class WidgetData {
              *
              * All 5 closed is handled separately
              */
-        if (!MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
+        /*if (!MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
             for (int i = 0; i < 5; i++) {
                 currentCollege--;
                 if (currentCollege == -1) {
@@ -146,7 +158,7 @@ public class WidgetData {
                     break;
                 }
             }
-        }
+        }*/
     }
 
     public void incrementMeal() {

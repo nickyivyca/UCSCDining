@@ -15,7 +15,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
-import android.widget.RemoteViews;
 
 import com.nickivy.ucscdining.MainActivity;
 import com.nickivy.ucscdining.R;
@@ -47,21 +46,17 @@ public class MenuWidget extends AppWidgetProvider {
     CLICKTAG_COLLEGERIGHT = "COLLEGE_RIGHT",
     CLICKTAG_MEALLEFT = "MEAL_LEFT",
     CLICKTAG_MEALRIGHT = "MEAL_RIGHT",
-    TAG_TIMEUPDATE="time_update",
-    TAG_WIDGETID="widget_id",
-    TAG_UPDATEALL="update_all",
-    KEY_COLLEGES="key_colleges",
-    KEY_MEALS="key_meals";
-
-    //public static int currentCollege = -1,
-    //currentMeal = -2;
-
-    //private static RemoteViews views;
+    TAG_TIMEUPDATE = "time_update",
+    TAG_WIDGETID = "widget_id",
+    TAG_UPDATEALL = "update_all",
+    KEY_COLLEGES = "key_colleges",
+    KEY_MEALS = "key_meals",
+    KEY_MONTHS = "key_months",
+    KEY_DAYS = "key_days",
+    KEY_YEARS = "key_years",
+    KEY_ID = "key_id";
 
     public static ArrayList<WidgetData> widgetData = new ArrayList<WidgetData>();
-
-    // Direction for telling which meal to skip over on brunch days
-    public static boolean directionRight = true;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -161,10 +156,12 @@ public class MenuWidget extends AppWidgetProvider {
                                 int appWidgetId) {
         WidgetData thisWidgetData = getWidgetDataById(appWidgetId);
         if (thisWidgetData == null) {
-            thisWidgetData = new WidgetData(appWidgetId, getSavedCollegeData(context,
-                    widgetData.size()), context);
+            // Not doing full reinitialization here, this is how we make the initial data when added
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences
+                    (context.getApplicationContext());
+            thisWidgetData = new WidgetData(appWidgetId, Integer.parseInt(
+                    prefs.getString("default_college", "0")), context);
             widgetData.add(thisWidgetData);
-            //saveData(context);
         }
         new RetrieveMenuInWidgetTask(context, appWidgetManager, thisWidgetData).execute();
         // Actual setting of widget data is accomplished in the postexecute of the asynctask
@@ -192,17 +189,11 @@ public class MenuWidget extends AppWidgetProvider {
 
         @Override
         protected void onPreExecute() {
-            /*if (views == null) {
-                views = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
-            }*/
             mData.getViews().setViewVisibility(R.id.widget_progresscircle, View.VISIBLE);
             mAppWidgetManager.updateAppWidget(mData.getWidgetId(), mData.getViews());
         }
 
         protected void onPostExecute(Long result) {
-            /*if (views == null) {
-                views = new RemoteViews(mContext.getPackageName(), R.layout.menu_widget);
-            }*/
             mData.getViews().setViewVisibility(R.id.widget_progresscircle, View.INVISIBLE);
 
             if (!result.equals(Double.valueOf(Util.GETLIST_SUCCESS).longValue())) {
@@ -264,22 +255,26 @@ public class MenuWidget extends AppWidgetProvider {
             intent.setAction(CLICKTAG_COLLEGELEFT);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, mData.getWidgetId(),
                     intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            mData.getViews().setOnClickPendingIntent(R.id.widget_college_leftbutton, pendingIntent);
+            mData.getViews().setOnClickPendingIntent(R.id.widget_college_leftbutton,
+                    pendingIntent);
 
             intent.setAction(CLICKTAG_COLLEGERIGHT);
             pendingIntent = PendingIntent.getBroadcast(mContext, mData.getWidgetId(), intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
-            mData.getViews().setOnClickPendingIntent(R.id.widget_college_rightbutton, pendingIntent);
+            mData.getViews().setOnClickPendingIntent(R.id.widget_college_rightbutton,
+                    pendingIntent);
 
             intent.setAction(CLICKTAG_MEALLEFT);
             pendingIntent = PendingIntent.getBroadcast(mContext, mData.getWidgetId(), intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
-            mData.getViews().setOnClickPendingIntent(R.id.widget_mealname_leftbutton, pendingIntent);
+            mData.getViews().setOnClickPendingIntent(R.id.widget_mealname_leftbutton,
+                    pendingIntent);
 
             intent.setAction(CLICKTAG_MEALRIGHT);
             pendingIntent = PendingIntent.getBroadcast(mContext, mData.getWidgetId(), intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
-            mData.getViews().setOnClickPendingIntent(R.id.widget_mealname_rightbutton, pendingIntent);
+            mData.getViews().setOnClickPendingIntent(R.id.widget_mealname_rightbutton,
+                    pendingIntent);
 
             // Set intent on other bits for launching main app
             Intent launchAppIntent = new Intent(mContext, MainActivity.class);
@@ -313,19 +308,19 @@ public class MenuWidget extends AppWidgetProvider {
 
     @Override
     public void onReceive(@NonNull Context context, @NonNull Intent intent) {
-        WidgetData data = getWidgetDataById(intent.getIntExtra(TAG_WIDGETID, -1));
-        if (data == null) {
-            // Trigger update for all
-            ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
-                    MenuWidget.class.getName());
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
-            onUpdate(context, appWidgetManager, appWidgetIds);
-            super.onReceive(context, intent);
-            return;
-        }
-        int thisDataIndex = widgetData.indexOf(data);
-        if(!intent.getBooleanExtra(TAG_UPDATEALL, true)) {
+        /*
+         * If intent contains widget ID data, make sure WidgetData exists in memory, otherwise
+         * load it from saved data
+         *
+         * Otherwise, check if intent is an alarm time update intent and run that.
+         */
+        if (!(intent.getIntExtra(TAG_WIDGETID, -1) == -1)) {
+            WidgetData data = getWidgetDataById(intent.getIntExtra(TAG_WIDGETID, -1));
+            if (data == null) {
+                reinitializeWidgetData(context);
+            }
+            int thisDataIndex = widgetData.indexOf(getWidgetDataById(
+                    intent.getIntExtra(TAG_WIDGETID, -1)));
             if (CLICKTAG_COLLEGELEFT.equals(intent.getAction())) {
                 widgetData.get(thisDataIndex).decrementCollege();
             }
@@ -338,22 +333,27 @@ public class MenuWidget extends AppWidgetProvider {
             if (CLICKTAG_MEALRIGHT.equals(intent.getAction())) {
                 widgetData.get(thisDataIndex).incrementMeal();
             }
-            ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
-                    MenuWidget.class.getName());
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             updateAppWidget(context, appWidgetManager, widgetData.get(thisDataIndex).getWidgetId());
         } else {
             if (TAG_TIMEUPDATE.equals(intent.getAction())) {
-                widgetData.get(thisDataIndex).setMeal(Util.getCurrentMeal
-                        (widgetData.get(thisDataIndex).getCollege()));
-                widgetData.get(thisDataIndex).setToToday();
+                if (widgetData.size() == 0) {
+                    reinitializeWidgetData(context);
+                } else {
+                    for (int i = 0; i < widgetData.size(); i++) {
+                        widgetData.get(i).setMeal(Util.getCurrentMeal
+                                (widgetData.get(i).getCollege()));
+                        widgetData.get(i).setToToday();
+                    }
+                }
+                // Trigger update of all
+                ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
+                        MenuWidget.class.getName());
+                AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+                int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
+                onUpdate(context, appWidgetManager, appWidgetIds);
             }
-            // Trigger update
-            ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
-                    MenuWidget.class.getName());
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
-            onUpdate(context, appWidgetManager, appWidgetIds);
+
         }
         super.onReceive(context, intent);
     }
@@ -378,29 +378,108 @@ public class MenuWidget extends AppWidgetProvider {
      * a max of 4)
      */
     private static void saveData(Context context) {
-        String savedCollege = "";//,
-                //savedMeals = "";
+        String savedColleges = "",
+                savedIds = "",
+                savedMeals = "",
+                savedMonths = "",
+                savedDays = "",
+                savedYears = "";
+
         for (WidgetData data : widgetData) {
-            savedCollege = savedCollege + data.getCollege();
-            //savedMeals = savedMeals + data.getMeal();
+            savedColleges = savedColleges + data.getCollege();
+            savedMeals = savedMeals + data.getMeal();
+            // savedIds, date data comma separated
+            if (savedMonths.length() > 0) {
+                savedMonths = savedMonths + "," + data.getMonth();
+                savedDays = savedDays + "," + data.getDay();
+                savedYears = savedYears + "," + data.getYear();
+                savedIds = savedIds + "," + data.getWidgetId();
+            } else {
+                savedMonths = "" + data.getMonth();
+                savedDays = "" + data.getDay();
+                savedYears = "" + data.getYear();
+                savedIds = "" + data.getWidgetId();
+            }
         }
         SharedPreferences settings = context.getSharedPreferences(Util.WIDGETSTATE_PREFS, 0);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString(KEY_COLLEGES, savedCollege);
-        //editor.putString(KEY_MEALS, savedMeals);
+        editor.putString(KEY_COLLEGES, savedColleges);
+        editor.putString(KEY_MEALS, savedMeals);
+        editor.putString(KEY_MONTHS, savedMonths);
+        editor.putString(KEY_DAYS, savedDays);
+        editor.putString(KEY_YEARS, savedYears);
+        editor.putString(KEY_ID, savedIds);
         editor.commit();
     }
 
-    private static int getSavedCollegeData(Context context, int index) {
+    private static int getSavedCollegeNumber(Context context, int index) {
         SharedPreferences settings = context.getSharedPreferences(Util.WIDGETSTATE_PREFS, 0);
         String collegeData = settings.getString(KEY_COLLEGES, "");
-        try {
-            return collegeData.charAt(index) - '0';
-        } catch (StringIndexOutOfBoundsException e) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences
-                    (context.getApplicationContext());
-            return Integer.parseInt(prefs.getString("default_college", "0"));
+        return collegeData.charAt(index) - '0';
+    }
+
+    private static int getSavedMeal(Context context, int index) {
+        SharedPreferences settings = context.getSharedPreferences(Util.WIDGETSTATE_PREFS, 0);
+        String mealData = settings.getString(KEY_MEALS, "");
+        return mealData.charAt(index) - '0';
+    }
+
+    private static int[] getSavedDate(Context context, int index) {
+        SharedPreferences settings = context.getSharedPreferences(Util.WIDGETSTATE_PREFS, 0);
+        String monthData = settings.getString(KEY_MONTHS, ""),
+                dayData = settings.getString(KEY_DAYS, ""),
+                yearData = settings.getString(KEY_YEARS, "");
+        // If only one data piece in string
+        if (!monthData.contains(",")) {
+                return new int[]{Integer.parseInt(monthData),
+                Integer.parseInt(dayData), Integer.parseInt(yearData)};
+        } else {
+            try {
+                String resMonthData[] = monthData.split(","),
+                        resDayData[] = dayData.split(","),
+                        resYearData[] = yearData.split(",");
+                return new int[]{Integer.parseInt(resMonthData[index]),
+                        Integer.parseInt(resDayData[index]), Integer.parseInt(resYearData[index])};
+            } catch (NullPointerException e) {
+                return Util.getToday();
+            } catch (NumberFormatException e) {
+                return Util.getToday();
+            }
         }
+    }
+
+    private static int getSavedWidgetID(Context context, int index) {
+        SharedPreferences settings = context.getSharedPreferences(Util.WIDGETSTATE_PREFS, 0);
+        String idData = settings.getString(KEY_ID, "");
+        // If only one data piece in string
+        if (!idData.contains(",")) {
+            return Integer.parseInt(idData);
+        } else {
+            try {
+                String[] resIDData = idData.split(",");
+                return Integer.parseInt(resIDData[index]);
+            } catch (NullPointerException e) {
+                // We're screwed if we reach here...
+                return -1;
+            } catch (NumberFormatException e) {
+                return -1;
+            }
+        }
+    }
+
+    private static void reinitializeWidgetData(Context context) {
+        SharedPreferences settings = context.getSharedPreferences(Util.WIDGETSTATE_PREFS, 0);
+        ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
+                MenuWidget.class.getName());
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
+        for (int i = 0; i < appWidgetIds.length; i++) {
+            WidgetData data = new WidgetData(getSavedWidgetID(context, i),
+                    getSavedCollegeNumber(context, i), getSavedDate(context, i),
+                    getSavedMeal(context, i), context);
+            widgetData.add(data);
+        }
+        saveData(context);
     }
 }
 
