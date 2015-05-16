@@ -48,7 +48,6 @@ public class MenuWidget extends AppWidgetProvider {
     CLICKTAG_MEALRIGHT = "MEAL_RIGHT",
     TAG_TIMEUPDATE = "time_update",
     TAG_WIDGETID = "widget_id",
-    TAG_UPDATEALL = "update_all",
     KEY_COLLEGES = "key_colleges",
     KEY_MEALS = "key_meals",
     KEY_MONTHS = "key_months",
@@ -137,10 +136,24 @@ public class MenuWidget extends AppWidgetProvider {
     @Override
     public void onDisabled(Context context) {
         final AlarmManager m = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        final Intent timeIntent = new Intent(context, MenuWidget.class);
+        timeIntent.setAction(TAG_TIMEUPDATE);
 
+        // Remake intents to cancel them in case they get lost in memory
+        breakfastIntent = PendingIntent.getBroadcast(context, Util.BREAKFAST_SWITCH_TIME,
+                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        lunchIntent = PendingIntent.getBroadcast(context, Util.LUNCH_SWITCH_TIME,
+                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        dinnerIntent = PendingIntent.getBroadcast(context, Util.DINNER_SWITCH_TIME,
+                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // Cancel the alarms
         m.cancel(breakfastIntent);
         m.cancel(lunchIntent);
         m.cancel(dinnerIntent);
+        // Cancel the intents themselves (so the alarmenabled calculations will work properly)
+        breakfastIntent.cancel();
+        lunchIntent.cancel();
+        dinnerIntent.cancel();
         super.onDisabled(context);
     }
 
@@ -157,11 +170,21 @@ public class MenuWidget extends AppWidgetProvider {
         WidgetData thisWidgetData = getWidgetDataById(appWidgetId);
         if (thisWidgetData == null) {
             // Not doing full reinitialization here, this is how we make the initial data when added
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences
-                    (context.getApplicationContext());
-            thisWidgetData = new WidgetData(appWidgetId, Integer.parseInt(
-                    prefs.getString("default_college", "0")), context);
-            widgetData.add(thisWidgetData);
+            SharedPreferences prefs = context.getSharedPreferences(Util.WIDGETSTATE_PREFS, 0);
+            String iddata = prefs.getString(KEY_ID, "");
+            // If appwidgetID exists in savedwidgetID, use backed up data
+            if (iddata.contains("" + appWidgetId)) {
+                // We are either at a device restart or a app reinstall, data should be in saved
+                reinitializeWidgetData(context);
+                thisWidgetData = getWidgetDataById(appWidgetId);
+            } else {
+                // Else, initialize new widget
+                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences
+                        (context.getApplicationContext());
+                thisWidgetData = new WidgetData(appWidgetId, Integer.parseInt(
+                        settings.getString("default_college", "0")), context);
+                widgetData.add(thisWidgetData);
+            }
         }
         new RetrieveMenuInWidgetTask(context, appWidgetManager, thisWidgetData).execute();
         // Actual setting of widget data is accomplished in the postexecute of the asynctask
@@ -197,7 +220,9 @@ public class MenuWidget extends AppWidgetProvider {
             mData.getViews().setViewVisibility(R.id.widget_progresscircle, View.INVISIBLE);
 
             if (!result.equals(Double.valueOf(Util.GETLIST_SUCCESS).longValue())) {
-                Log.v(Util.LOGTAG, "No internet connection or database error not updating widget");
+                Log.v(Util.LOGTAG, "No internet connection or database error, not updating widget");
+                // We still need to update the widget to remove the spinny
+                mAppWidgetManager.updateAppWidget(mData.getWidgetId(), mData.getViews());
                 return;
             }
             // Check if all dining halls are closed
@@ -246,11 +271,6 @@ public class MenuWidget extends AppWidgetProvider {
             Intent intent = new Intent(mContext, MenuWidget.class);
             // Store the widget tag in it for use in onReceive
             intent.putExtra(TAG_WIDGETID, mData.getWidgetId());
-            /*
-             * Arrow button presses do not need to update all the widgets, just their own
-             * (alarms update all)
-             */
-            intent.putExtra(TAG_UPDATEALL, false);
 
             intent.setAction(CLICKTAG_COLLEGELEFT);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, mData.getWidgetId(),
@@ -468,7 +488,6 @@ public class MenuWidget extends AppWidgetProvider {
     }
 
     private static void reinitializeWidgetData(Context context) {
-        SharedPreferences settings = context.getSharedPreferences(Util.WIDGETSTATE_PREFS, 0);
         ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
                 MenuWidget.class.getName());
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);

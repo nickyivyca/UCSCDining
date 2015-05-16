@@ -105,7 +105,7 @@ public class Util {
         if(cal.get(Calendar.HOUR_OF_DAY) >= BREAKFAST_SWITCH_TIME ||
                 cal.get(Calendar.HOUR_OF_DAY) < LUNCH_SWITCH_TIME) {
             if (MenuParser.fullMenuObj.get(college).getBreakfast().size() > 0) {
-                if (MenuParser.fullMenuObj.get(college).getBreakfast().get(0)
+                if (MenuParser.fullMenuObj.get(college).getBreakfast().get(0).getItemName()
                         .equals(brunchMessage)) {
                     return LUNCH;
                 }

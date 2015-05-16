@@ -120,22 +120,6 @@ public class WidgetData {
         if (currentCollege >= 5) {
             currentCollege = 0;
         }
-            /*
-             * If college is not open, cycle until find one that is. Only try five times
-             *
-             * All 5 closed is handled separately
-             */
-        /*if (!MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
-            for (int i = 0; i < 5; i++) {
-                currentCollege++;
-                if (currentCollege == 5) {
-                    currentCollege = 0;
-                }
-                if (MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
-                    break;
-                }
-            }
-        }*/
     }
 
     public void decrementCollege() {
@@ -143,22 +127,6 @@ public class WidgetData {
         if (currentCollege <= -1) {
             currentCollege = 4;
         }
-            /*
-             * If college is not open, cycle until find one that is. Only try five times
-             *
-             * All 5 closed is handled separately
-             */
-        /*if (!MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
-            for (int i = 0; i < 5; i++) {
-                currentCollege--;
-                if (currentCollege == -1) {
-                    currentCollege = 4;
-                }
-                if (MenuParser.fullMenuObj.get(currentCollege).getIsOpen()) {
-                    break;
-                }
-            }
-        }*/
     }
 
     public void incrementMeal() {

@@ -57,30 +57,92 @@ public class MenuParser {
                 lunchFoodNames = null,
                 dinnerNutIds = null,
                 dinnerFoodNames = null;
+
         try {
             breakfastDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
                     day + "%2F" + year + URLPart3 + Util.meals[0]).get();
-            breakfastFoodNames = breakfastDoc.select("div[class=\"pickmenucoldispname\"]");
-            breakfastNutIds = breakfastDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
-
-            lunchDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" + day +
-                    "%2F" + year + URLPart3 + Util.meals[1]).get();
-            lunchFoodNames = lunchDoc.select("div[class=\"pickmenucoldispname\"]");
-            lunchNutIds = lunchDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
-
-            dinnerDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" + day +
-                    "%2F" + year + URLPart3 + Util.meals[2]).get();
-            dinnerFoodNames = dinnerDoc.select("div[class=\"pickmenucoldispname\"]");
-            dinnerNutIds = dinnerDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
         } catch (UnknownHostException e) {
-            Log.v("ucscdining", "Internet connection missing");
+            // Internet connection completely missing is a separate error from okhttp
+            Log.v(Util.LOGTAG, "Internet connection missing");
             e.printStackTrace();
             return Util.GETLIST_INTERNET_FAILURE;
         } catch (IOException e) {
-            Log.w("ucscdining","Unable to download dining menu");
-            e.printStackTrace();
-            return Util.GETLIST_OKHTTP_FAILURE;
+            Log.w(Util.LOGTAG, "okhttp error");
+            try {
+                breakfastDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
+                        day + "%2F" + year + URLPart3 + Util.meals[0]).get();
+            } catch (IOException e1) {
+                Log.w(Util.LOGTAG, "okhttp error");
+                try {
+                    breakfastDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
+                            day + "%2F" + year + URLPart3 + Util.meals[0]).get();
+                } catch (IOException e2) {
+                    Log.w(Util.LOGTAG, "okhttp error");
+                    // Give up after three times
+                    return Util.GETLIST_OKHTTP_FAILURE;
+                }
+            }
         }
+
+        try {
+            lunchDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
+                    day + "%2F" + year + URLPart3 + Util.meals[1]).get();
+        } catch (UnknownHostException e) {
+            // Internet connection completely missing is a separate error from okhttp
+            Log.v(Util.LOGTAG, "Internet connection missing");
+            e.printStackTrace();
+            return Util.GETLIST_INTERNET_FAILURE;
+        } catch (IOException e) {
+            Log.w(Util.LOGTAG, "okhttp error");
+            try {
+                lunchDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
+                        day + "%2F" + year + URLPart3 + Util.meals[1]).get();
+            } catch (IOException e1) {
+                Log.w(Util.LOGTAG, "okhttp error");
+                try {
+                    lunchDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
+                            day + "%2F" + year + URLPart3 + Util.meals[1]).get();
+                } catch (IOException e2) {
+                    Log.w(Util.LOGTAG, "okhttp error");
+                    // Give up after three times
+                    return Util.GETLIST_OKHTTP_FAILURE;
+                }
+            }
+        }
+
+        try {
+            dinnerDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
+                    day + "%2F" + year + URLPart3 + Util.meals[2]).get();
+        } catch (UnknownHostException e) {
+            // Internet connection completely missing is a separate error from okhttp
+            Log.v(Util.LOGTAG, "Internet connection missing");
+            e.printStackTrace();
+            return Util.GETLIST_INTERNET_FAILURE;
+        } catch (IOException e) {
+            Log.w(Util.LOGTAG, "okhttp error");
+            try {
+                dinnerDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
+                        day + "%2F" + year + URLPart3 + Util.meals[2]).get();
+            } catch (IOException e1) {
+                Log.w(Util.LOGTAG, "okhttp error");
+                try {
+                    dinnerDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
+                            day + "%2F" + year + URLPart3 + Util.meals[2]).get();
+                } catch (IOException e2) {
+                    Log.w(Util.LOGTAG, "okhttp error");
+                    // Give up after three times
+                    return Util.GETLIST_OKHTTP_FAILURE;
+                }
+            }
+        }
+        breakfastFoodNames = breakfastDoc.select("div[class=\"pickmenucoldispname\"]");
+        breakfastNutIds = breakfastDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
+
+        lunchFoodNames = lunchDoc.select("div[class=\"pickmenucoldispname\"]");
+        lunchNutIds = lunchDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
+
+        dinnerFoodNames = dinnerDoc.select("div[class=\"pickmenucoldispname\"]");
+        dinnerNutIds = dinnerDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
 
         ArrayList<MenuItem> breakfastList = new ArrayList<MenuItem>(),
                 lunchList = new ArrayList<MenuItem>(),
@@ -127,13 +189,22 @@ public class MenuParser {
     public static int getMealList(int month, int day, int year) {
     	for (int i = 0; i < 5; i++) {
             int res = getSingleMealList(i, month, day, year);
-            // Try three times to defeat OKHTTP error.
+            /*
+             * For some stupid reason, it throws these stupid unexpected status line errors half the
+             * time on mobile data. So we have to intercept those somehow. getsinglemeallist returns
+             * okhttp failure if it gets one - and getsinglemeallist also tries multiple times
+             * before returning the error. It will only try once for lost internet connection,
+             * though.
+             */
             if (res == Util.GETLIST_OKHTTP_FAILURE) {
                 res = getSingleMealList(i, month, day, year);
                 if (res == Util.GETLIST_OKHTTP_FAILURE) {
                     res = getSingleMealList(i, month, day, year);
                     if (res == Util.GETLIST_OKHTTP_FAILURE) {
-                        return Util.GETLIST_INTERNET_FAILURE;
+                        res = getSingleMealList(i, month, day, year);
+                        if (res == Util.GETLIST_OKHTTP_FAILURE) {
+                            return Util.GETLIST_INTERNET_FAILURE;
+                        }
                     }
                 }
             } else if (res != Util.GETLIST_SUCCESS) {

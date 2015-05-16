@@ -123,12 +123,13 @@ public class MealViewFragment extends ListFragment{
                         mMealList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
                             public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
-                                Intent intent = new Intent(Intent.ACTION_VIEW);
-                                intent.setData(Uri.parse("http://nutrition.sa.ucsc.edu/label.asp" +
+                                Intent intent = new Intent(getActivity().getApplicationContext(),
+                                        NutritionWebpageActivity.class);
+                                intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                                         MenuParser.URLPart2s[collegePos] + displayedMonth +
                                         "%2F" + displayedDay + "%2F" + displayedYear +
                                         "&RecNumAndPort=" + MenuParser.fullMenuObj.get(collegePos)
-                                        .getBreakfast().get(pos).getCode()));
+                                        .getBreakfast().get(pos).getCode());
                                 startActivity(intent);
                             }
                         });
@@ -142,12 +143,13 @@ public class MealViewFragment extends ListFragment{
                     mMealList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
-                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                            intent.setData(Uri.parse("http://nutrition.sa.ucsc.edu/label.asp" +
+                            Intent intent = new Intent(getActivity().getApplicationContext(),
+                                    NutritionWebpageActivity.class);
+                            intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                                     MenuParser.URLPart2s[collegePos] + displayedMonth +
                                     "%2F" + displayedDay + "%2F" + displayedYear +
                                     "&RecNumAndPort=" + MenuParser.fullMenuObj.get(collegePos)
-                                    .getLunch().get(pos).getCode()));
+                                    .getLunch().get(pos).getCode());
                             startActivity(intent);
                         }
                     });
@@ -161,12 +163,13 @@ public class MealViewFragment extends ListFragment{
                     mMealList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
-                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                            intent.setData(Uri.parse("http://nutrition.sa.ucsc.edu/label.asp" +
+                            Intent intent = new Intent(getActivity().getApplicationContext(),
+                                    NutritionWebpageActivity.class);
+                            intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                                     MenuParser.URLPart2s[collegePos] + displayedMonth +
                                     "%2F" + displayedDay + "%2F" + displayedYear +
                                     "&RecNumAndPort=" + MenuParser.fullMenuObj.get(collegePos)
-                                    .getDinner().get(pos).getCode()));
+                                    .getDinner().get(pos).getCode());
                             startActivity(intent);
                         }
                     });
