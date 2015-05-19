@@ -2,7 +2,6 @@ package com.nickivy.ucscdining.widget;
 
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.nickivy.ucscdining.R;
@@ -25,7 +24,8 @@ public class WidgetData {
     currentMeal,
     currentMonth,
     currentDay,
-    currentYear;
+    currentYear,
+    backupCollege;
 
     private boolean directionRight;
 
@@ -45,10 +45,12 @@ public class WidgetData {
         currentDay = today[1];
         currentYear = today[2];
         views = new RemoteViews(context.getPackageName(), R.layout.menu_widget);
+        backupCollege = Util.NO_BACKUP_COLLEGE;
     }
 
     // Constructor used for recreating data
-    public WidgetData(int widgetId, int initialCollege, int[] date, int meal, Context context) {
+    public WidgetData(int widgetId, int initialCollege, int[] date, int meal, Context context,
+                      int backupCollege) {
         this.widgetId = widgetId;
         this.currentCollege = initialCollege;
         currentMeal = meal;
@@ -57,6 +59,7 @@ public class WidgetData {
         currentDay = date[1];
         currentYear = date[2];
         views = new RemoteViews(context.getPackageName(), R.layout.menu_widget);
+        this.backupCollege = backupCollege;
     }
 
     public int getWidgetId() {
@@ -81,6 +84,10 @@ public class WidgetData {
 
     public int getYear() {
         return currentYear;
+    }
+
+    public int getBackupCollege() {
+        return backupCollege;
     }
 
     public RemoteViews getViews() {
@@ -114,6 +121,11 @@ public class WidgetData {
     public void setDirectionRight(boolean direction) {
         this.directionRight = direction;
     }
+
+    public void setBackupCollege() {
+        backupCollege = currentCollege;
+    }
+
 
     public void incrementCollege() {
         currentCollege++;

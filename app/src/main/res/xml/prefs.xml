@@ -9,6 +9,12 @@
             android:entries="@array/colleges_pref"
             android:entryValues="@array/colleges_values"
             />
+        <ListPreference android:key="default_college_2nd"
+            android:title="@string/default_college_2nd"
+            android:summary="@string/default_desc_2nd"
+            android:entries="@array/colleges_pref"
+            android:entryValues="@array/colleges_values"
+            />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/licenses" android:key="licences">
         <Preference android:key="mylicense"
@@ -26,6 +32,12 @@
             android:summary="@string/jsouplicense_desc">
             <intent android:action="android.intent.action.VIEW"
                 android:data="https://jsoup.org" />
+        </Preference>
+        <Preference android:key="fablicense"
+            android:title="@string/fablicense_title"
+            android:summary="@string/fablicense_desc">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://github.com/makovkastar/FloatingActionButton" />
         </Preference>
     </PreferenceCategory>
 </PreferenceScreen>

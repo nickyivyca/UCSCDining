@@ -2,11 +2,13 @@ package com.nickivy.ucscdining;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -73,7 +75,6 @@ public class MealViewFragmentLarge extends Fragment {
             displayedDay = getArguments().getInt(Util.TAG_DAY);
             displayedYear = getArguments().getInt(Util.TAG_YEAR);
         }
-        initialRefreshed = false;
 
         return inflater.inflate(R.layout.meal_fragment, container, false);
     }
@@ -93,10 +94,8 @@ public class MealViewFragmentLarge extends Fragment {
             mSwipeRefreshLayout.setProgressViewOffset(false, 0,
                     getResources().getDimensionPixelSize(typed_value.resourceId));
             mSwipeRefreshLayout.setRefreshing(true);
-            // Default loading to today
-            initialRefreshed = true;
-            new RetrieveMenuInLargeFragmentTask(displayedMonth, displayedDay, displayedYear)
-                    .execute();
+            new RetrieveMenuInLargeFragmentTask(displayedMonth, displayedDay, displayedYear,
+                    getActivity()).execute();
         }
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.large_refresh_layout);
         mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.primary));
@@ -106,7 +105,7 @@ public class MealViewFragmentLarge extends Fragment {
                 MenuParser.manualRefresh = true;
                 // When doing swipe refresh, reload to the displayed day
                 new RetrieveMenuInLargeFragmentTask(displayedMonth, displayedDay,
-                        displayedYear).execute();
+                        displayedYear, getActivity()).execute();
             }
         });
 
@@ -267,19 +266,23 @@ public class MealViewFragmentLarge extends Fragment {
                 mAttemptedDay,
                 mAttemptedYear;
 
+        private Context mContext;
+
         /**
          * @param month Month of day to fetch
          * @param day Day of day to fetch
          * @param year Year of day to fetch
          */
-        public RetrieveMenuInLargeFragmentTask(int month, int day, int year) {
+        public RetrieveMenuInLargeFragmentTask(int month, int day, int year, Context context) {
             mAttemptedMonth = month;
             mAttemptedDay = day;
             mAttemptedYear = year;
+            mContext = context;
         }
 
         @Override
-        protected void onPreExecute(){}
+        protected void onPreExecute(){
+        }
 
         @Override
         protected Long doInBackground(Void... voids) {
@@ -293,6 +296,15 @@ public class MealViewFragmentLarge extends Fragment {
                 // Rotation or something must have happened, etc. Spinners are gone.
                 return;
             }
+            // Only do secondary preference check here on init
+            if (!initialRefreshed) {
+                if (!(MenuParser.fullMenuObj.get(collegeNum).getIsSet() &&
+                        MenuParser.fullMenuObj.get(collegeNum).getIsOpen())) {
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+                    collegeNum = Integer.parseInt(prefs.getString("default_college_2nd", "0"));
+                }
+            }
+            initialRefreshed = true;
             MenuParser.manualRefresh = false;
             // Post-execute: set array adapters, reload animation, set title
 
@@ -424,7 +436,7 @@ public class MealViewFragmentLarge extends Fragment {
                 }
             }
         });
-        new RetrieveMenuInLargeFragmentTask(month, day, year).execute();
+        new RetrieveMenuInLargeFragmentTask(month, day, year, getActivity()).execute();
     }
 
     private void setTitleText(int college, ActionBar bar) {
@@ -439,8 +451,8 @@ public class MealViewFragmentLarge extends Fragment {
         } else if (MenuParser.fullMenuObj.get(college).getIsFarmFriday() ||
                 MenuParser.fullMenuObj.get(college).getIsHealthyMonday()) {
             // Green for Healthy Monday / Farm Friday
-            text.setSpan(new ForegroundColorSpan(Color.rgb(0x4C, 0xC5, 0x52)), 0,
-                    text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE); // 'Green Apple'
+            text.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.healthy)), 0,
+                    text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         } else {
             text.setSpan(new ForegroundColorSpan(R.color.primary_text), 0, text.length(),
                     Spannable.SPAN_INCLUSIVE_INCLUSIVE);

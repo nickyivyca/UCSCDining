@@ -246,7 +246,6 @@ public class MainActivity extends AppCompatActivity{
             int year = c.get(Calendar.YEAR);
             int today[] = getCurrentDispDate();
 
-
             // Only return themed datepicker if on Lollipop
             if (Integer.valueOf(Build.VERSION.SDK_INT) >= Integer.valueOf(Build.VERSION_CODES.LOLLIPOP)) {
                 return new DatePickerDialog(getActivity(), R.style.DatePickerTheme, this, year,

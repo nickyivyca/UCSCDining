@@ -11,12 +11,14 @@ import com.nickivy.ucscdining.util.Util;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.PagerAdapter;
@@ -111,7 +113,21 @@ public class MealViewFragment extends ListFragment{
         mSlidingTabLayout.setSelectedIndicatorColors(getResources().getColor(R.color.primary));
     }
 
+    public void selectItemWithSecondary(int position) {
+        if (MenuParser.fullMenuObj.get(position).getIsOpen()) {
+            if (MenuParser.fullMenuObj.get(position).getIsSet()) {
+                selectItem(position);
+                return;
+            }
+        } else {
+            /*SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences
+                    (container.getContext());
+            selectItem(Integer.parseInt(prefs.getString("default_college_2nd", "0")));*/
+        }
+    }
+
     public void selectItem(int position) {
+        Log.v(Util.LOGTAG, "selecting item " + position);
         collegeNum = position;
         mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer_list);
         mDrawerList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -213,6 +229,8 @@ public class MealViewFragment extends ListFragment{
         mAttemptedDay,
         mAttemptedYear;
 
+        private Context mContext;
+
         /**
          * @param month Month of day to fetch
          * @param day Day of day to fetch
@@ -222,12 +240,13 @@ public class MealViewFragment extends ListFragment{
          *                 if setPage is true. Set to -1 to set date automatically (by getToday())
          */
         public RetrieveMenuInFragmentTask(int month, int day, int year, boolean setPage,
-                                          int initMeal) {
+                                          int initMeal, Context context) {
             mAttemptedMonth = month;
             mAttemptedDay = day;
             mAttemptedYear = year;
             mSetPage = setPage;
             mInitialMeal = initMeal;
+            mContext = context;
         }
 
         @Override
@@ -245,6 +264,15 @@ public class MealViewFragment extends ListFragment{
                 // Rotation or something must have happened, etc.
                 return;
             }
+            // Only do secondary preference check here on init
+            if (!initialRefreshed) {
+                if (!(MenuParser.fullMenuObj.get(collegeNum).getIsSet() &&
+                        MenuParser.fullMenuObj.get(collegeNum).getIsOpen())) {
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+                    collegeNum = Integer.parseInt(prefs.getString("default_college_2nd", "0"));
+                }
+            }
+            initialRefreshed = true;
             MenuParser.manualRefresh = false;
 
 
@@ -442,7 +470,7 @@ public class MealViewFragment extends ListFragment{
                     MenuParser.manualRefresh = true;
                     // When doing swipe refresh, reload to the displayed day
                     new RetrieveMenuInFragmentTask(displayedMonth, displayedDay,
-                            displayedYear, false, 0).execute();
+                            displayedYear, false, 0, getActivity()).execute();
                 }
             });
             mFab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
@@ -471,9 +499,8 @@ public class MealViewFragment extends ListFragment{
                         }
                     }
                 });
-                initialRefreshed = true;
                 new RetrieveMenuInFragmentTask(displayedMonth, displayedDay, displayedYear, true,
-                        initialMeal).execute();
+                        initialMeal, getActivity()).execute();
             }
 
             ArrayList<String> testedArray = new ArrayList<String>();
@@ -622,7 +649,7 @@ public class MealViewFragment extends ListFragment{
                 }
             }
         });
-        new RetrieveMenuInFragmentTask(month, day, year, false, 0).execute();
+        new RetrieveMenuInFragmentTask(month, day, year, false, 0, getActivity()).execute();
     }
 
     /**

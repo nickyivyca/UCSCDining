@@ -65,6 +65,8 @@ public class Util {
     TAG_URL = "tag_url",
     TAG_USESAVED = "tag_usesaved";
 
+    public static final int NO_BACKUP_COLLEGE = 6;
+
     /**
      * Returns today's date as a 3-number int array. [month, day, year]
      *

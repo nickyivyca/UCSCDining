@@ -9,7 +9,7 @@ import android.support.v7.app.ActionBarActivity;
 /**
  * Displays some info about the app, as well as option to look at license information for the app.
  *
- * <p>May actually hold preferences later, but currently only displays the info.
+ * Also display default college preferences.
  *
  * <p>Not using AppCompatActivity because preferencefragment isn't in support library.
  *
@@ -36,7 +36,7 @@ public class PreferencesActivity extends ActionBarActivity {
             Preference pref = findPreference("mylicense");
             // Display the verison number once BuildConfig.VERSION_NAME works. Says 1.3 on bug page?
             //pref.setTitle(getString(R.string.app_name) + " " + BuildConfig.VERSION_NAME);
-            pref.setTitle(getString(R.string.app_name)+ " 0.9.5");
+            pref.setTitle(getString(R.string.app_name)+ " 0.9.6");
         }
     }
 }

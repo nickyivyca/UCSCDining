@@ -53,7 +53,8 @@ public class MenuWidget extends AppWidgetProvider {
     KEY_MONTHS = "key_months",
     KEY_DAYS = "key_days",
     KEY_YEARS = "key_years",
-    KEY_ID = "key_id";
+    KEY_ID = "key_id",
+    KEY_BACKUP_COLLEGE = "key_backup_college";
 
     public static ArrayList<WidgetData> widgetData = new ArrayList<WidgetData>();
 
@@ -185,8 +186,10 @@ public class MenuWidget extends AppWidgetProvider {
                         settings.getString("default_college", "0")), context);
                 widgetData.add(thisWidgetData);
             }
+            new RetrieveMenuInWidgetTask(context, appWidgetManager, thisWidgetData, true).execute();
+        } else {
+            new RetrieveMenuInWidgetTask(context, appWidgetManager, thisWidgetData, false).execute();
         }
-        new RetrieveMenuInWidgetTask(context, appWidgetManager, thisWidgetData).execute();
         // Actual setting of widget data is accomplished in the postexecute of the asynctask
     }
 
@@ -195,12 +198,14 @@ public class MenuWidget extends AppWidgetProvider {
         private Context mContext;
         private AppWidgetManager mAppWidgetManager;
         private WidgetData mData;
+        private boolean mTimeUpdate;
 
         public RetrieveMenuInWidgetTask(Context context, AppWidgetManager appWidgetManager,
-                WidgetData data) {
+                WidgetData data, boolean timeUpdate) {
             mContext = context;
             mData = data;
             mAppWidgetManager = appWidgetManager;
+            mTimeUpdate = timeUpdate;
         }
 
         @Override
@@ -248,7 +253,28 @@ public class MenuWidget extends AppWidgetProvider {
                     }
                 }
 
+                /*
+                 * Logic for backup college
+                 *
+                 * If widget is automatically updated:
+                 *
+                 *
+                 */
+                if (mTimeUpdate && mData.getBackupCollege() != Util.NO_BACKUP_COLLEGE &&
+                        MenuParser.fullMenuObj.get(mData.getBackupCollege()).getIsOpen()) {
+                    mData.setCollege(mData.getBackupCollege());
+                }
+
+                if (mTimeUpdate && !MenuParser.fullMenuObj.get(mData.getCollege()).getIsOpen()) {
+                    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences
+                            (mContext.getApplicationContext());
+                    mData.setBackupCollege();
+                    mData.setCollege(Integer.parseInt(
+                            settings.getString("default_college_2nd", "0")));
+                }
+
                 // Set view text of college and current meal
+
                 mData.getViews().setTextViewText(R.id.widget_collegename,
                         Util.collegeList[mData.getCollege()]);
                 if (MenuParser.fullMenuObj.get(mData.getCollege()).getIsCollegeNight()) {
@@ -361,18 +387,17 @@ public class MenuWidget extends AppWidgetProvider {
                     reinitializeWidgetData(context);
                 }
                 for (int i = 0; i < widgetData.size(); i++) {
+                    widgetData.get(i).setToToday();
                     widgetData.get(i).setMeal(Util.getCurrentMeal
                             (widgetData.get(i).getCollege()));
-                    widgetData.get(i).setToToday();
                 }
-                // Trigger update of all
-                ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
-                        MenuWidget.class.getName());
-                AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-                int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
-                onUpdate(context, appWidgetManager, appWidgetIds);
             }
-
+            // Trigger update of all
+            ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
+                    MenuWidget.class.getName());
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
+            onUpdate(context, appWidgetManager, appWidgetIds);
         }
         super.onReceive(context, intent);
     }
@@ -402,11 +427,13 @@ public class MenuWidget extends AppWidgetProvider {
                 savedMeals = "",
                 savedMonths = "",
                 savedDays = "",
-                savedYears = "";
+                savedYears = "",
+                savedBackupColleges = "";
 
         for (WidgetData data : widgetData) {
             savedColleges = savedColleges + data.getCollege();
             savedMeals = savedMeals + data.getMeal();
+            savedBackupColleges = savedBackupColleges + data.getBackupCollege();
             // savedIds, date data comma separated
             if (savedMonths.length() > 0) {
                 savedMonths = savedMonths + "," + data.getMonth();
@@ -428,6 +455,7 @@ public class MenuWidget extends AppWidgetProvider {
         editor.putString(KEY_DAYS, savedDays);
         editor.putString(KEY_YEARS, savedYears);
         editor.putString(KEY_ID, savedIds);
+        editor.putString(KEY_BACKUP_COLLEGE, savedBackupColleges);
         editor.commit();
     }
 
@@ -440,6 +468,12 @@ public class MenuWidget extends AppWidgetProvider {
     private static int getSavedMeal(Context context, int index) {
         SharedPreferences settings = context.getSharedPreferences(Util.WIDGETSTATE_PREFS, 0);
         String mealData = settings.getString(KEY_MEALS, "");
+        return mealData.charAt(index) - '0';
+    }
+
+    private static int getSavedBackupCollege(Context context, int index) {
+        SharedPreferences settings = context.getSharedPreferences(Util.WIDGETSTATE_PREFS, 0);
+        String mealData = settings.getString(KEY_BACKUP_COLLEGE, "");
         return mealData.charAt(index) - '0';
     }
 
@@ -494,7 +528,7 @@ public class MenuWidget extends AppWidgetProvider {
         for (int i = 0; i < appWidgetIds.length; i++) {
             WidgetData data = new WidgetData(getSavedWidgetID(context, i),
                     getSavedCollegeNumber(context, i), getSavedDate(context, i),
-                    getSavedMeal(context, i), context);
+                    getSavedMeal(context, i), context, getSavedBackupCollege(context, i));
             widgetData.add(data);
         }
         saveData(context);
