@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MainThemeColorful21" parent="@style/MainThemeColorful">
+        <item name="android:datePickerDialogTheme">@style/DatePickerTheme</item>
+    </style>
+
+    <style name="DatePickerTheme" parent="android:Theme.Material.Light.Dialog">
+        <!--item name="android:datePickerStyle">@style/DatePickerStyle</item-->
+        <item name="android:colorAccent">@color/accent</item>
+    </style>
+
+    <style name="DatePickerStyle" parent="@android:style/Widget.Material.Light.DatePicker">
+        <item name="android:headerBackground">@color/primary</item>
+        <item name="android:colorButtonNormal">@color/accent</item>
+        <item name="android:calendarTextColor">@color/accent</item>
+    </style>
+
+</resources>

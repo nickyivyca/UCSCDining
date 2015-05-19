@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.samples.apps.iosched.ui.widget.SlidingTabLayout;
+import com.melnykov.fab.FloatingActionButton;
 import com.nickivy.ucscdining.parser.MealDataFetcher;
 import com.nickivy.ucscdining.parser.MenuParser;
 import com.nickivy.ucscdining.util.Util;
@@ -11,10 +12,12 @@ import com.nickivy.ucscdining.util.Util;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -57,7 +60,10 @@ public class MealViewFragment extends ListFragment{
     LISTVIEW_ID3 = 14,
     SWIPEREF_ID1 = 15,
     SWIPEREF_ID2 = 16,
-    SWIPEREF_ID3 = 17;
+    SWIPEREF_ID3 = 17,
+    FAB_ID1 = 18,
+    FAB_ID2 = 19,
+    FAB_ID3 = 20;
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ViewPager mViewPager;
@@ -66,6 +72,7 @@ public class MealViewFragment extends ListFragment{
     private RelativeLayout mDrawer;
     private DrawerLayout mDrawerLayout;
     private ListView mMealList;
+    private FloatingActionButton mFab;
 
     private static int collegeNum = 0;
 
@@ -101,10 +108,14 @@ public class MealViewFragment extends ListFragment{
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setDistributeEvenly(true);
         mSlidingTabLayout.setViewPager(mViewPager);
+        mSlidingTabLayout.setSelectedIndicatorColors(getResources().getColor(R.color.primary));
     }
 
     public void selectItem(int position) {
         collegeNum = position;
+        mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer_list);
+        mDrawerList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
         // update the main content by replacing listview adapters
         if (MenuParser.fullMenuObj.get(position).getIsOpen()) {
             if (MenuParser.fullMenuObj.get(position).getIsSet()) {
@@ -182,6 +193,10 @@ public class MealViewFragment extends ListFragment{
 
             // update selected item and title, then close the drawer
             mDrawerList.setItemChecked(position, true);
+            mDrawerList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+            mDrawerList.setSelection(position);
+            mDrawerList.setAdapter(new ColorAdapter(getActivity(),
+                    R.layout.drawer_list_item, Util.collegeList));
             mDrawerLayout.closeDrawer(mDrawer);
         } else {
             Toast.makeText(getActivity(), Util.collegeList[position] + " dining hall closed today!",
@@ -420,6 +435,7 @@ public class MealViewFragment extends ListFragment{
             mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.meal_refresh_layout);
             //Add 15 instead of 12 for swipelayout
             mSwipeRefreshLayout.setId(mealnum + SWIPEREF_ID1);
+            mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.primary));
             mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
@@ -429,6 +445,10 @@ public class MealViewFragment extends ListFragment{
                             displayedYear, false, 0).execute();
                 }
             });
+            mFab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+            mFab.setId(mealnum + FAB_ID1);
+            mFab.setOnClickListener(new FloatingActionButtonListener());
+            mFab.attachToListView(mealList);
 
             /*
              * ASynctask to load menu, either from web
@@ -537,7 +557,7 @@ public class MealViewFragment extends ListFragment{
      * Allows us to set colors of entries in the college list to denote
      * events
      */
-    public static class ColorAdapter extends ArrayAdapter<String> {
+    private class ColorAdapter extends ArrayAdapter<String> {
 
         public ColorAdapter(Context context, int resource, List<String> objects) {
             super(context, resource, objects);
@@ -561,7 +581,12 @@ public class MealViewFragment extends ListFragment{
             // Green for Healthy Monday / Farm Friday
             if (MenuParser.fullMenuObj.get(position).getIsFarmFriday() ||
                 MenuParser.fullMenuObj.get(position).getIsHealthyMonday()) {
-                ((TextView) v).setTextColor(Color.rgb(0x4C, 0xC5, 0x52)); // 'Green Apple'
+                //((TextView) v).setTextColor(Color.rgb(0x4C, 0xC5, 0x52)); // 'Green Apple'
+                ((TextView) v).setTextColor(getResources().getColor(R.color.healthy)); // 'Green Apple'
+            }
+            if (collegeNum == position) {
+                //((TextView) v).setTypeface(null, Typeface.BOLD);
+                ((TextView) v).setBackgroundColor(getResources().getColor(R.color.primary_light));
             }
             return v;
         }
@@ -618,13 +643,22 @@ public class MealViewFragment extends ListFragment{
         } else if (MenuParser.fullMenuObj.get(college).getIsFarmFriday() ||
             MenuParser.fullMenuObj.get(college).getIsHealthyMonday()) {
             // Green for Healthy Monday / Farm Friday
-            text.setSpan(new ForegroundColorSpan(Color.rgb(0x4C, 0xC5, 0x52)), 0,
+            text.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.healthy)), 0,
                 text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE); // 'Green Apple'
         } else {
-            text.setSpan(new ForegroundColorSpan(Color.BLACK), 0, text.length(),
+            text.setSpan(new ForegroundColorSpan(R.color.primary_text), 0, text.length(),
                 Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         }
         bar.setTitle(text);
+    }
+
+    public class FloatingActionButtonListener implements FloatingActionButton.OnClickListener {
+
+        @Override
+        public void onClick(View view) {
+            DialogFragment newFragment = new MainActivity.DatePicker();
+            newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
+        }
     }
 
 }

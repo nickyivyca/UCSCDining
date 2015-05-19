@@ -2,4 +2,6 @@
 <resources>
     <color name="button_released">#eeeeee</color>
     <color name="button_pressed">#cccccc</color>
+    <!-- 'Green Apple' -->
+    <color name="healthy">#4CC552</color>
 </resources>

@@ -1,8 +1,0 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" 
-    xmlns:ucscdining="http://schemas.android.com/apk/res-auto">
-    <!-- using Go to today icon to select date - it was the only calendar looking icon in the action bar pack -->
-    <item android:id="@+id/action_select_date"
-          android:title="@string/select_date"
-          android:icon="@drawable/ic_action_go_to_today" 
-          ucscdining:showAsAction="always" />
-</menu>

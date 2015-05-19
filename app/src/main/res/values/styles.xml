@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="MainThemeColorful" parent="@style/Theme.AppCompat.Light">
+        <!--item name="android:actionBarStyle">@style/ColorActionBar</item-->
+        <!-- colorPrimary is used for the default action bar background -->
+        <item name="colorPrimary">@color/primary</item>
+
+        <!-- colorPrimaryDark is used for the status bar -->
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+
+        <!-- colorAccent is used as the default value for colorControlActivated
+             which is used to tint widgets -->
+        <!--item name="colorAccent">@color/divider</item-->
+        <item name="colorAccent">@color/accent</item>
+
+        <item name="android:textColorPrimary">@color/primary_text</item>
+        <item name="android:textColorSecondary">@color/secondary_text</item>
+        <item name="android:divider">@color/divider</item>
+    </style>
+
+    <style name="ColorActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
+        <!-- Title Text color -->
+        <item name="android:titleTextStyle">@style/ColorActionBarText</item>
+    </style>
+
+    <style name="ColorActionBarText"
+        parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/primary_text</item>
+    </style>
+
+</resources>

@@ -1,10 +1,13 @@
 package com.nickivy.ucscdining;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -13,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -23,13 +27,16 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.melnykov.fab.FloatingActionButton;
 import com.nickivy.ucscdining.parser.MealDataFetcher;
 import com.nickivy.ucscdining.parser.MenuParser;
 import com.nickivy.ucscdining.util.Util;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Fragment for displaying all three menus at once - tablet layout.
@@ -50,6 +57,7 @@ public class MealViewFragmentLarge extends Fragment {
     private RelativeLayout mDrawer;
     private DrawerLayout mDrawerLayout;
     private ListView mMealList;
+    private FloatingActionButton mFab;
 
     private boolean initialRefreshed = false;
 
@@ -91,6 +99,7 @@ public class MealViewFragmentLarge extends Fragment {
                     .execute();
         }
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.large_refresh_layout);
+        mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.primary));
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -157,9 +166,14 @@ public class MealViewFragmentLarge extends Fragment {
                         topRowVerticalPosition >= 0);
             }
         });
+        mFab = (FloatingActionButton) getActivity().findViewById(R.id.fab_large);
+        mFab.setOnClickListener(new FloatingActionButtonListener());
+        // Attach to dinner list view
+        //fab.attachToListView(listViewDinner);
     }
 
     public void selectItem(int position) {
+        int oldPosition = collegeNum;
         collegeNum = position;
         // update the main content by replacing listview adapters
         if (MenuParser.fullMenuObj.get(position).getIsOpen()) {
@@ -236,8 +250,9 @@ public class MealViewFragmentLarge extends Fragment {
             mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer_list);
             mDrawer = (RelativeLayout) getActivity().findViewById(R.id.left_drawer);
 
-            // update selected item and title, then close the drawer
-            mDrawerList.setItemChecked(position, true);
+            mDrawerList.setAdapter(new ColorAdapter(getActivity(),
+                    R.layout.drawer_list_item, Util.collegeList));
+
             mDrawerLayout.closeDrawer(mDrawer);
         } else {
             Toast.makeText(getActivity(), Util.collegeList[position] + " dining hall closed today!",
@@ -334,7 +349,7 @@ public class MealViewFragmentLarge extends Fragment {
 
             mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer_list);
 
-            mDrawerList.setAdapter(new MealViewFragment.ColorAdapter(getActivity(),
+            mDrawerList.setAdapter(new ColorAdapter(getActivity(),
                     R.layout.drawer_list_item, Util.collegeList));
 
             final int collegePos = collegeNum;
@@ -427,10 +442,57 @@ public class MealViewFragmentLarge extends Fragment {
             text.setSpan(new ForegroundColorSpan(Color.rgb(0x4C, 0xC5, 0x52)), 0,
                     text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE); // 'Green Apple'
         } else {
-            text.setSpan(new ForegroundColorSpan(Color.BLACK), 0, text.length(),
+            text.setSpan(new ForegroundColorSpan(R.color.primary_text), 0, text.length(),
                     Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         }
         bar.setTitle(text);
+    }
+
+    /**
+     * Allows us to set colors of entries in the college list to denote
+     * events
+     */
+    private class ColorAdapter extends ArrayAdapter<String> {
+
+        public ColorAdapter(Context context, int resource, List<String> objects) {
+            super(context, resource, objects);
+        }
+
+        public ColorAdapter(Context context, int resource, String[] objects) {
+            super(context, resource, objects);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent){
+            View v = super.getView(position,  convertView,  parent);
+            // Blue text for college night
+            if (MenuParser.fullMenuObj.get(position).getIsCollegeNight()) {
+                ((TextView) v).setTextColor(Color.BLUE); //
+            }
+            // Grayed out if dining hall is closed
+            if (!MenuParser.fullMenuObj.get(position).getIsOpen()) {
+                ((TextView) v).setTextColor(Color.LTGRAY); //
+            }
+            // Green for Healthy Monday / Farm Friday
+            if (MenuParser.fullMenuObj.get(position).getIsFarmFriday() ||
+                    MenuParser.fullMenuObj.get(position).getIsHealthyMonday()) {
+                ((TextView) v).setTextColor(getResources().getColor(R.color.healthy));
+            }
+            if (collegeNum == position) {
+                //((TextView) v).setTypeface(null, Typeface.BOLD);
+                ((TextView) v).setBackgroundColor(getResources().getColor(R.color.primary_light));
+            }
+            return v;
+        }
+    }
+
+    public class FloatingActionButtonListener implements FloatingActionButton.OnClickListener {
+
+        @Override
+        public void onClick(View view) {
+            DialogFragment newFragment = new MainActivity.DatePicker();
+            newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
+        }
     }
 
 }

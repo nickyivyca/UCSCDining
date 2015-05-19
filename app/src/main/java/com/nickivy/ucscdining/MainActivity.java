@@ -8,6 +8,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -31,6 +32,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import com.melnykov.fab.FloatingActionButton;
 import com.nickivy.ucscdining.util.Util;
 
 /**
@@ -151,7 +153,7 @@ public class MainActivity extends AppCompatActivity{
              * and view landscape, use large layout (displays all meals at once), otherwise use
              * normal layout
              */
-          if ((getResources().getConfiguration().screenLayout &
+            if ((getResources().getConfiguration().screenLayout &
                     Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE
                     || ( (getResources().getConfiguration().screenLayout &
                     Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE)
@@ -227,24 +229,11 @@ public class MainActivity extends AppCompatActivity{
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.overflow_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        switch(item.getItemId()) {
-            case R.id.action_select_date:
-                DialogFragment newFragment = new DatePicker();
-                newFragment.show(getSupportFragmentManager(), "datePicker");
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        return super.onOptionsItemSelected(item);
     }
 
     public static class DatePicker extends DialogFragment
@@ -257,10 +246,15 @@ public class MainActivity extends AppCompatActivity{
             int year = c.get(Calendar.YEAR);
             int today[] = getCurrentDispDate();
 
-            // Create a new instance of DatePickerDialog and return it
-            // Default date to what is currently selected by user
-            return new DatePickerDialog(getActivity(), this, year,
-                today[0] - 1, today[1]);
+
+            // Only return themed datepicker if on Lollipop
+            if (Integer.valueOf(Build.VERSION.SDK_INT) >= Integer.valueOf(Build.VERSION_CODES.LOLLIPOP)) {
+                return new DatePickerDialog(getActivity(), R.style.DatePickerTheme, this, year,
+                        today[0] - 1, today[1]);
+            } else {
+                return new DatePickerDialog(getActivity(), this, year,
+                        today[0] - 1, today[1]);
+            }
         }
 
         @Override

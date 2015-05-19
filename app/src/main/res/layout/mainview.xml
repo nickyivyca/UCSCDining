@@ -2,12 +2,24 @@
 
 <android.support.v4.widget.DrawerLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 	<FrameLayout android:id="@+id/fragment_container"
   	  	android:layout_width="match_parent"
-    	android:layout_height="match_parent"/>
+    	android:layout_height="match_parent">
+        <!--com.melnykov.fab.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_action_go_to_today"
+            fab:fab_colorNormal="@color/primary"
+            fab:fab_colorPressed="@color/primary_dark"
+            fab:fab_colorRipple="@color/primary_light" /-->
+        </FrameLayout>
     <RelativeLayout
         android:id="@+id/left_drawer"
         android:layout_height="match_parent"

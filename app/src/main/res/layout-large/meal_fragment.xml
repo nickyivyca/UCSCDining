@@ -1,84 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v4.widget.SwipeRefreshLayout
     android:id="@+id/large_refresh_layout"
     android:layout_height="fill_parent"
     android:layout_width="fill_parent">
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:id="@+id/large_breakfast_label"
-                android:text="@string/breakfast"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                android:gravity="center"
-                android:paddingBottom="16dp"
-                android:paddingTop="16dp"
-                android:background="#dddddd"/>
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:id="@+id/large_lunch_label"
-                android:text="@string/lunch"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                android:gravity="center"
-                android:paddingBottom="16dp"
-                android:paddingTop="16dp"
-                android:background="#dddddd"/>
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:id="@+id/large_dinner_label"
-                android:text="@string/dinner"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                android:gravity="center"
-                android:paddingBottom="16dp"
-                android:paddingTop="16dp"
-                android:background="#dddddd"/>
-        </LinearLayout>
-
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-            <ListView android:id="@+id/breakfast_list"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"/>
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
             <LinearLayout
-                android:layout_width="1dip"
-                android:layout_height="fill_parent"
-                android:background="#dddddd"
-                android:orientation="vertical" />
-            <ListView android:id="@+id/lunch_list"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"/>
-            <LinearLayout
-                android:layout_width="1dip"
-                android:layout_height="fill_parent"
-                android:background="#dddddd"
-                android:orientation="vertical" />
-            <ListView android:id="@+id/dinner_list"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"/>
-        </LinearLayout>
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/large_breakfast_label"
+                    android:text="@string/breakfast"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:gravity="center"
+                    android:paddingBottom="16dp"
+                    android:paddingTop="16dp"
+                    android:background="@color/primary_light"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/large_lunch_label"
+                    android:text="@string/lunch"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:gravity="center"
+                    android:paddingBottom="16dp"
+                    android:paddingTop="16dp"
+                    android:background="@color/primary_light"/>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/large_dinner_label"
+                    android:text="@string/dinner"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:gravity="center"
+                    android:paddingBottom="16dp"
+                    android:paddingTop="16dp"
+                    android:background="@color/primary_light"/>
+            </LinearLayout>
 
-    </LinearLayout>
-</android.support.v4.widget.SwipeRefreshLayout>
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <ListView android:id="@+id/breakfast_list"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"/>
+                <LinearLayout
+                    android:layout_width="1dip"
+                    android:layout_height="fill_parent"
+                    android:background="#dddddd"
+                    android:orientation="vertical" />
+                <ListView android:id="@+id/lunch_list"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"/>
+                <LinearLayout
+                    android:layout_width="1dip"
+                    android:layout_height="fill_parent"
+                    android:background="#dddddd"
+                    android:orientation="vertical" />
+                <ListView android:id="@+id/dinner_list"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/fab_large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_action_go_to_today"
+        fab:fab_colorNormal="@color/primary"
+        fab:fab_colorPressed="@color/primary_dark"
+        fab:fab_colorRipple="@color/primary_light" />
+</FrameLayout>

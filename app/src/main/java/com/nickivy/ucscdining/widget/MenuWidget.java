@@ -257,7 +257,7 @@ public class MenuWidget extends AppWidgetProvider {
                         MenuParser.fullMenuObj.get(mData.getCollege()).getIsHealthyMonday()) {
                     // 'Green Apple'
                     mData.getViews().setTextColor(R.id.widget_collegename,
-                            Color.rgb(0x4C, 0xC5, 0x52));
+                            mContext.getResources().getColor(R.color.healthy));
                 } else if (!MenuParser.fullMenuObj.get(mData.getCollege()).getIsOpen()) {
                     mData.getViews().setTextColor(R.id.widget_collegename, Color.LTGRAY);
                 } else {
@@ -359,12 +359,11 @@ public class MenuWidget extends AppWidgetProvider {
             if (TAG_TIMEUPDATE.equals(intent.getAction())) {
                 if (widgetData.size() == 0) {
                     reinitializeWidgetData(context);
-                } else {
-                    for (int i = 0; i < widgetData.size(); i++) {
-                        widgetData.get(i).setMeal(Util.getCurrentMeal
-                                (widgetData.get(i).getCollege()));
-                        widgetData.get(i).setToToday();
-                    }
+                }
+                for (int i = 0; i < widgetData.size(); i++) {
+                    widgetData.get(i).setMeal(Util.getCurrentMeal
+                            (widgetData.get(i).getCollege()));
+                    widgetData.get(i).setToToday();
                 }
                 // Trigger update of all
                 ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
