@@ -22,7 +22,7 @@ import android.util.Log;
  *
  * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  * 
- * @author Nick Ivy parkedraccoon@gmail.com
+ * @author Nicky Ivy parkedraccoon@gmail.com
  */
 
 public class MenuParser {

@@ -5,6 +5,7 @@ import java.util.Calendar;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -14,17 +15,13 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -32,7 +29,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
-import com.melnykov.fab.FloatingActionButton;
 import com.nickivy.ucscdining.util.Util;
 
 /**
@@ -40,7 +36,8 @@ import com.nickivy.ucscdining.util.Util;
  * read all menus, display them based on time, with special colors displayed
  * for events such as College Nights, Healthy Mondays, or Farm Fridays. Also allows for
  * viewing days in the future and there is an automatically updating widget which displays the
- * same info.
+ * same info. There are preferences for default college, and secondary college, which is used when
+ * the default college is closed (only if it is open itself)
  *
  * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
@@ -58,13 +55,18 @@ public class MainActivity extends AppCompatActivity{
     private MealViewFragment fragment;
     private MealViewFragmentLarge fragmentLarge;
 
+    private int intentCollege = -1, intentMeal = -1, intentMonth = -1, intentDay = -1,
+            intentYear = -1, mostRecentRotation = 0;
+
+    private static final String KEY_ROTATION = "key_rotation";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mostRecentRotation = getResources().getConfiguration().orientation;
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.mainview);
 
-        int intentCollege = -1, intentMeal = -1, intentMonth = -1, intentDay = -1, intentYear = -1;
         boolean useSaved = false;
 
 		//if(getFragmentManager().findFragmentById(R.id.fragment_container) == null) {
@@ -80,6 +82,7 @@ public class MainActivity extends AppCompatActivity{
              *
              * savedinstancestate is not null:
              * use saved data in fragment
+             * -be careful when fragment is rotated between 3-column and 1-column ('large' size)
              *
              * solution:
              *
@@ -88,6 +91,8 @@ public class MainActivity extends AppCompatActivity{
              *  - the onNewIntent overriding makes sure that a launch from the widget overrides the
              *    saved state.
              * 2. savedinstancestate
+             *  - make sure rotation is the same, otherwise copy data saved into instancestate back
+             *  out for use (this is in the case of a rotation)
              * 3. nothing (launch intent, get from [today[], prefs
              *
              */
@@ -103,7 +108,16 @@ public class MainActivity extends AppCompatActivity{
                 intentDay = getIntent().getIntExtra(Util.TAG_DAY, today[1]);
                 intentYear = getIntent().getIntExtra(Util.TAG_YEAR, today[2]);
             } else if (savedInstanceState != null) {
-                useSaved = true;
+                if (savedInstanceState.getInt(KEY_ROTATION) ==
+                        getResources().getConfiguration().orientation) {
+                    useSaved = true;
+                } else {
+                    intentCollege = savedInstanceState.getInt(Util.TAG_COLLEGE);
+                    intentMeal = savedInstanceState.getInt(Util.TAG_MEAL);
+                    intentMonth = savedInstanceState.getInt(Util.TAG_MONTH);
+                    intentDay = savedInstanceState.getInt(Util.TAG_DAY);
+                    intentYear = savedInstanceState.getInt(Util.TAG_YEAR);
+                }
             } else {
                 int today[] = Util.getToday();
                 intentCollege = Integer.parseInt(prefs.getString("default_college", "0"));
@@ -179,6 +193,17 @@ public class MainActivity extends AppCompatActivity{
             }*/
 		//}
 
+    }@Override
+     public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save current rotation state, plus all other stuff
+        savedInstanceState.putInt(KEY_ROTATION, mostRecentRotation);
+        savedInstanceState.putInt(Util.TAG_COLLEGE, intentCollege);
+        savedInstanceState.putInt(Util.TAG_MONTH, intentMonth);
+        savedInstanceState.putInt(Util.TAG_DAY, intentDay);
+        savedInstanceState.putInt(Util.TAG_YEAR, intentYear);
+        savedInstanceState.putInt(Util.TAG_MEAL, intentMeal);
+
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -195,10 +220,13 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onNewIntent(Intent intent) {
+        // Need to reset intent when new one is sent
         super.onNewIntent(intent);
+        // If intent has no extras, it's a launch or return intent, do nothing
         if (intent.getExtras() == null) {
             return;
         }
+        // If it contains college data, it's from widget, run new intent
         if (intent.getExtras().getInt(Util.TAG_COLLEGE, -1) != -1) {
             setIntent(intent);
             recreate();
@@ -208,6 +236,7 @@ public class MainActivity extends AppCompatActivity{
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            // Need to act on whatever fragment is active
             try {
                 MealViewFragment meal = (MealViewFragment)
                         getSupportFragmentManager().findFragmentById(R.id.fragment_container);
@@ -239,15 +268,18 @@ public class MainActivity extends AppCompatActivity{
     public static class DatePicker extends DialogFragment
         implements DatePickerDialog.OnDateSetListener {
 
+        private static Context savedContext;
+
         @Override
         public Dialog onCreateDialog(@NonNull Bundle savedInstanceState) {
             // Use the current date as the default date in the picker
             final Calendar c = Calendar.getInstance();
             int year = c.get(Calendar.YEAR);
-            int today[] = getCurrentDispDate();
+            int today[] = getCurrentDispDate(savedContext);
 
             // Only return themed datepicker if on Lollipop
-            if (Integer.valueOf(Build.VERSION.SDK_INT) >= Integer.valueOf(Build.VERSION_CODES.LOLLIPOP)) {
+            if (Integer.valueOf(Build.VERSION.SDK_INT) >=
+                    Integer.valueOf(Build.VERSION_CODES.LOLLIPOP)) {
                 return new DatePickerDialog(getActivity(), R.style.DatePickerTheme, this, year,
                         today[0] - 1, today[1]);
             } else {
@@ -259,6 +291,7 @@ public class MainActivity extends AppCompatActivity{
         @Override
         public void onDateSet(android.widget.DatePicker view, int year,
             int monthOfYear, int dayOfMonth) {
+            // Need to act on whatever fragment is active
             try {
                 MealViewFragment meal = (MealViewFragment)
                         getFragmentManager().findFragmentById(R.id.fragment_container);
@@ -269,15 +302,25 @@ public class MainActivity extends AppCompatActivity{
                 meal.selectNewDate(monthOfYear + 1, dayOfMonth, year);
             }
         }
+
+        public static void setSavedContext(Context context) {
+            savedContext = context;
+        }
     }
 
-    public static int[] getCurrentDispDate() {
-        if (MealViewFragment.displayedMonth == 0 || MealViewFragment.displayedDay == 0 ||
-                MealViewFragment.displayedYear == 0) {
-            int ret[] = {MealViewFragmentLarge.displayedMonth, MealViewFragmentLarge.displayedDay};
+    private static int[] getCurrentDispDate(Context context) {
+        // Need to act on whatever fragment is active
+        try {
+            MealViewFragment meal = (MealViewFragment)
+                    ((AppCompatActivity)context).getSupportFragmentManager().findFragmentById(
+                            R.id.fragment_container);
+            int ret[] = {meal.displayedMonth, meal.displayedDay};
             return ret;
-        } else {
-            int ret[] = {MealViewFragment.displayedMonth, MealViewFragment.displayedDay};
+        } catch (ClassCastException e) {
+            MealViewFragmentLarge meal = (MealViewFragmentLarge)
+                    ((AppCompatActivity)context).getSupportFragmentManager().findFragmentById(
+                            R.id.fragment_container);
+            int ret[] = {meal.displayedMonth, meal.displayedDay};
             return ret;
         }
     }

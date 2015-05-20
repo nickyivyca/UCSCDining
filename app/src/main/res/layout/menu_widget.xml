@@ -4,29 +4,42 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@android:color/white">
+    <TextView android:id="@+id/widget_collegename"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:textColor="@color/primary_text"
+        android:textSize="24sp"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        android:background="@color/primary"/>
+    <TextView android:id="@+id/widget_mealname"
+        android:layout_below="@id/widget_collegename"
+        android:gravity="center_horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/primary_text"
+        android:textSize="24sp"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        android:background="@color/primary"/>
     <ImageButton
         android:id="@+id/widget_college_leftbutton"
         android:layout_width="50dp"
         android:layout_height="match_parent"
         android:layout_alignBottom="@+id/widget_collegename"
-        android:src="@drawable/ic_arrow_left_grey600_24dp"
+        android:src="@drawable/arrow_left_black"
         android:background="@drawable/arrow_background"/>
-    <TextView android:id="@id/widget_collegename"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerInParent="true"
-        android:textColor="#000000"
-        android:textSize="24sp"
-        android:layout_margin="8dp"
-        android:paddingBottom="8dp"/>
     <ImageButton
         android:id="@+id/widget_college_rightbutton"
-        android:layout_alignBottom="@+id/widget_collegename"
+        android:layout_alignBottom="@id/widget_collegename"
         android:layout_alignParentRight="true"
         android:layout_width="50dp"
         android:layout_height="fill_parent"
-        android:src="@drawable/ic_arrow_right_grey600_24dp"
+        android:src="@drawable/arrow_right_black"
         android:background="@drawable/arrow_background"/>
     <ImageButton
         android:id="@+id/widget_mealname_leftbutton"
@@ -34,17 +47,8 @@
         android:layout_alignBottom="@+id/widget_mealname"
         android:layout_width="50dp"
         android:layout_height="match_parent"
-        android:src="@drawable/ic_arrow_left_grey600_24dp"
+        android:src="@drawable/arrow_left_black"
         android:background="@drawable/arrow_background"/>
-    <TextView android:id="@+id/widget_mealname"
-        android:layout_below="@id/widget_collegename"
-        android:layout_centerInParent="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:textColor="#000000"
-        android:textSize="24sp"
-        android:paddingBottom="8dp"/>
     <ImageButton
         android:id="@+id/widget_mealname_rightbutton"
         android:layout_below="@id/widget_college_rightbutton"
@@ -52,15 +56,8 @@
         android:layout_alignParentRight="true"
         android:layout_width="50dp"
         android:layout_height="fill_parent"
-        android:src="@drawable/ic_arrow_right_grey600_24dp"
+        android:src="@drawable/arrow_right_black"
         android:background="@drawable/arrow_background"/>
-    <LinearLayout
-        android:id="@+id/widget_mealname_divider"
-        android:layout_below="@id/widget_mealname"
-        android:layout_width="fill_parent"
-        android:layout_height="1dip"
-        android:background="#e5e5e5"
-        android:orientation="horizontal" />
     <ListView
         android:id="@+id/widget_list"
         android:layout_below="@id/widget_mealname_leftbutton"
@@ -75,6 +72,6 @@
         android:paddingTop="10dp"
         android:layout_centerInParent="true"
         android:layout_below="@id/widget_mealname"
-        android:indeterminate="true" />
+        android:indeterminate="true"/>
 
 </RelativeLayout>

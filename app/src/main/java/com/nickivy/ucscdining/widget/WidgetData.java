@@ -15,7 +15,7 @@ import java.util.Calendar;
  *
  * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
- * @author Nick Ivy parkedraccoon@gmail.com
+ * @author Nicky Ivy parkedraccoon@gmail.com
  */
 public class WidgetData {
 
@@ -27,13 +27,10 @@ public class WidgetData {
     currentYear,
     backupCollege;
 
-    private boolean directionRight;
+    private boolean directionRight,
+    taskRunning;
 
     private RemoteViews views;
-
-    public WidgetData(int widgetId, Context context) {
-        this(widgetId, 0, context);
-    }
 
     public WidgetData(int widgetId, int initialCollege, Context context) {
         this.widgetId = widgetId;
@@ -90,6 +87,10 @@ public class WidgetData {
         return backupCollege;
     }
 
+    public boolean getTaskRunning() {
+        return taskRunning;
+    }
+
     public RemoteViews getViews() {
         return views;
     }
@@ -124,6 +125,10 @@ public class WidgetData {
 
     public void setBackupCollege() {
         backupCollege = currentCollege;
+    }
+
+    public void setTaskRunning(boolean running) {
+        taskRunning = running;
     }
 
 

@@ -1,28 +1,24 @@
 package com.nickivy.ucscdining.widget;
 
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.nickivy.ucscdining.MainActivity;
 import com.nickivy.ucscdining.R;
 import com.nickivy.ucscdining.parser.MenuParser;
 import com.nickivy.ucscdining.util.Util;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * RemoteViewsService for the UCSCDining Widget. This only handles the ListView.
  *
  * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
- * @author Nick Ivy parkedraccoon@gmail.com
+ * @author Nicky Ivy parkedraccoon@gmail.com
  */
 
 public class WidgetService extends RemoteViewsService {

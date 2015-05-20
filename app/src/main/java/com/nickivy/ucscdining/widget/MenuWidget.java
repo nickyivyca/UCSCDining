@@ -34,7 +34,7 @@ import java.util.Calendar;
  *
  * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
- * @author Nick Ivy parkedraccoon@gmail.com
+ * @author Nicky Ivy parkedraccoon@gmail.com
  */
 public class MenuWidget extends AppWidgetProvider {
 
@@ -47,6 +47,7 @@ public class MenuWidget extends AppWidgetProvider {
     CLICKTAG_MEALLEFT = "MEAL_LEFT",
     CLICKTAG_MEALRIGHT = "MEAL_RIGHT",
     TAG_TIMEUPDATE = "time_update",
+    TAG_RELOAD = "tag_reload",
     TAG_WIDGETID = "widget_id",
     KEY_COLLEGES = "key_colleges",
     KEY_MEALS = "key_meals",
@@ -58,6 +59,8 @@ public class MenuWidget extends AppWidgetProvider {
 
     public static ArrayList<WidgetData> widgetData = new ArrayList<WidgetData>();
 
+    private static boolean timeUpdate;
+
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         setAlarm(context);
@@ -65,6 +68,7 @@ public class MenuWidget extends AppWidgetProvider {
             updateAppWidget(context, appWidgetManager, appWidgetId);
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds);
+        timeUpdate = false;
     }
 
     @Override
@@ -186,22 +190,27 @@ public class MenuWidget extends AppWidgetProvider {
                         settings.getString("default_college", "0")), context);
                 widgetData.add(thisWidgetData);
             }
-            new RetrieveMenuInWidgetTask(context, appWidgetManager, thisWidgetData, true).execute();
+            if (!thisWidgetData.getTaskRunning()) {
+                thisWidgetData.setTaskRunning(true);
+                new RetrieveMenuInWidgetTask(context, appWidgetManager, thisWidgetData).execute();
+            }
         } else {
-            new RetrieveMenuInWidgetTask(context, appWidgetManager, thisWidgetData, false).execute();
+            if (!thisWidgetData.getTaskRunning()) {
+                thisWidgetData.setTaskRunning(true);
+                new RetrieveMenuInWidgetTask(context, appWidgetManager, thisWidgetData).execute();
+            }
         }
         // Actual setting of widget data is accomplished in the postexecute of the asynctask
     }
 
     private static class RetrieveMenuInWidgetTask extends AsyncTask<Void, Void, Long> {
-
         private Context mContext;
         private AppWidgetManager mAppWidgetManager;
         private WidgetData mData;
         private boolean mTimeUpdate;
 
         public RetrieveMenuInWidgetTask(Context context, AppWidgetManager appWidgetManager,
-                WidgetData data, boolean timeUpdate) {
+                WidgetData data) {
             mContext = context;
             mData = data;
             mAppWidgetManager = appWidgetManager;
@@ -223,11 +232,13 @@ public class MenuWidget extends AppWidgetProvider {
 
         protected void onPostExecute(Long result) {
             mData.getViews().setViewVisibility(R.id.widget_progresscircle, View.INVISIBLE);
+            mData.setTaskRunning(false);
 
             if (!result.equals(Double.valueOf(Util.GETLIST_SUCCESS).longValue())) {
                 Log.v(Util.LOGTAG, "No internet connection or database error, not updating widget");
                 // We still need to update the widget to remove the spinny
                 mAppWidgetManager.updateAppWidget(mData.getWidgetId(), mData.getViews());
+                timeUpdate = false;
                 return;
             }
             // Check if all dining halls are closed
@@ -242,7 +253,8 @@ public class MenuWidget extends AppWidgetProvider {
             // If so display 'All Closed' and nothing else
             if (allClosed) {
                 mData.getViews().setTextViewText(R.id.widget_collegename, "All Closed");
-                mData.getViews().setTextColor(R.id.widget_collegename, Color.BLACK);
+                mData.getViews().setTextColor(R.id.widget_collegename, mContext.getResources()
+                        .getColor(R.color.primary_text));
             } else {
                 // Check if brunch message present - if so skip past it
                 if (mData.getMeal() == Util.BREAKFAST &&
@@ -254,11 +266,8 @@ public class MenuWidget extends AppWidgetProvider {
                 }
 
                 /*
-                 * Logic for backup college
-                 *
-                 * If widget is automatically updated:
-                 *
-                 *
+                 * Backup college: only use backup college on timeupdate switches, switch back to
+                 * main college afterwards
                  */
                 if (mTimeUpdate && mData.getBackupCollege() != Util.NO_BACKUP_COLLEGE &&
                         MenuParser.fullMenuObj.get(mData.getBackupCollege()).getIsOpen()) {
@@ -281,13 +290,13 @@ public class MenuWidget extends AppWidgetProvider {
                     mData.getViews().setTextColor(R.id.widget_collegename, Color.BLUE);
                 } else if (MenuParser.fullMenuObj.get(mData.getCollege()).getIsFarmFriday() ||
                         MenuParser.fullMenuObj.get(mData.getCollege()).getIsHealthyMonday()) {
-                    // 'Green Apple'
                     mData.getViews().setTextColor(R.id.widget_collegename,
                             mContext.getResources().getColor(R.color.healthy));
                 } else if (!MenuParser.fullMenuObj.get(mData.getCollege()).getIsOpen()) {
                     mData.getViews().setTextColor(R.id.widget_collegename, Color.LTGRAY);
                 } else {
-                    mData.getViews().setTextColor(R.id.widget_collegename, Color.BLACK);
+                    mData.getViews().setTextColor(R.id.widget_collegename, mContext.getResources()
+                            .getColor(R.color.primary_text));
                 }
                 mData.getViews().setTextViewText(R.id.widget_mealname, mData.getMonth() + "/" +
                         mData.getDay() + " " + Util.meals[mData.getMeal()]);
@@ -363,7 +372,21 @@ public class MenuWidget extends AppWidgetProvider {
         if (!(intent.getIntExtra(TAG_WIDGETID, -1) == -1)) {
             WidgetData data = getWidgetDataById(intent.getIntExtra(TAG_WIDGETID, -1));
             if (data == null) {
-                reinitializeWidgetData(context);
+                // Not doing full reinitialization here, this is how we make the initial data when added
+                SharedPreferences prefs = context.getSharedPreferences(Util.WIDGETSTATE_PREFS, 0);
+                String iddata = prefs.getString(KEY_ID, "");
+                // If appwidgetID exists in savedwidgetID, use backed up data
+                if (iddata.contains("" + (intent.getIntExtra(TAG_WIDGETID, -1)))) {
+                    // We are either at a device restart or a app reinstall, data should be in saved
+                    reinitializeWidgetData(context);
+                } else {
+                    // Otherwise, user has cleared data of app
+                    ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
+                            MenuWidget.class.getName());
+                    AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+                    int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
+                    onUpdate(context, appWidgetManager, appWidgetIds);
+                }
             }
             int thisDataIndex = widgetData.indexOf(getWidgetDataById(
                     intent.getIntExtra(TAG_WIDGETID, -1)));
@@ -391,6 +414,7 @@ public class MenuWidget extends AppWidgetProvider {
                     widgetData.get(i).setMeal(Util.getCurrentMeal
                             (widgetData.get(i).getCollege()));
                 }
+                timeUpdate = true;
             }
             // Trigger update of all
             ComponentName thisAppWidget = new ComponentName(context.getPackageName(),
@@ -506,7 +530,11 @@ public class MenuWidget extends AppWidgetProvider {
         String idData = settings.getString(KEY_ID, "");
         // If only one data piece in string
         if (!idData.contains(",")) {
-            return Integer.parseInt(idData);
+            if (!idData.isEmpty()) {
+                return Integer.parseInt(idData);
+            } else {
+                return -1;
+            }
         } else {
             try {
                 String[] resIDData = idData.split(",");
@@ -514,7 +542,7 @@ public class MenuWidget extends AppWidgetProvider {
             } catch (NullPointerException e) {
                 // We're screwed if we reach here...
                 return -1;
-            } catch (NumberFormatException e) {
+            } catch (java.lang.NumberFormatException e) {
                 return -1;
             }
         }
@@ -525,6 +553,7 @@ public class MenuWidget extends AppWidgetProvider {
                 MenuWidget.class.getName());
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
+        // Recreate all widgetData into the array, from saved data
         for (int i = 0; i < appWidgetIds.length; i++) {
             WidgetData data = new WidgetData(getSavedWidgetID(context, i),
                     getSavedCollegeNumber(context, i), getSavedDate(context, i),

@@ -8,7 +8,7 @@ import java.util.ArrayList;
  *
  * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
- * @author Nick Ivy parkedraccoon@gmail.com
+ * @author Nicky Ivy parkedraccoon@gmail.com
  */
 
 public class CollegeMenu {

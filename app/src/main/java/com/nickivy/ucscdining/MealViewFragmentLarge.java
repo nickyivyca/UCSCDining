@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -172,11 +171,11 @@ public class MealViewFragmentLarge extends Fragment {
     }
 
     public void selectItem(int position) {
-        int oldPosition = collegeNum;
-        collegeNum = position;
         // update the main content by replacing listview adapters
         if (MenuParser.fullMenuObj.get(position).getIsOpen()) {
             if (MenuParser.fullMenuObj.get(position).getIsSet()) {
+                int oldPosition = collegeNum;
+                collegeNum = position;
                 // Set title to include date and color, based on events at the dining hall
                 setTitleText(position, ((AppCompatActivity)getActivity()).getSupportActionBar());
 
@@ -243,16 +242,14 @@ public class MealViewFragmentLarge extends Fragment {
                         }
                     });
                 }
+
+                mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer_list);
+                mDrawerList.setAdapter(new ColorAdapter(getActivity(),
+                        R.layout.drawer_list_item, Util.collegeList));
+                mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
+                mDrawer = (RelativeLayout) getActivity().findViewById(R.id.left_drawer);
+                mDrawerLayout.closeDrawer(mDrawer);
             }
-
-            mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
-            mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer_list);
-            mDrawer = (RelativeLayout) getActivity().findViewById(R.id.left_drawer);
-
-            mDrawerList.setAdapter(new ColorAdapter(getActivity(),
-                    R.layout.drawer_list_item, Util.collegeList));
-
-            mDrawerLayout.closeDrawer(mDrawer);
         } else {
             Toast.makeText(getActivity(), Util.collegeList[position] + " dining hall closed today!",
                     Toast.LENGTH_SHORT).show();
@@ -300,8 +297,14 @@ public class MealViewFragmentLarge extends Fragment {
             if (!initialRefreshed) {
                 if (!(MenuParser.fullMenuObj.get(collegeNum).getIsSet() &&
                         MenuParser.fullMenuObj.get(collegeNum).getIsOpen())) {
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-                    collegeNum = Integer.parseInt(prefs.getString("default_college_2nd", "0"));
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences
+                            (mContext);
+                    int possibleCollege = Integer.parseInt(prefs.getString("default_college_2nd",
+                            "" + Util.NO_BACKUP_COLLEGE));
+                    // If no value set on backup college, do nothing
+                    if (possibleCollege != Util.NO_BACKUP_COLLEGE) {
+                        collegeNum = possibleCollege;
+                    }
                 }
             }
             initialRefreshed = true;
@@ -358,9 +361,7 @@ public class MealViewFragmentLarge extends Fragment {
                     !MenuParser.fullMenuObj.get(collegeNum).getDinner().isEmpty()) {
                 // hide breakfast and lunch? there is already nothing in the lists
             }*/
-
             mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer_list);
-
             mDrawerList.setAdapter(new ColorAdapter(getActivity(),
                     R.layout.drawer_list_item, Util.collegeList));
 
@@ -490,8 +491,7 @@ public class MealViewFragmentLarge extends Fragment {
                     MenuParser.fullMenuObj.get(position).getIsHealthyMonday()) {
                 ((TextView) v).setTextColor(getResources().getColor(R.color.healthy));
             }
-            if (collegeNum == position) {
-                //((TextView) v).setTypeface(null, Typeface.BOLD);
+            if (collegeNum == position && MenuParser.fullMenuObj.get(position).getIsOpen()) {
                 ((TextView) v).setBackgroundColor(getResources().getColor(R.color.primary_light));
             }
             return v;
@@ -502,6 +502,7 @@ public class MealViewFragmentLarge extends Fragment {
 
         @Override
         public void onClick(View view) {
+            MainActivity.DatePicker.setSavedContext(view.getContext());
             DialogFragment newFragment = new MainActivity.DatePicker();
             newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
         }

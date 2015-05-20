@@ -1,11 +1,8 @@
 package com.nickivy.ucscdining.util;
 
-import android.util.Log;
-
 import com.nickivy.ucscdining.parser.MenuParser;
 
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Class for holding static functions and enums such as getting today, getting current meal, etc

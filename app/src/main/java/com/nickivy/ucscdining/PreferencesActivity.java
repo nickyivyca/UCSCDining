@@ -1,6 +1,5 @@
 package com.nickivy.ucscdining;
 
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -36,7 +35,7 @@ public class PreferencesActivity extends ActionBarActivity {
             Preference pref = findPreference("mylicense");
             // Display the verison number once BuildConfig.VERSION_NAME works. Says 1.3 on bug page?
             //pref.setTitle(getString(R.string.app_name) + " " + BuildConfig.VERSION_NAME);
-            pref.setTitle(getString(R.string.app_name)+ " 0.9.6");
+            pref.setTitle(getString(R.string.app_name)+ " 1.0.0");
         }
     }
 }
