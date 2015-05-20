@@ -1,4 +1,4 @@
-package com.nickivy.ucscdining.widget;
+package com.nickivy.slugfood.widget;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -16,11 +16,11 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 
-import com.nickivy.ucscdining.MainActivity;
-import com.nickivy.ucscdining.R;
-import com.nickivy.ucscdining.parser.MealDataFetcher;
-import com.nickivy.ucscdining.parser.MenuParser;
-import com.nickivy.ucscdining.util.Util;
+import com.nickivy.slugfood.MainActivity;
+import com.nickivy.slugfood.R;
+import com.nickivy.slugfood.parser.MealDataFetcher;
+import com.nickivy.slugfood.parser.MenuParser;
+import com.nickivy.slugfood.util.Util;
 
 import java.util.ArrayList;
 import java.util.Calendar;

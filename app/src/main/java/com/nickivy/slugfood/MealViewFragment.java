@@ -1,13 +1,13 @@
-package com.nickivy.ucscdining;
+package com.nickivy.slugfood;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.samples.apps.iosched.ui.widget.SlidingTabLayout;
 import com.melnykov.fab.FloatingActionButton;
-import com.nickivy.ucscdining.parser.MealDataFetcher;
-import com.nickivy.ucscdining.parser.MenuParser;
-import com.nickivy.ucscdining.util.Util;
+import com.nickivy.slugfood.parser.MealDataFetcher;
+import com.nickivy.slugfood.parser.MenuParser;
+import com.nickivy.slugfood.util.Util;
 
 import android.content.Context;
 import android.content.Intent;

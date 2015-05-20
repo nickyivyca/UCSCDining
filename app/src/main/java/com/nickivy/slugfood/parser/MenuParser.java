@@ -1,4 +1,4 @@
-package com.nickivy.ucscdining.parser;
+package com.nickivy.slugfood.parser;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -8,9 +8,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import com.nickivy.ucscdining.util.CollegeMenu;
-import com.nickivy.ucscdining.util.MenuItem;
-import com.nickivy.ucscdining.util.Util;
+import com.nickivy.slugfood.util.CollegeMenu;
+import com.nickivy.slugfood.util.MenuItem;
+import com.nickivy.slugfood.util.Util;
 
 import android.util.Log;
 

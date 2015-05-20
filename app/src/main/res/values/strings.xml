@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">UCSC Dining</string>
+    <string name="app_name">Slug Food</string>
 
     <string name="drawer_open">Opened</string>
     <string name="drawer_close">Closed</string>
@@ -22,9 +22,9 @@
     <string name="default_desc_2nd">College that will be shown by default when the main default
         dining hall is closed.</string>
 
-    <string name="mylicense_title">UCSC Dining</string>
+    <string name="mylicense_title">Slug Food</string>
     <string name="mylicense_desc">Released under GPL v2 license. Click here to visit
-    the UCSCDining Github page.</string>
+    the Slug Food Github page.</string>
     <string name="googlicense_title">SlidingTabLayout and SlidingTabStrip</string>
     <string name="googlicense_desc">Released by Google under the Apache 2.0 license.</string>
     <string name="jsouplicense_title">jsoup 1.8.2</string>

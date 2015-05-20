@@ -1,12 +1,12 @@
-package com.nickivy.ucscdining.widget;
+package com.nickivy.slugfood.widget;
 
 
 import android.content.Context;
 import android.widget.RemoteViews;
 
-import com.nickivy.ucscdining.R;
-import com.nickivy.ucscdining.parser.MenuParser;
-import com.nickivy.ucscdining.util.Util;
+import com.nickivy.slugfood.R;
+import com.nickivy.slugfood.parser.MenuParser;
+import com.nickivy.slugfood.util.Util;
 
 import java.util.Calendar;
 

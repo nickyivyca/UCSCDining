@@ -1,4 +1,4 @@
-package com.nickivy.ucscdining;
+package com.nickivy.slugfood;
 
 import android.content.Context;
 import android.content.Intent;
@@ -32,9 +32,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.melnykov.fab.FloatingActionButton;
-import com.nickivy.ucscdining.parser.MealDataFetcher;
-import com.nickivy.ucscdining.parser.MenuParser;
-import com.nickivy.ucscdining.util.Util;
+import com.nickivy.slugfood.parser.MealDataFetcher;
+import com.nickivy.slugfood.parser.MenuParser;
+import com.nickivy.slugfood.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;

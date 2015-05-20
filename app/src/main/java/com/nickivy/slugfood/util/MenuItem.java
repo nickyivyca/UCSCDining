@@ -1,4 +1,4 @@
-package com.nickivy.ucscdining.util;
+package com.nickivy.slugfood.util;
 
 /**
  * Simple object so that we can store the nutrition info code and string name for each dining menu

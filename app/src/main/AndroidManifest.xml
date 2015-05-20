@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.nickivy.ucscdining"
+    package="com.nickivy.slugfood"
     android:versionCode="1"
     android:versionName="1.0.0" >
 
@@ -27,19 +27,19 @@
         <activity
             android:name=".PreferencesActivity"
             android:label="@string/about"
-            android:parentActivityName="com.nickivy.ucscdining.MainActivity">
+            android:parentActivityName="com.nickivy.slugfood.MainActivity">
             <!-- Include metadata for ICS compatibility -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nickivy.ucscdining.MainActivity" />
+                android:value="com.nickivy.slugfood.MainActivity" />
         </activity>
         <activity
             android:name=".NutritionWebpageActivity"
             android:label="@string/nutinfo"
-            android:parentActivityName="com.nickivy.ucscdining.MainActivity">
+            android:parentActivityName="com.nickivy.slugfood.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.nickivy.ucscdining.MainActivity" />
+                android:value="com.nickivy.slugfood.MainActivity" />
         </activity>
 
         <receiver android:name=".widget.MenuWidget"
@@ -53,7 +53,7 @@
                 android:resource="@xml/menu_widget_info" />
         </receiver>
 
-        <service android:name="com.nickivy.ucscdining.widget.WidgetService"
+        <service android:name="com.nickivy.slugfood.widget.WidgetService"
             android:exported="true"
             android:enabled="true"
             android:permission="android.permission.BIND_REMOTEVIEWS"/>

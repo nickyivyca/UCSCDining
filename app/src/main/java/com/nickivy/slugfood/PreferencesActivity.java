@@ -1,4 +1,4 @@
-package com.nickivy.ucscdining;
+package com.nickivy.slugfood;
 
 import android.os.Bundle;
 import android.preference.Preference;

@@ -1,4 +1,4 @@
-package com.nickivy.ucscdining.widget;
+package com.nickivy.slugfood.widget;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
@@ -7,9 +7,9 @@ import android.os.Bundle;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.nickivy.ucscdining.R;
-import com.nickivy.ucscdining.parser.MenuParser;
-import com.nickivy.ucscdining.util.Util;
+import com.nickivy.slugfood.R;
+import com.nickivy.slugfood.parser.MenuParser;
+import com.nickivy.slugfood.util.Util;
 
 import java.util.ArrayList;
 

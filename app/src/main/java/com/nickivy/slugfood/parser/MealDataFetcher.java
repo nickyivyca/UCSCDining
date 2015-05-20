@@ -1,4 +1,4 @@
-package com.nickivy.ucscdining.parser;
+package com.nickivy.slugfood.parser;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -6,8 +6,8 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
-import com.nickivy.ucscdining.util.MenuItem;
-import com.nickivy.ucscdining.util.Util;
+import com.nickivy.slugfood.util.MenuItem;
+import com.nickivy.slugfood.util.Util;
 
 import java.util.ArrayList;
 

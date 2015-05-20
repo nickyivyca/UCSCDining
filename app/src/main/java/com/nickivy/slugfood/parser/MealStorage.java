@@ -1,4 +1,4 @@
-package com.nickivy.ucscdining.parser;
+package com.nickivy.slugfood.parser;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

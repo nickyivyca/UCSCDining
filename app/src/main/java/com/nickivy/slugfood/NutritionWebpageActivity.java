@@ -1,11 +1,11 @@
-package com.nickivy.ucscdining;
+package com.nickivy.slugfood;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.webkit.WebView;
 
-import com.nickivy.ucscdining.util.Util;
+import com.nickivy.slugfood.util.Util;
 
 
 /**

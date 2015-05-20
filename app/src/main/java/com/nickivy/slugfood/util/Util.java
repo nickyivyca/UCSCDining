@@ -1,6 +1,6 @@
-package com.nickivy.ucscdining.util;
+package com.nickivy.slugfood.util;
 
-import com.nickivy.ucscdining.parser.MenuParser;
+import com.nickivy.slugfood.parser.MenuParser;
 
 import java.util.Calendar;
 

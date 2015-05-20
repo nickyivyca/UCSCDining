@@ -1,4 +1,4 @@
-package com.nickivy.ucscdining.util;
+package com.nickivy.slugfood.util;
 
 import java.util.ArrayList;
 

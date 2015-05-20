@@ -1,4 +1,4 @@
-package com.nickivy.ucscdining;
+package com.nickivy.slugfood;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,7 +29,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
-import com.nickivy.ucscdining.util.Util;
+import com.nickivy.slugfood.util.Util;
 
 /**
  * App for viewing UCSC dining menus. Currently can
