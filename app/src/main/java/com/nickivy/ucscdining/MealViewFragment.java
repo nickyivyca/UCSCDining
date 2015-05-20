@@ -253,7 +253,6 @@ public class MealViewFragment extends ListFragment{
                     }
                 }
             }
-            initialRefreshed = true;
             MenuParser.manualRefresh = false;
 
 
@@ -479,6 +478,7 @@ public class MealViewFragment extends ListFragment{
                         }
                     }
                 });
+                initialRefreshed = true;
                 new RetrieveMenuInFragmentTask(displayedMonth, displayedDay, displayedYear, true,
                         initialMeal, getActivity()).execute();
             }

@@ -235,7 +235,7 @@ public class MenuWidget extends AppWidgetProvider {
             mData.setTaskRunning(false);
 
             if (!result.equals(Double.valueOf(Util.GETLIST_SUCCESS).longValue())) {
-                Log.v(Util.LOGTAG, "No internet connection or database error, not updating widget");
+                Log.w(Util.LOGTAG, "No internet connection or database error, not updating widget");
                 // We still need to update the widget to remove the spinny
                 mAppWidgetManager.updateAppWidget(mData.getWidgetId(), mData.getViews());
                 timeUpdate = false;
