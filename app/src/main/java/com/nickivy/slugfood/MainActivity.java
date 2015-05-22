@@ -112,11 +112,12 @@ public class MainActivity extends AppCompatActivity{
                         getResources().getConfiguration().orientation) {
                     useSaved = true;
                 }
-                intentCollege = savedInstanceState.getInt(Util.TAG_COLLEGE);
-                intentMeal = savedInstanceState.getInt(Util.TAG_MEAL);
-                intentMonth = savedInstanceState.getInt(Util.TAG_MONTH);
-                intentDay = savedInstanceState.getInt(Util.TAG_DAY);
-                intentYear = savedInstanceState.getInt(Util.TAG_YEAR);
+                intentCollege = getCurrentCollege(this);
+                int date[] = getCurrentDispDate(this);
+                intentMonth = date[0];
+                intentDay = date[1];
+                intentYear = date[2];
+                intentMeal = Util.getCurrentMeal(intentCollege);
             } else {
                 int today[] = Util.getToday();
                 intentCollege = Integer.parseInt(prefs.getString("default_college", "0"));
@@ -313,14 +314,29 @@ public class MainActivity extends AppCompatActivity{
             MealViewFragment meal = (MealViewFragment)
                     ((AppCompatActivity)context).getSupportFragmentManager().findFragmentById(
                             R.id.fragment_container);
-            int ret[] = {meal.displayedMonth, meal.displayedDay};
+            int ret[] = {meal.displayedMonth, meal.displayedDay, meal.displayedYear};
             return ret;
         } catch (ClassCastException e) {
             MealViewFragmentLarge meal = (MealViewFragmentLarge)
                     ((AppCompatActivity)context).getSupportFragmentManager().findFragmentById(
                             R.id.fragment_container);
-            int ret[] = {meal.displayedMonth, meal.displayedDay};
+            int ret[] = {meal.displayedMonth, meal.displayedDay, meal.displayedYear};
             return ret;
+        }
+    }
+
+    private static int getCurrentCollege(Context context) {
+        // Need to act on whatever fragment is active
+        try {
+            MealViewFragment meal = (MealViewFragment)
+                    ((AppCompatActivity)context).getSupportFragmentManager().findFragmentById(
+                            R.id.fragment_container);
+            return meal.collegeNum;
+        } catch (ClassCastException e) {
+            MealViewFragmentLarge meal = (MealViewFragmentLarge)
+                    ((AppCompatActivity)context).getSupportFragmentManager().findFragmentById(
+                            R.id.fragment_container);
+            return meal.collegeNum;
         }
     }
 

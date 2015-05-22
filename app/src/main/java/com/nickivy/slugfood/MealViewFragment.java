@@ -73,7 +73,7 @@ public class MealViewFragment extends ListFragment{
     private ListView mMealList;
     private FloatingActionButton mFab;
 
-    private static int collegeNum = 0;
+    public static int collegeNum = 0;
 
     public static int displayedMonth = 0,
     displayedDay = 0,
