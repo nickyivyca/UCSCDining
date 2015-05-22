@@ -111,13 +111,12 @@ public class MainActivity extends AppCompatActivity{
                 if (savedInstanceState.getInt(KEY_ROTATION) ==
                         getResources().getConfiguration().orientation) {
                     useSaved = true;
-                } else {
-                    intentCollege = savedInstanceState.getInt(Util.TAG_COLLEGE);
-                    intentMeal = savedInstanceState.getInt(Util.TAG_MEAL);
-                    intentMonth = savedInstanceState.getInt(Util.TAG_MONTH);
-                    intentDay = savedInstanceState.getInt(Util.TAG_DAY);
-                    intentYear = savedInstanceState.getInt(Util.TAG_YEAR);
                 }
+                intentCollege = savedInstanceState.getInt(Util.TAG_COLLEGE);
+                intentMeal = savedInstanceState.getInt(Util.TAG_MEAL);
+                intentMonth = savedInstanceState.getInt(Util.TAG_MONTH);
+                intentDay = savedInstanceState.getInt(Util.TAG_DAY);
+                intentYear = savedInstanceState.getInt(Util.TAG_YEAR);
             } else {
                 int today[] = Util.getToday();
                 intentCollege = Integer.parseInt(prefs.getString("default_college", "0"));
