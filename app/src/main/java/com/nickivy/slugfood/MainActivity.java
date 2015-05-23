@@ -58,7 +58,10 @@ public class MainActivity extends AppCompatActivity{
     private int intentCollege = -1, intentMeal = -1, intentMonth = -1, intentDay = -1,
             intentYear = -1, mostRecentRotation = 0;
 
-    private static final String KEY_ROTATION = "key_rotation";
+    private static final String KEY_ROTATION = "key_rotation",
+    KEY_WIDGETINTENT = "key_widget";
+
+    private boolean fromWidget = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,13 +103,25 @@ public class MainActivity extends AppCompatActivity{
 
             // If data in intent, it's from the widget. Highest priority
             if (!(getIntent().getIntExtra(Util.TAG_COLLEGE, -1) == -1)) {
-                int today[] = Util.getToday();
-                intentCollege = getIntent().getIntExtra(Util.TAG_COLLEGE,
-                        Integer.parseInt(prefs.getString("default_college", "0")));
-                intentMeal = getIntent().getIntExtra(Util.TAG_MEAL, Util.getCurrentMeal(intentCollege));
-                intentMonth = getIntent().getIntExtra(Util.TAG_MONTH, today[0]);
-                intentDay = getIntent().getIntExtra(Util.TAG_DAY, today[1]);
-                intentYear = getIntent().getIntExtra(Util.TAG_YEAR, today[2]);
+                if (savedInstanceState != null && savedInstanceState.getBoolean(KEY_WIDGETINTENT)) {
+                    useSaved = true;
+                    intentCollege = getCurrentCollege(this);
+                    int date[] = getCurrentDispDate(this);
+                    intentMonth = date[0];
+                    intentDay = date[1];
+                    intentYear = date[2];
+                    intentMeal = Util.getCurrentMeal(intentCollege);
+                } else {
+                    // First time running intent from widget. Actually use it.
+                    int today[] = Util.getToday();
+                    intentCollege = getIntent().getIntExtra(Util.TAG_COLLEGE,
+                            Integer.parseInt(prefs.getString("default_college", "0")));
+                    intentMeal = getIntent().getIntExtra(Util.TAG_MEAL, Util.getCurrentMeal(intentCollege));
+                    intentMonth = getIntent().getIntExtra(Util.TAG_MONTH, today[0]);
+                    intentDay = getIntent().getIntExtra(Util.TAG_DAY, today[1]);
+                    intentYear = getIntent().getIntExtra(Util.TAG_YEAR, today[2]);
+                }
+                fromWidget = true;
             } else if (savedInstanceState != null) {
                 if (savedInstanceState.getInt(KEY_ROTATION) ==
                         getResources().getConfiguration().orientation) {
@@ -197,11 +212,13 @@ public class MainActivity extends AppCompatActivity{
      public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save current rotation state, plus all other stuff
         savedInstanceState.putInt(KEY_ROTATION, mostRecentRotation);
-        savedInstanceState.putInt(Util.TAG_COLLEGE, intentCollege);
-        savedInstanceState.putInt(Util.TAG_MONTH, intentMonth);
-        savedInstanceState.putInt(Util.TAG_DAY, intentDay);
-        savedInstanceState.putInt(Util.TAG_YEAR, intentYear);
-        savedInstanceState.putInt(Util.TAG_MEAL, intentMeal);
+        int date[] = getCurrentDispDate(this);
+        savedInstanceState.putInt(Util.TAG_COLLEGE, getCurrentCollege(this));
+        savedInstanceState.putInt(Util.TAG_MONTH, date[0]);
+        savedInstanceState.putInt(Util.TAG_DAY, date[1]);
+        savedInstanceState.putInt(Util.TAG_YEAR, date[2]);
+        savedInstanceState.putInt(Util.TAG_MEAL, Util.getCurrentMeal(intentCollege));
+        savedInstanceState.putBoolean(KEY_WIDGETINTENT, fromWidget);
 
         super.onSaveInstanceState(savedInstanceState);
     }

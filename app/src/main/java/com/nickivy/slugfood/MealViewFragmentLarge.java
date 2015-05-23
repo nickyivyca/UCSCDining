@@ -70,7 +70,7 @@ public class MealViewFragmentLarge extends Fragment {
          * If intent tells us to use saved data (and there actually is saved data), use it,
          * otherwise use data stored in intent.
          */
-        if (!getArguments().getBoolean(Util.TAG_USESAVED) || (displayedMonth != 0)) {
+        if (!getArguments().getBoolean(Util.TAG_USESAVED) || (displayedMonth == 0)) {
             collegeNum = getArguments().getInt(Util.TAG_COLLEGE);
             getActivity().setTitle(Util.collegeList[collegeNum]);
 
