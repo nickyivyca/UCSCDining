@@ -1,9 +1,12 @@
 package com.nickivy.slugfood.widget;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -61,6 +64,12 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     @Override
     public int getCount() {
         if (MenuWidget.getWidgetDataById(appWidgetId) == null) {
+            Intent intent = new Intent(context, MenuWidget.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, -2,
+                    intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            try {
+                pendingIntent.send();
+            } catch (PendingIntent.CanceledException e) {}
             return -1;
         }
         switch (MenuWidget.getWidgetDataById(appWidgetId).getMeal()) {

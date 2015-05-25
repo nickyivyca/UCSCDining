@@ -67,17 +67,17 @@ public class MenuParser {
             e.printStackTrace();
             return Util.GETLIST_INTERNET_FAILURE;
         } catch (IOException e) {
-            Log.w(Util.LOGTAG, "okhttp error");
+            Log.w(Util.LOGTAG, "connection error");
             try {
                 breakfastDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
                         day + "%2F" + year + URLPart3 + Util.meals[0]).get();
             } catch (IOException e1) {
-                Log.w(Util.LOGTAG, "okhttp error");
+                Log.w(Util.LOGTAG, "connection error");
                 try {
                     breakfastDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
                             day + "%2F" + year + URLPart3 + Util.meals[0]).get();
                 } catch (IOException e2) {
-                    Log.w(Util.LOGTAG, "okhttp error");
+                    Log.w(Util.LOGTAG, "connection error");
                     // Give up after three times
                     return Util.GETLIST_OKHTTP_FAILURE;
                 }
@@ -93,17 +93,17 @@ public class MenuParser {
             e.printStackTrace();
             return Util.GETLIST_INTERNET_FAILURE;
         } catch (IOException e) {
-            Log.w(Util.LOGTAG, "okhttp error");
+            Log.w(Util.LOGTAG, "connection error");
             try {
                 lunchDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
                         day + "%2F" + year + URLPart3 + Util.meals[1]).get();
             } catch (IOException e1) {
-                Log.w(Util.LOGTAG, "okhttp error");
+                Log.w(Util.LOGTAG, "connection error");
                 try {
                     lunchDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
                             day + "%2F" + year + URLPart3 + Util.meals[1]).get();
                 } catch (IOException e2) {
-                    Log.w(Util.LOGTAG, "okhttp error");
+                    Log.w(Util.LOGTAG, "connection error");
                     // Give up after three times
                     return Util.GETLIST_OKHTTP_FAILURE;
                 }
@@ -119,17 +119,17 @@ public class MenuParser {
             e.printStackTrace();
             return Util.GETLIST_INTERNET_FAILURE;
         } catch (IOException e) {
-            Log.w(Util.LOGTAG, "okhttp error");
+            Log.w(Util.LOGTAG, "connection error");
             try {
                 dinnerDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
                         day + "%2F" + year + URLPart3 + Util.meals[2]).get();
             } catch (IOException e1) {
-                Log.w(Util.LOGTAG, "okhttp error");
+                Log.w(Util.LOGTAG, "connection error");
                 try {
                     dinnerDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
                             day + "%2F" + year + URLPart3 + Util.meals[2]).get();
                 } catch (IOException e2) {
-                    Log.w(Util.LOGTAG, "okhttp error");
+                    Log.w(Util.LOGTAG, "connection error");
                     // Give up after three times
                     return Util.GETLIST_OKHTTP_FAILURE;
                 }
