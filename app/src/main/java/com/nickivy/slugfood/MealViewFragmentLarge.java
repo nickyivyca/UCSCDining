@@ -66,18 +66,13 @@ public class MealViewFragmentLarge extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        /*
-         * If intent tells us to use saved data (and there actually is saved data), use it,
-         * otherwise use data stored in intent.
-         */
-        if (!getArguments().getBoolean(Util.TAG_USESAVED) || (displayedMonth == 0)) {
-            collegeNum = getArguments().getInt(Util.TAG_COLLEGE);
-            getActivity().setTitle(Util.collegeList[collegeNum]);
+        // MainActivity sets data, often it will read the displayed date and send it back in here
+        collegeNum = getArguments().getInt(Util.TAG_COLLEGE);
+        getActivity().setTitle(Util.collegeList[collegeNum]);
 
-            displayedMonth = getArguments().getInt(Util.TAG_MONTH);
-            displayedDay = getArguments().getInt(Util.TAG_DAY);
-            displayedYear = getArguments().getInt(Util.TAG_YEAR);
-        }
+        displayedMonth = getArguments().getInt(Util.TAG_MONTH);
+        displayedDay = getArguments().getInt(Util.TAG_DAY);
+        displayedYear = getArguments().getInt(Util.TAG_YEAR);
 
         return inflater.inflate(R.layout.meal_fragment, container, false);
     }

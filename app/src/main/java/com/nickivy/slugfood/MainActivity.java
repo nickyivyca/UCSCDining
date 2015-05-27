@@ -70,8 +70,6 @@ public class MainActivity extends AppCompatActivity{
 
         setContentView(R.layout.mainview);
 
-        boolean useSaved = false;
-
 		//if(getFragmentManager().findFragmentById(R.id.fragment_container) == null) {
 
             /*
@@ -104,9 +102,11 @@ public class MainActivity extends AppCompatActivity{
             // If data in intent, it's from the widget. Highest priority
             if (!(getIntent().getIntExtra(Util.TAG_COLLEGE, -1) == -1)) {
                 if (savedInstanceState != null && savedInstanceState.getBoolean(KEY_WIDGETINTENT)) {
-                    useSaved = true;
                     intentCollege = getCurrentCollege(this);
                     int date[] = getCurrentDispDate(this);
+                    if (date[0] == 0) {
+                        date = Util.getToday();
+                    }
                     intentMonth = date[0];
                     intentDay = date[1];
                     intentYear = date[2];
@@ -123,12 +123,11 @@ public class MainActivity extends AppCompatActivity{
                 }
                 fromWidget = true;
             } else if (savedInstanceState != null) {
-                if (savedInstanceState.getInt(KEY_ROTATION) ==
-                        getResources().getConfiguration().orientation) {
-                    useSaved = true;
-                }
                 intentCollege = getCurrentCollege(this);
                 int date[] = getCurrentDispDate(this);
+                if (date[0] == 0) {
+                    date = Util.getToday();
+                }
                 intentMonth = date[0];
                 intentDay = date[1];
                 intentYear = date[2];
@@ -175,7 +174,6 @@ public class MainActivity extends AppCompatActivity{
             args.putInt(Util.TAG_MONTH, intentMonth);
             args.putInt(Util.TAG_DAY, intentDay);
             args.putInt(Util.TAG_YEAR, intentYear);
-            args.putBoolean(Util.TAG_USESAVED, useSaved);
 
             /**
              * If layout xlarge (nexus 10-sized tablet) or layout large (nexus 7-sized tablet)
