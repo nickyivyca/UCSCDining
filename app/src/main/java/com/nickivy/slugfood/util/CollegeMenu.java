@@ -139,10 +139,16 @@ public class CollegeMenu {
 	 */
 	public boolean getIsHealthyMonday(){
     	if(isSet){
-    		if((getDinner().size() > 0 && getDinner().get(0).getItemName().equals("Healthy Mondays")) ||
-    			getLunch().size() > 0 && getLunch().get(0).getItemName().equals("Healthy Mondays")){
-    			return true;
-    		}
+			for(MenuItem item : getDinner()) {
+                if (item.getItemName().equals("Healthy Mondays")) {
+                    return true;
+                }
+            }
+            for(MenuItem item : getLunch()) {
+                if (item.getItemName().equals("Healthy Mondays")) {
+                    return true;
+                }
+            }
     	}
     	return false;		
 	}
