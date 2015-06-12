@@ -118,7 +118,7 @@ public class CollegeMenu {
 	 */
 	public boolean getIsOpen(){
     	if(isSet) {
-            if (!getBreakfast().isEmpty() && !getLunch().isEmpty() && !getDinner().isEmpty()) {
+            if (!getBreakfast().isEmpty() || !getLunch().isEmpty() || !getDinner().isEmpty()) {
                 return true;
             }
     	}

@@ -250,7 +250,9 @@ public class MenuWidget extends AppWidgetProvider {
                 }
             }
 
-            // If so display 'All Closed' and nothing else
+            // If so display 'All Closed' and nothing else, but still set date
+            mData.getViews().setTextViewText(R.id.widget_mealname, mData.getMonth() + "/" +
+                    mData.getDay() + " " + Util.meals[mData.getMeal()]);
             if (allClosed) {
                 mData.getViews().setTextViewText(R.id.widget_collegename, "All Closed");
                 mData.getViews().setTextColor(R.id.widget_collegename, mContext.getResources()
@@ -298,8 +300,6 @@ public class MenuWidget extends AppWidgetProvider {
                     mData.getViews().setTextColor(R.id.widget_collegename, mContext.getResources()
                             .getColor(R.color.primary_text));
                 }
-                mData.getViews().setTextViewText(R.id.widget_mealname, mData.getMonth() + "/" +
-                        mData.getDay() + " " + Util.meals[mData.getMeal()]);
             }
 
             // Set intents on all four buttons
