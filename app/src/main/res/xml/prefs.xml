@@ -15,6 +15,10 @@
             android:entries="@array/colleges_pref"
             android:entryValues="@array/colleges_values"
             />
+        <CheckBoxPreference android:key="dark_theme"
+            android:title="@string/dark_theme"
+            android:summary="@string/dark_theme_desc"
+            />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/licenses" android:key="licences">
         <Preference android:key="mylicense"

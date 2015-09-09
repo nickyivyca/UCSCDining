@@ -6,7 +6,8 @@
     <android.support.v4.widget.SwipeRefreshLayout
     android:id="@+id/large_refresh_layout"
     android:layout_height="fill_parent"
-    android:layout_width="fill_parent">
+    android:layout_width="fill_parent"
+    android:background="?attr/listBackground">
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -27,7 +28,7 @@
                     android:gravity="center"
                     android:paddingBottom="16dp"
                     android:paddingTop="16dp"
-                    android:background="@color/primary_light"/>
+                    android:background="?attr/tabBackground"/>
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -40,7 +41,7 @@
                     android:gravity="center"
                     android:paddingBottom="16dp"
                     android:paddingTop="16dp"
-                    android:background="@color/primary_light"/>
+                    android:background="?attr/tabBackground"/>
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -53,7 +54,7 @@
                     android:gravity="center"
                     android:paddingBottom="16dp"
                     android:paddingTop="16dp"
-                    android:background="@color/primary_light"/>
+                    android:background="?attr/tabBackground"/>
             </LinearLayout>
 
             <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -67,7 +68,7 @@
                 <LinearLayout
                     android:layout_width="1dip"
                     android:layout_height="fill_parent"
-                    android:background="#dddddd"
+                    android:background="?attr/dividerColor"
                     android:orientation="vertical" />
                 <ListView android:id="@+id/lunch_list"
                     android:layout_width="0dp"
@@ -76,7 +77,7 @@
                 <LinearLayout
                     android:layout_width="1dip"
                     android:layout_height="fill_parent"
-                    android:background="#dddddd"
+                    android:background="?attr/dividerColor"
                     android:orientation="vertical" />
                 <ListView android:id="@+id/dinner_list"
                     android:layout_width="0dp"
@@ -93,7 +94,7 @@
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
         android:src="@drawable/ic_action_go_to_today"
-        fab:fab_colorNormal="@color/primary"
-        fab:fab_colorPressed="@color/primary_dark"
-        fab:fab_colorRipple="@color/primary_light" />
+        fab:fab_colorNormal="?attr/fabMain"
+        fab:fab_colorPressed="?attr/fabPressed"
+        fab:fab_colorRipple="?attr/fabRipple" />
 </FrameLayout>

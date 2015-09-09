@@ -9,6 +9,6 @@
   <color name="secondary_text">#727272</color>
   <color name="icons">#212121</color>
   <color name="divider">#B6B6B6</color>
-
-    <color name="primary_superdark">#FF9800</color>
+  <color name="primary_superdark">#FF9800</color>
+  <color name="disabled_text">#cccccc</color>
 </resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="MainThemeColorful21" parent="@style/MainThemeColorful">
+    <style name="MainTheme.Colorful.21" parent="@style/MainTheme.Colorful">
         <item name="android:datePickerDialogTheme">@style/DatePickerTheme</item>
     </style>
 

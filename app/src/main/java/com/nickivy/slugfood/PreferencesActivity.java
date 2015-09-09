@@ -1,8 +1,10 @@
 package com.nickivy.slugfood;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 
 /**
@@ -20,6 +22,10 @@ public class PreferencesActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // Set theme based on pref
+        setTheme(prefs.getBoolean("dark_theme",false)? R.style.MainTheme_Dark :
+                R.style.MainTheme_Colorful);
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
@@ -35,7 +41,16 @@ public class PreferencesActivity extends ActionBarActivity {
             Preference pref = findPreference("mylicense");
             // Display the verison number once BuildConfig.VERSION_NAME works. Says 1.3 on bug page?
             //pref.setTitle(getString(R.string.app_name) + " " + BuildConfig.VERSION_NAME);
-            pref.setTitle(getString(R.string.app_name)+ " 1.1.6");
+            pref.setTitle(getString(R.string.app_name)+ " 1.2");
+
+            pref = findPreference("dark_theme");
+            pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    getActivity().recreate();
+                    return true;
+                }
+            });
         }
     }
 }

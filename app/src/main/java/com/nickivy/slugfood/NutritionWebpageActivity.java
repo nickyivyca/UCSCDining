@@ -1,6 +1,8 @@
 package com.nickivy.slugfood;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.webkit.WebView;
@@ -19,6 +21,10 @@ public class NutritionWebpageActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // Set theme based on pref
+        setTheme(prefs.getBoolean("dark_theme",false)? R.style.MainTheme_Dark :
+                R.style.MainTheme_Colorful);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.web_view);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

@@ -3,6 +3,7 @@ package com.nickivy.slugfood;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -96,7 +97,9 @@ public class MealViewFragmentLarge extends Fragment {
                     getActivity()).execute();
         }
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.large_refresh_layout);
-        mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.primary));
+        TypedArray a = view.getContext().getTheme().obtainStyledAttributes(new int[]
+                {R.attr.tabSelector});
+        mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(a.getResourceId(0, 0)));
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -352,14 +355,6 @@ public class MealViewFragmentLarge extends Fragment {
                 listView = (ListView) getActivity().findViewById(R.id.breakfast_list);
                 listView.setVisibility(View.VISIBLE);
             }
-
-            // If only dinner available, set to dinner
-            // (rare occurence, pretty much only on return from holidays)
-            /*if (MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
-                    MenuParser.fullMenuObj.get(collegeNum).getLunch().isEmpty() &&
-                    !MenuParser.fullMenuObj.get(collegeNum).getDinner().isEmpty()) {
-                // hide breakfast and lunch? there is already nothing in the lists
-            }*/
             mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer_list);
             mDrawerList.setAdapter(new ColorAdapter(getActivity(),
                     R.layout.drawer_list_item, Util.collegeList));
@@ -454,8 +449,10 @@ public class MealViewFragmentLarge extends Fragment {
             text.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.healthy)), 0,
                     text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         } else {
-            text.setSpan(new ForegroundColorSpan(R.color.primary_text), 0, text.length(),
-                    Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+            TypedArray a = bar.getThemedContext().getTheme().obtainStyledAttributes(new int[]
+                    {R.attr.actionBarText});
+            text.setSpan(new ForegroundColorSpan(getResources().getColor(a.getResourceId(0, 0))),
+                    0, text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         }
         bar.setTitle(text);
     }
@@ -483,7 +480,9 @@ public class MealViewFragmentLarge extends Fragment {
             }
             // Grayed out if dining hall is closed
             if (!MenuParser.fullMenuObj.get(position).getIsOpen()) {
-                ((TextView) v).setTextColor(Color.LTGRAY); //
+                TypedArray a = v.getContext().getTheme().obtainStyledAttributes(new int[]
+                        {R.attr.closedDiningHallText});
+                ((TextView) v).setTextColor(getResources().getColor(a.getResourceId(0, 0)));
             }
             // Green for Healthy Monday / Farm Friday
             if (MenuParser.fullMenuObj.get(position).getIsFarmFriday() ||
@@ -491,7 +490,9 @@ public class MealViewFragmentLarge extends Fragment {
                 ((TextView) v).setTextColor(getResources().getColor(R.color.healthy));
             }
             if (collegeNum == position && MenuParser.fullMenuObj.get(position).getIsOpen()) {
-                ((TextView) v).setBackgroundColor(getResources().getColor(R.color.primary_light));
+                TypedArray a = v.getContext().getTheme().obtainStyledAttributes(new int[]
+                        {R.attr.tabBackground});
+                ((TextView) v).setBackgroundColor(getResources().getColor(a.getResourceId(0, 0)));
             }
             return v;
         }

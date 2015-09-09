@@ -12,6 +12,7 @@ import com.nickivy.slugfood.util.Util;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -105,7 +106,8 @@ public class MealViewFragment extends ListFragment{
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setDistributeEvenly(true);
         mSlidingTabLayout.setViewPager(mViewPager);
-        mSlidingTabLayout.setSelectedIndicatorColors(getResources().getColor(R.color.primary));
+        TypedArray a = view.getContext().getTheme().obtainStyledAttributes(new int[] {R.attr.tabSelector});
+        mSlidingTabLayout.setSelectedIndicatorColors(getResources().getColor(a.getResourceId(0, 0)));
     }
 
     public void selectItem(int position) {
@@ -440,7 +442,8 @@ public class MealViewFragment extends ListFragment{
             mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.meal_refresh_layout);
             //Add 15 instead of 12 for swipelayout
             mSwipeRefreshLayout.setId(mealnum + SWIPEREF_ID1);
-            mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.primary));
+            TypedArray a = mealList.getContext().getTheme().obtainStyledAttributes(new int[] {R.attr.tabSelector});
+            mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(a.getResourceId(0, 0)));
             mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
@@ -453,7 +456,7 @@ public class MealViewFragment extends ListFragment{
             mFab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
             mFab.setId(mealnum + FAB_ID1);
             mFab.setOnClickListener(new FloatingActionButtonListener());
-            mFab.attachToListView(mealList);
+            //mFab.attachToListView(mealList);
 
             /*
              * ASynctask to load menu, either from web
@@ -581,7 +584,9 @@ public class MealViewFragment extends ListFragment{
             }
             // Grayed out if dining hall is closed
             if (!MenuParser.fullMenuObj.get(position).getIsOpen()) {
-                ((TextView) v).setTextColor(Color.LTGRAY); //
+                TypedArray a = v.getContext().getTheme().obtainStyledAttributes(new int[]
+                        {R.attr.closedDiningHallText});
+                ((TextView) v).setTextColor(getResources().getColor(a.getResourceId(0, 0)));
             }
             // Green for Healthy Monday / Farm Friday
             if (MenuParser.fullMenuObj.get(position).getIsFarmFriday() ||
@@ -589,7 +594,9 @@ public class MealViewFragment extends ListFragment{
                 ((TextView) v).setTextColor(getResources().getColor(R.color.healthy));
             }
             if (collegeNum == position && MenuParser.fullMenuObj.get(position).getIsOpen()) {
-                ((TextView) v).setBackgroundColor(getResources().getColor(R.color.primary_light));
+                TypedArray a = v.getContext().getTheme().obtainStyledAttributes(new int[]
+                        {R.attr.tabBackground});
+                ((TextView) v).setBackgroundColor(getResources().getColor(a.getResourceId(0, 0)));
             }
             return v;
         }
@@ -649,8 +656,10 @@ public class MealViewFragment extends ListFragment{
             text.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.healthy)), 0,
                 text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE); // 'Green Apple'
         } else {
-            text.setSpan(new ForegroundColorSpan(R.color.primary_text), 0, text.length(),
-                Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+            TypedArray a = bar.getThemedContext().getTheme().obtainStyledAttributes(new int[]
+                    {R.attr.actionBarText});
+            text.setSpan(new ForegroundColorSpan(getResources().getColor(a.getResourceId(0, 0))),
+                    0, text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         }
         bar.setTitle(text);
     }

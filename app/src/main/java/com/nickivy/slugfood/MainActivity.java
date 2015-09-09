@@ -63,8 +63,15 @@ public class MainActivity extends AppCompatActivity{
 
     private boolean fromWidget = false;
 
+    private int theme = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // Set theme based on pref
+        theme = prefs.getBoolean("dark_theme",false)? R.style.MainTheme_Dark :
+                R.style.MainTheme_Colorful;
+        setTheme(theme);
         mostRecentRotation = getResources().getConfiguration().orientation;
         super.onCreate(savedInstanceState);
 
@@ -97,7 +104,6 @@ public class MainActivity extends AppCompatActivity{
              * 3. nothing (launch intent, get from [today[], prefs
              *
              */
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
             // If data in intent, it's from the widget. Highest priority
             if (!(getIntent().getIntExtra(Util.TAG_COLLEGE, -1) == -1)) {
@@ -231,6 +237,17 @@ public class MainActivity extends AppCompatActivity{
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // Set theme based on pref
+        if (theme != (prefs.getBoolean("dark_theme",false)? R.style.MainTheme_Dark :
+                R.style.MainTheme_Colorful)) {
+            recreate();
+        }
     }
 
     @Override

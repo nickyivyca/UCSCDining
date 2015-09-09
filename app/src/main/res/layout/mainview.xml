@@ -25,7 +25,7 @@
         android:layout_height="match_parent"
         android:layout_width="240dp"
         android:layout_gravity="start"
-        android:background="#eee" >
+        android:background="?attr/drawerBackground" >
         <ListView android:id="@+id/left_drawer_list"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
