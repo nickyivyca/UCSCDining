@@ -264,6 +264,8 @@ public class MenuWidget extends AppWidgetProvider {
                     if (MenuParser.fullMenuObj.get(mData.getCollege()).getBreakfast().get(0)
                             .getItemName().equals(Util.brunchMessage)) {
                         mData.setMeal(mData.getDirectionRight() ? Util.LUNCH : Util.DINNER);
+                        mData.getViews().setTextViewText(R.id.widget_mealname, mData.getMonth()
+                                + "/" + mData.getDay() + " " + Util.meals[mData.getMeal()]);
                     }
                 }
 

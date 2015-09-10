@@ -174,7 +174,7 @@ public class MenuParser {
         fullMenuObj.get(k).setLunch(lunchList);
         fullMenuObj.get(k).setDinner(dinnerList);
         if(fullMenuObj.get(k).getBreakfast().isEmpty() &&
-                (!(fullMenuObj.get(k).getLunch().isEmpty()) ||
+                (!(fullMenuObj.get(k).getLunch().isEmpty()) &&
                         !(fullMenuObj.get(k).getDinner().isEmpty()))){
             ArrayList<MenuItem> breakfastMessage = new ArrayList<MenuItem>();
             breakfastMessage.add(new MenuItem(Util.brunchMessage, "-1"));
