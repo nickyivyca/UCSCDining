@@ -194,7 +194,7 @@ public class MealViewFragmentLarge extends Fragment {
                         @Override
                         public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
                             Intent intent = new Intent(getActivity().getApplicationContext(),
-                                    NutritionWebpageActivity.class);
+                                    NutritionViewActivity.class);
                             intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                                     MenuParser.URLPart2s[collegePos] + displayedMonth +
                                     "%2F" + displayedDay + "%2F" + displayedYear +
@@ -214,7 +214,7 @@ public class MealViewFragmentLarge extends Fragment {
                         @Override
                         public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
                             Intent intent = new Intent(getActivity().getApplicationContext(),
-                                    NutritionWebpageActivity.class);
+                                    NutritionViewActivity.class);
                             intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                                     MenuParser.URLPart2s[collegePos] + displayedMonth +
                                     "%2F" + displayedDay + "%2F" + displayedYear +
@@ -234,7 +234,7 @@ public class MealViewFragmentLarge extends Fragment {
                         @Override
                         public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
                             Intent intent = new Intent(getActivity().getApplicationContext(),
-                                    NutritionWebpageActivity.class);
+                                    NutritionViewActivity.class);
                             intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                                     MenuParser.URLPart2s[collegePos] + displayedMonth +
                                     "%2F" + displayedDay + "%2F" + displayedYear +
@@ -369,7 +369,7 @@ public class MealViewFragmentLarge extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
                     Intent intent = new Intent(getActivity().getApplicationContext(),
-                            NutritionWebpageActivity.class);
+                            NutritionViewActivity.class);
                     intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                             MenuParser.URLPart2s[collegePos] + displayedMonth +
                             "%2F" + displayedDay + "%2F" + displayedYear +
@@ -386,7 +386,7 @@ public class MealViewFragmentLarge extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
                     Intent intent = new Intent(getActivity().getApplicationContext(),
-                            NutritionWebpageActivity.class);
+                            NutritionViewActivity.class);
                     intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                             MenuParser.URLPart2s[collegePos] + displayedMonth +
                             "%2F" + displayedDay + "%2F" + displayedYear +
@@ -403,7 +403,7 @@ public class MealViewFragmentLarge extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
                     Intent intent = new Intent(getActivity().getApplicationContext(),
-                            NutritionWebpageActivity.class);
+                            NutritionViewActivity.class);
                     intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                             MenuParser.URLPart2s[collegePos] + displayedMonth +
                             "%2F" + displayedDay + "%2F" + displayedYear +

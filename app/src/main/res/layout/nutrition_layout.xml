@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff">
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/nutrition_item_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:gravity="center_horizontal"/>
+    <LinearLayout
+        android:layout_width="4dip"
+        android:layout_height="fill_parent"
+        android:background="#000000"
+        android:orientation="vertical"
+        android:layout_alignParentLeft="true"
+        android:paddingLeft="2dp"
+        android:layout_below="@id/nutrition_item_title"/>
+    <LinearLayout
+        android:layout_width="4dip"
+        android:layout_height="fill_parent"
+        android:background="#000000"
+        android:orientation="vertical"
+        android:layout_alignParentRight="true"
+        android:paddingLeft="2dp"
+        android:layout_below="@id/nutrition_item_title"/>
+    <LinearLayout
+        android:id="@+id/nutrition_top"
+        android:layout_width="fill_parent"
+        android:layout_height="4dip"
+        android:background="#000000"
+        android:orientation="horizontal"
+        android:layout_below="@id/nutrition_item_title"/>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="4dip"
+        android:background="#000000"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"/>
+    <ProgressBar
+        android:id="@+id/nutrition_progresscircle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="20dp"
+        android:layout_centerInParent="true"
+        android:indeterminate="true"/>
+    <ScrollView android:id="@+id/nutrition_scroll"
+        android:layout_below="@id/nutrition_top"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingBottom="8dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/nutrition_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:textColor="#000000"/>
+            <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/nutrition_servingsize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#000000"/>
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="16dip"
+                android:background="#000000"
+                android:orientation="horizontal"/>
+            <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/nutrition_amountperserving"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#000000"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dip"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"/>
+            <!--TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/nutrition_calories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#000000"/-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_calories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_calories_fat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="6dip"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"/>
+            <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/nutrition_percentdailyvalues"
+                android:layout_gravity="right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#000000"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dip"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_totalfat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_totalfat_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dip"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_satfat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="24dp"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_satfat_percent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dip"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"/>
+            <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/nutrition_transfat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="24dp"
+                android:textSize="16sp"
+                android:textColor="#000000"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dip"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_cholesterol"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_cholesterol_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_cholesterol_percent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dip"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_sodium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_sodium_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_sodium_percent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dip"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_carbs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_carbs_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_carbs_percent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dip"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:paddingLeft="24dp">
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_fiber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_fiber_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_fiber_percent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dip"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"/>
+            <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/nutrition_sugars"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="24dp"
+                android:textSize="16sp"
+                android:textColor="#000000"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dip"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_protein"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_protein_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="16dip"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"/>
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_percent_vitamina"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+                <View android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/dot"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_percent_vitb12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+            </RelativeLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dip"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"/>
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_percent_vitaminc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+                <View android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/dot"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_percent_iron"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+            </RelativeLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dip"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"/>
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_percent_sodium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+                <View android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/dot"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_percent_fiber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+            </RelativeLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dip"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_ingredients"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_ingredients_list"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_allergens"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_allergens_list"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#000000"/>
+            </LinearLayout>
+            <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/nutrition_percentdvnotice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="#000000"/>
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

@@ -9,6 +9,7 @@
 
     <string name="internet_failed">Internet connection failed!</string>
     <string name="database_failed">Database error, please swipe down to manually refresh</string>
+    <string name="no_nutrition_info">Nutrition info is not available for this item!</string>
 
     <string name="about">Settings / About</string>
     <string name="settings">Settings</string>
