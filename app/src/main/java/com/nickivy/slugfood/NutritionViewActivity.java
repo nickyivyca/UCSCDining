@@ -162,38 +162,87 @@ public class NutritionViewActivity extends AppCompatActivity {
              */
             try {
                 title = page.select("div").get(0).text();
-                servingsize = "Serving Size " + fonts.get(2).text();
-                calories = page.select("b").get(1).text();
-                calories_fat = fonts.get(4).text();
-                totalfat_amount = fonts.get(11).text();
-                satfat = "Saturated Fat " + fonts.get(18).text();
-                satfat_percent = fonts.get(55).text().substring(1);
-                transfat = "Trans Fat " + fonts.get(25).text();
-                cholesterol_amount = fonts.get(31).text();
-                cholesterol_percent = fonts.get(59).text().substring(1);
-                sodium_amount = fonts.get(37).text();
-                sodium_percent = fonts.get(38).text() + "%";
-                carbs_amount = fonts.get(14).text();
-                carbs_percent = fonts.get(15).text() + "%";
-                fiber_amount = fonts.get(21).text();
-                fiber_percent = fonts.get(22).text() + "%";
-                sugars = "Sugars " + fonts.get(28).text();
-                protein_amount = fonts.get(34).text();
-                protein_percent = fonts.get(59).text().substring(1);
 
-            /*
-             * Percents appearing below normal list. Strangely, the page includes 2 often different
-             * amounts of sodium and fiber.
-             */
-                percent_vitamina = "Vitamin A - IU" + fonts.get(65).text().substring(1);
-                percent_vitb12 = "Vitamin B12" + fonts.get(69).text().substring(1);
-                percent_vitaminc = "Vitamin C" + fonts.get(67).text().substring(1);
-                percent_iron = "Iron" + fonts.get(61).text().substring(1);
-                percent_sodium = "Sodium" + fonts.get(63).text().substring(1);
-                percent_fiber = "Dietary Fiber" + fonts.get(49).text().substring(1);
+                /**
+                 * For whatever reason, the dining hall pages are all perfectly consistent -
+                 * EXCEPT for Chicken Nuggets. So since it's a well-liked item I figured I might
+                 * as well make a fix for it.
+                 *
+                 * The difference is that on Chicken Nuggets, the Dietary Fiber and Sugars
+                 * tags use different tag formatting. Dietary fiber uses 2 instead of 4, and sugars
+                 * uses 1 instead of 2.
+                 */
+                if (title.equals("Chicken Nuggets")) {
+                    servingsize = "Serving Size " + fonts.get(2).text();
+                    calories = page.select("b").get(1).text();
+                    calories_fat = fonts.get(4).text();
+                    totalfat_amount = fonts.get(11).text();
+                    satfat = "Saturated Fat " + fonts.get(18).text();
+                    satfat_percent = fonts.get(52).text().substring(1);
+                    transfat = "Trans Fat " + fonts.get(23).text();
+                    cholesterol_amount = fonts.get(28).text();
+                    cholesterol_percent = fonts.get(56).text().substring(1);
+                    sodium_amount = fonts.get(34).text();
+                    sodium_percent = fonts.get(35).text() + "%";
+                    carbs_amount = fonts.get(14).text();
+                    carbs_percent = fonts.get(15).text() + "%";
+                    fiber_amount = "- - -";
+                    fiber_percent = fonts.get(21).text() + "%";
+                    sugars = "Sugars " + "- - - g";
 
-                ingredients_list = page.select("span").get(1).text();
-                allergens_list = page.select("span").get(3).text();
+                    protein_amount = fonts.get(31).text();
+                    protein_percent = fonts.get(56).text().substring(1);
+
+                    /*
+                     * Percents appearing below normal list. Strangely, the page includes 2 often different
+                     * amounts of sodium and fiber.
+                     */
+                    percent_vitamina = "Vitamin A - IU" + fonts.get(62).text().substring(1);
+                    percent_vitb12 = "Vitamin B12" + fonts.get(66).text().substring(1);
+                    percent_vitaminc = "Vitamin C" + fonts.get(64).text().substring(1);
+                    percent_iron = "Iron" + fonts.get(58).text().substring(1);
+                    percent_sodium = "Sodium" + fonts.get(60).text().substring(1);
+                    percent_fiber = "Dietary Fiber" + fonts.get(46).text().substring(1);
+
+                    ingredients_list = page.select("span").get(1).text();
+                    allergens_list = page.select("span").get(3).text();
+                } else {
+                    servingsize = "Serving Size " + fonts.get(2).text();
+                    calories = page.select("b").get(1).text();
+                    calories_fat = fonts.get(4).text();
+                    totalfat_amount = fonts.get(11).text();
+                    satfat = "Saturated Fat " + fonts.get(18).text();
+                    satfat_percent = fonts.get(55).text().substring(1);
+                    transfat = "Trans Fat " + fonts.get(25).text();
+                    cholesterol_amount = fonts.get(31).text();
+                    cholesterol_percent = fonts.get(59).text().substring(1);
+                    sodium_amount = fonts.get(37).text();
+                    sodium_percent = fonts.get(38).text() + "%";
+                    carbs_amount = fonts.get(14).text();
+                    carbs_percent = fonts.get(15).text() + "%";
+                    fiber_amount = fonts.get(21).text();
+                    fiber_percent = fonts.get(22).text() + "%";
+                    sugars = "Sugars " + fonts.get(28).text();
+
+                    protein_amount = fonts.get(34).text();
+                    protein_percent = fonts.get(59).text().substring(1);
+
+                    /*
+                     * Percents appearing below normal list. Strangely, the page includes 2 often different
+                     * amounts of sodium and fiber.
+                     */
+                    percent_vitamina = "Vitamin A - IU" + fonts.get(65).text().substring(1);
+                    percent_vitb12 = "Vitamin B12" + fonts.get(69).text().substring(1);
+                    percent_vitaminc = "Vitamin C" + fonts.get(67).text().substring(1);
+                    percent_iron = "Iron" + fonts.get(61).text().substring(1);
+                    percent_sodium = "Sodium" + fonts.get(63).text().substring(1);
+                    percent_fiber = "Dietary Fiber" + fonts.get(49).text().substring(1);
+
+                    ingredients_list = page.select("span").get(1).text();
+                    allergens_list = page.select("span").get(3).text();
+                }
+
+
             } catch(java.lang.IndexOutOfBoundsException e) {
                 e.printStackTrace();
                 return Util.GETNUT_NO_INFO;
