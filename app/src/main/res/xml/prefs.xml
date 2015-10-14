@@ -19,6 +19,11 @@
             android:title="@string/dark_theme"
             android:summary="@string/dark_theme_desc"
             />
+        <CheckBoxPreference android:key="background_load"
+            android:title="@string/background_load"
+            android:summary="@string/background_load_desc"
+            />
+        <!-- Hidden preference key for widget enabled: widget_enabled -->
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/licenses" android:key="licences">
         <Preference android:key="mylicense"

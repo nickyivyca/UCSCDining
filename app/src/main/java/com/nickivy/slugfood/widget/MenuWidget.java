@@ -16,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 
+import com.nickivy.slugfood.BackgroundLoader;
 import com.nickivy.slugfood.MainActivity;
 import com.nickivy.slugfood.R;
 import com.nickivy.slugfood.parser.MealDataFetcher;
@@ -63,7 +64,11 @@ public class MenuWidget extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        setAlarm(context);
+        Intent intent = new Intent(context, BackgroundLoader.class);
+        intent.setAction(Util.TAG_WIDGETENABLED);
+        context.sendBroadcast(intent);
+        Log.v(Util.LOGTAG, "updating here");
+        //setAlarm(context);
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
         }
@@ -73,92 +78,19 @@ public class MenuWidget extends AppWidgetProvider {
 
     @Override
     public void onEnabled(Context context) {
-        setAlarm(context);
+        Intent intent = new Intent(context, BackgroundLoader.class);
+        intent.setAction(Util.TAG_WIDGETENABLED);
+        context.sendBroadcast(intent);
+
         super.onEnabled(context);
-    }
-
-    /**
-     * Android can be idiotic sometimes and not call the onEnabled method, which means that if the
-     * alarm manager is set up in onEnabled, which would be the proper place to do it since it only
-     * needs to run once, it will not always be enabled. I've noticed that it will work the first
-     * time I install the app, but if I update the app the Alarm manager will not run. With this
-     * method we can call it from both onUpdate and onEnabled.
-     *
-     * However! AlarmManager is stupid. If you reset the alarm, it runs the alarm again in about
-     * a minute. This means that the alarm set to run every hour or every day runs every day. If you
-     * add two or three alarms they can start piling up on top of each other and triggering
-     * constantly. So we have to run checks to make sure that the alarm is not already set before
-     * resetting it. The PendingIntent.FLAG_UPDATE_CURRENT is supposed to take care of this, but it
-     * doesn't.
-     */
-    public void setAlarm(Context context) {
-        final Intent timeIntent = new Intent(context, MenuWidget.class);
-        timeIntent.setAction(TAG_TIMEUPDATE);
-
-        // If getBroadcast with the NO_CREATE flag returns null for all of these all alarms are set
-        // Don't reset them or else the alarm manager will run off with them
-        boolean alarmEnabled = (PendingIntent.getBroadcast(context, Util.BREAKFAST_SWITCH_TIME,
-                timeIntent, PendingIntent.FLAG_NO_CREATE) != null) &&
-                (PendingIntent.getBroadcast(context, Util.LUNCH_SWITCH_TIME,
-                        timeIntent, PendingIntent.FLAG_NO_CREATE) != null) &&
-                (PendingIntent.getBroadcast(context, Util.DINNER_SWITCH_TIME,
-                        timeIntent, PendingIntent.FLAG_NO_CREATE) != null);
-        if (alarmEnabled) {
-            return;
-        }
-
-        final AlarmManager m = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Calendar calendar = Calendar.getInstance();
-
-        breakfastIntent = PendingIntent.getBroadcast(context, Util.BREAKFAST_SWITCH_TIME,
-                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        calendar.set(Calendar.HOUR_OF_DAY, Util.BREAKFAST_SWITCH_TIME);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        m.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, breakfastIntent);
-
-        lunchIntent = PendingIntent.getBroadcast(context, Util.LUNCH_SWITCH_TIME,
-                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        calendar.set(Calendar.HOUR_OF_DAY, Util.LUNCH_SWITCH_TIME);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        m.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, lunchIntent);
-
-        dinnerIntent = PendingIntent.getBroadcast(context, Util.DINNER_SWITCH_TIME,
-                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        calendar.set(Calendar.HOUR_OF_DAY, Util.DINNER_SWITCH_TIME);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        m.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, dinnerIntent);
     }
 
     @Override
     public void onDisabled(Context context) {
-        final AlarmManager m = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        final Intent timeIntent = new Intent(context, MenuWidget.class);
-        timeIntent.setAction(TAG_TIMEUPDATE);
+        Intent intent = new Intent(context, BackgroundLoader.class);
+        intent.setAction(Util.TAG_WIDGETGONE);
+        context.sendBroadcast(intent);
 
-        // Remake intents to cancel them in case they get lost in memory
-        breakfastIntent = PendingIntent.getBroadcast(context, Util.BREAKFAST_SWITCH_TIME,
-                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        lunchIntent = PendingIntent.getBroadcast(context, Util.LUNCH_SWITCH_TIME,
-                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        dinnerIntent = PendingIntent.getBroadcast(context, Util.DINNER_SWITCH_TIME,
-                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        // Cancel the alarms
-        m.cancel(breakfastIntent);
-        m.cancel(lunchIntent);
-        m.cancel(dinnerIntent);
-        // Cancel the intents themselves (so the alarmenabled calculations will work properly)
-        breakfastIntent.cancel();
-        lunchIntent.cancel();
-        dinnerIntent.cancel();
         super.onDisabled(context);
     }
 
@@ -408,6 +340,7 @@ public class MenuWidget extends AppWidgetProvider {
             updateAppWidget(context, appWidgetManager, widgetData.get(thisDataIndex).getWidgetId());
         } else {
             if (TAG_TIMEUPDATE.equals(intent.getAction())) {
+                Log.v(Util.LOGTAG, "received timeupdate in widget receiver");
                 if (widgetData.size() == 0) {
                     reinitializeWidgetData(context);
                 }

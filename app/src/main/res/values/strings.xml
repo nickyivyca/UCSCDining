@@ -26,6 +26,10 @@
     <string name="dark_theme">Dark Theme</string>
     <string name="dark_theme_desc">Optimized for AMOLED screens.</string>
 
+    <string name="background_load">Load data in background</string>
+    <string name="background_load_desc">Automatically load data in background. Automatically enabled
+        when widget or favorite item notifications are enabled.</string>
+
     <string name="mylicense_title">Slug Food</string>
     <string name="mylicense_desc">Released under GPL v2 license. Click here to visit
     the Slug Food Github page.</string>

@@ -1,11 +1,14 @@
 package com.nickivy.slugfood;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+
+import com.nickivy.slugfood.util.Util;
 
 /**
  * Displays some info about the app, as well as option to look at license information for the app.
@@ -41,7 +44,7 @@ public class PreferencesActivity extends ActionBarActivity {
             Preference pref = findPreference("mylicense");
             // Display the verison number once BuildConfig.VERSION_NAME works. Says 1.3 on bug page?
             //pref.setTitle(getString(R.string.app_name) + " " + BuildConfig.VERSION_NAME);
-            pref.setTitle(getString(R.string.app_name)+ " 1.2");
+            pref.setTitle(getString(R.string.app_name)+ " 1.3");
 
             pref = findPreference("dark_theme");
             pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -51,6 +54,22 @@ public class PreferencesActivity extends ActionBarActivity {
                     return true;
                 }
             });
+            // Gray out background load preference if widget/notifications enabled
+            pref = findPreference("background_load");
+            pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    Intent intent = new Intent(getActivity(), BackgroundLoader.class);
+                    intent.setAction(((Boolean) o)? Util.TAG_ENABLEBACKGROUND :
+                            Util.TAG_DISABLEBACKGROUND);
+                    getActivity().sendBroadcast(intent);
+                    return true;
+                }
+            });
+            pref.setShouldDisableView(true);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            pref.setEnabled(!(prefs.getBoolean("widget_enabled", false) ||
+                    prefs.getBoolean("notifications_enabled", false)));
         }
     }
 }

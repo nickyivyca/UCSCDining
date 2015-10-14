@@ -61,7 +61,14 @@ public class Util {
     TAG_DAY = "tag_day",
     TAG_YEAR = "tag_year",
     TAG_URL = "tag_url",
-    TAG_USESAVED = "tag_usesaved";
+    TAG_USESAVED = "tag_usesaved",
+    TAG_TIMEUPDATE = "time_update",
+    TAG_RELOAD = "tag_reload",
+    TAG_WIDGETID = "widget_id",
+    TAG_ENABLEBACKGROUND = "enable_bg",
+    TAG_DISABLEBACKGROUND = "disable_bg",
+    TAG_WIDGETENABLED = "enable_widget",
+    TAG_WIDGETGONE = "widget_gone";
 
     public static final int NO_BACKUP_COLLEGE = 6;
 
