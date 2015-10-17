@@ -267,6 +267,14 @@ public class NutritionViewActivity extends AppCompatActivity {
             } else if (result == Util.GETLIST_OKHTTP_FAILURE || result == Util.GETLIST_INTERNET_FAILURE) {
                 Toast.makeText(mActivity, getString(R.string.internet_failed),
                         Toast.LENGTH_SHORT).show();
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Hide spinner after internet failure
+                        View spinner = mActivity.findViewById(R.id.nutrition_progresscircle);
+                        spinner.setVisibility(View.INVISIBLE);
+                    }
+                });
             } else {
                 mActivity.runOnUiThread(new Runnable() {
                     @Override

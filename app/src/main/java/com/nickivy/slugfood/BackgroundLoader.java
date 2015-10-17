@@ -6,13 +6,25 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.nickivy.slugfood.parser.MealDataFetcher;
 import com.nickivy.slugfood.util.Util;
 import com.nickivy.slugfood.widget.MenuWidget;
 
 import java.util.Calendar;
+
+/**
+ * This class controls the background loading of the app. The
+ * alarms are set in this class, and this class sends out broadcasts
+ * to relevant areas when loading is done.
+ *
+ * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
+ *
+ * @author @author Nicky Ivy parkedraccoon@gmail.com
+ */
 
 public class BackgroundLoader extends BroadcastReceiver {
 
@@ -26,6 +38,11 @@ public class BackgroundLoader extends BroadcastReceiver {
         if (Util.TAG_TIMEUPDATE.equals(intent.getAction())) {
             Log.v(Util.LOGTAG, "Received timeupdate");
             setAlarm(context);
+            // Run background data load
+            int today[] = Util.getToday();
+            new BackgroundLoadTask(today[0], today[1],
+                    today[2], context).execute();
+            // Also send time update to widget
             Intent timeIntent = new Intent(context, MenuWidget.class);
             timeIntent.setAction(Util.TAG_TIMEUPDATE);
             context.sendBroadcast(timeIntent);
@@ -148,5 +165,44 @@ public class BackgroundLoader extends BroadcastReceiver {
         breakfastIntent.cancel();
         lunchIntent.cancel();
         dinnerIntent.cancel();
+        Log.v(Util.LOGTAG, "disabling alarm");
+    }
+
+
+    private class BackgroundLoadTask extends AsyncTask<Void, Void, Long> {
+
+        private int mAttemptedMonth,
+                mAttemptedDay,
+                mAttemptedYear;
+
+        private Context mContext;
+
+        /**
+         * @param month Month of day to fetch
+         * @param day Day of day to fetch
+         * @param year Year of day to fetch
+         * @param context context
+         */
+        public BackgroundLoadTask(int month, int day, int year, Context context) {
+            mAttemptedMonth = month;
+            mAttemptedDay = day;
+            mAttemptedYear = year;
+            mContext = context;
+        }
+
+        @Override
+        protected void onPreExecute(){}
+
+        @Override
+        protected Long doInBackground(Void... voids) {
+            int res = MealDataFetcher.fetchData(mContext, mAttemptedMonth, mAttemptedDay,
+                    mAttemptedYear);
+            return Double.valueOf(res).longValue();
+        }
+
+        protected void onPostExecute(Long result) {
+            // call notification system here
+        }
+
     }
 }

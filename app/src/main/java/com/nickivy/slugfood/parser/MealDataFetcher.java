@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
 
 import com.nickivy.slugfood.util.MenuItem;
 import com.nickivy.slugfood.util.Util;
@@ -20,14 +21,24 @@ import java.util.ArrayList;
  */
 public class MealDataFetcher {
 
+    // Keep track of if the fetch is running
+    private static boolean running = false;
+
     /**
      * Loads data from database or web into the full menu object.
      */
     public static int fetchData(Context context, int month, int day, int year) {
+        // If called multiple times, hold the second call until the first one exits.
+        if (running) {
+            Log.v(Util.LOGTAG, "waiting for another fetchdata to complete");
+            while(running);
+        }
+        running = true;
         MealStorage mealStore = new MealStorage(context);
         SQLiteDatabase db;
 
         if (mealStore == null) {
+            running = false;
             return Util.GETLIST_DATABASE_FAILURE;
         }
 
@@ -57,6 +68,7 @@ public class MealDataFetcher {
         if(cexists || MenuParser.manualRefresh){
             int res = MenuParser.getMealList(month, day, year);
             if (res != Util.GETLIST_SUCCESS) {
+                running = false;
                 return res;
             }
 
@@ -119,6 +131,7 @@ public class MealDataFetcher {
                     try {
                         statement.execute();
                     } catch (SQLiteConstraintException e) {
+                        running = false;
                         return Util.GETLIST_DATABASE_FAILURE;
                     }
                 }
@@ -135,6 +148,7 @@ public class MealDataFetcher {
                     try {
                         statement.execute();
                     } catch (SQLiteConstraintException e) {
+                        running = false;
                         return Util.GETLIST_DATABASE_FAILURE;
                     }
                 }
@@ -151,6 +165,7 @@ public class MealDataFetcher {
                     try {
                         statement.execute();
                     } catch (SQLiteConstraintException e) {
+                        running = false;
                         return Util.GETLIST_DATABASE_FAILURE;
                     }
                 }
@@ -245,6 +260,7 @@ public class MealDataFetcher {
             mealStore.close();
 
         }
+        running = false;
         return Util.GETLIST_SUCCESS;
     }
 }
