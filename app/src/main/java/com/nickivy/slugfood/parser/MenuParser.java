@@ -38,6 +38,17 @@ public class MenuParser {
     };
 
     private static final String URLPart3 = "&mealName=";
+
+    private static final String legacyURLPart1 = "http://nutrition.sa.ucsc.edu/menuSamp.asp?" +
+            "myaction=read&sName=&dtdate=";
+
+    private static final String[] legacyURLListParts2 = {
+            "&locationNum=05&locationName=%20Cowell&naFlag=1",
+            "&locationNum=20&locationName=Crown+Merrill&sName=&naFlag=1",
+            "&locationNum=25&locationName=Porter&sName=&naFlag=1",
+            "&locationNum=30&locationName=College+Eight&sName=&naFlag=1",
+            "&locationNum=40&locationName=College+Nine+%26+Ten&sName=&naFlag=1"
+    };
     
     public static boolean manualRefresh = false;
     
@@ -67,17 +78,17 @@ public class MenuParser {
             e.printStackTrace();
             return Util.GETLIST_INTERNET_FAILURE;
         } catch (IOException e) {
-            Log.w(Util.LOGTAG, "connection error");
+            Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
             try {
                 breakfastDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
                         day + "%2F" + year + URLPart3 + Util.meals[0]).get();
             } catch (IOException e1) {
-                Log.w(Util.LOGTAG, "connection error");
+                Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
                 try {
                     breakfastDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
                             day + "%2F" + year + URLPart3 + Util.meals[0]).get();
                 } catch (IOException e2) {
-                    Log.w(Util.LOGTAG, "connection error");
+                    Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
                     // Give up after three times
                     return Util.GETLIST_OKHTTP_FAILURE;
                 }
@@ -89,21 +100,21 @@ public class MenuParser {
                     day + "%2F" + year + URLPart3 + Util.meals[1]).get();
         } catch (UnknownHostException e) {
             // Internet connection completely missing is a separate error from okhttp
-            Log.v(Util.LOGTAG, "Internet connection missing");
+            Log.v(Util.LOGTAG, Util.LOGMSG_INTERNETERROR);
             e.printStackTrace();
             return Util.GETLIST_INTERNET_FAILURE;
         } catch (IOException e) {
-            Log.w(Util.LOGTAG, "connection error");
+            Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
             try {
                 lunchDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
                         day + "%2F" + year + URLPart3 + Util.meals[1]).get();
             } catch (IOException e1) {
-                Log.w(Util.LOGTAG, "connection error");
+                Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
                 try {
                     lunchDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
                             day + "%2F" + year + URLPart3 + Util.meals[1]).get();
                 } catch (IOException e2) {
-                    Log.w(Util.LOGTAG, "connection error");
+                    Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
                     // Give up after three times
                     return Util.GETLIST_OKHTTP_FAILURE;
                 }
@@ -115,21 +126,21 @@ public class MenuParser {
                     day + "%2F" + year + URLPart3 + Util.meals[2]).get();
         } catch (UnknownHostException e) {
             // Internet connection completely missing is a separate error from okhttp
-            Log.v(Util.LOGTAG, "Internet connection missing");
+            Log.v(Util.LOGTAG, Util.LOGMSG_INTERNETERROR);
             e.printStackTrace();
             return Util.GETLIST_INTERNET_FAILURE;
         } catch (IOException e) {
-            Log.w(Util.LOGTAG, "connection error");
+            Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
             try {
                 dinnerDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
                         day + "%2F" + year + URLPart3 + Util.meals[2]).get();
             } catch (IOException e1) {
-                Log.w(Util.LOGTAG, "connection error");
+                Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
                 try {
                     dinnerDoc = Jsoup.connect(URLPart1 + URLPart2s[k] + month + "%2F" +
                             day + "%2F" + year + URLPart3 + Util.meals[2]).get();
                 } catch (IOException e2) {
-                    Log.w(Util.LOGTAG, "connection error");
+                    Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
                     // Give up after three times
                     return Util.GETLIST_OKHTTP_FAILURE;
                 }
@@ -179,6 +190,62 @@ public class MenuParser {
             ArrayList<MenuItem> breakfastMessage = new ArrayList<MenuItem>();
             breakfastMessage.add(new MenuItem(Util.brunchMessage, "-1"));
             fullMenuObj.get(k).setBreakfast(breakfastMessage);
+        }
+        /*
+         * If breakfast and lunch but no dinner, may be college night, check the old page
+         * without nutrition info - the page we used to use before nutrition info
+         */
+        if(!fullMenuObj.get(k).getBreakfast().isEmpty() &&
+                !(fullMenuObj.get(k).getLunch().isEmpty()) &&
+                        (fullMenuObj.get(k).getDinner().isEmpty())){
+            Document collegeNightDoc;
+            try {
+                collegeNightDoc = Jsoup.connect(legacyURLPart1 + month + "%2F" + day + "%2F" + year
+                        + legacyURLListParts2[k]).get();
+            } catch (UnknownHostException e) {
+                // Internet connection completely missing is a separate error from okhttp
+                Log.v(Util.LOGTAG, Util.LOGMSG_INTERNETERROR);
+                e.printStackTrace();
+                return Util.GETLIST_INTERNET_FAILURE;
+            } catch (IOException e) {
+                Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
+                try {
+                    collegeNightDoc = Jsoup.connect(legacyURLPart1 + month + "%2F" + day + "%2F" +
+                            year + legacyURLListParts2[k]).get();
+                } catch (IOException e1) {
+                    Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
+                    try {
+                        collegeNightDoc = Jsoup.connect(legacyURLPart1 + month + "%2F" + day + "%2F"
+                                + year + legacyURLListParts2[k]).get();
+                    } catch (IOException e2) {
+                        Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
+                        // Give up after three times
+                        return Util.GETLIST_OKHTTP_FAILURE;
+                    }
+                }
+            }
+
+            dinnerFoodNames = collegeNightDoc.select("td[valign=\"top\"]");
+            for(int j = 0; j < dinnerFoodNames.size(); j++) {
+                //Dinner
+                if(dinnerFoodNames.get(j).text().contains("Dinner")){
+                    Elements dinner = dinnerFoodNames.get(j).select(" div[class=\"menusamprecipes\"]");
+                    for(int i = 0; i < dinner.size(); i++) {
+                        dinnerList = new ArrayList<MenuItem>();
+                        //dinnerList.add(dinner.get(i).text());
+                        Log.v(Util.LOGTAG, "names size: " + dinner.size());
+                        Log.v(Util.LOGTAG, "i: " + i);
+                        if (i == 0) {
+                            dinnerList.add(new MenuItem(dinner.get(i).text(),
+                                    "-1"));
+                        } else {
+                            dinnerList.add(new MenuItem(dinner.get(i).text(),
+                                    dinnerNutIds.get(i - 1).attr("VALUE")));
+                        }
+                    }
+                }
+            }
+            fullMenuObj.get(k).setDinner(dinnerList);
         }
         return Util.GETLIST_SUCCESS;
     }

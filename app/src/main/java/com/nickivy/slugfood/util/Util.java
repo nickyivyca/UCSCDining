@@ -48,7 +48,10 @@ public class Util {
     // Extra word key for intent creation
     public static final String EXTRA_WORD = "com.nickivy.ucscdining.widget.WORD";
 
-    public static final String LOGTAG = "ucscdining";
+    public static final String LOGTAG = "ucscdining",
+    LOGMSG_INTERNETERROR = "Internet connection missing",
+    LOGMSG_OKHTTP = "Connection error";
+
 
     public static final String WIDGETSTATE_PREFS = "widgetstate_prefs";
 
