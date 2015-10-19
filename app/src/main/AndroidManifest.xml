@@ -8,8 +8,13 @@
         android:minSdkVersion="14"
         android:targetSdkVersion="23" />
 
+    <!-- To connect to servers -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- To set up background loading on boot (otherwise automatic loads will not be set until
+        opening app-->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- To vibrate when notification is sent -->
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -59,6 +64,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
+        </receiver>
+
+        <receiver android:name=".Notifications"
+            android:exported="true">
         </receiver>
 
         <service android:name="com.nickivy.slugfood.widget.WidgetService"

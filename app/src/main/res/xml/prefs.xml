@@ -15,38 +15,65 @@
             android:entries="@array/colleges_pref"
             android:entryValues="@array/colleges_values"
             />
-        <CheckBoxPreference android:key="dark_theme"
-            android:title="@string/dark_theme"
-            android:summary="@string/dark_theme_desc"
-            />
+        <!--PreferenceScreen android:key="notifications_settings"
+            android:title="@string/notifications_settings"
+            android:summary="@string/notifications_settings_desc"-->
+                <CheckBoxPreference android:key="notifications_events"
+                    android:title="@string/notifications_events"
+                    android:summary="@string/notifications_events_desc"
+                    />
+                <CheckBoxPreference android:key="notifications_favorites"
+                    android:title="@string/notifications_favorites"
+                    android:summary="@string/notifications_favorites_desc"
+                    />
+                <Preference android:key="favslist"
+                    android:title="@string/notifications_favoriteslist"
+                    android:summary="@string/notifications_favoriteslist_desc">
+                </Preference>
+                <MultiSelectListPreference android:key="notification_dhalls"
+                    android:title="@string/notifications_dhalls"
+                    android:summary="@string/notifications_dhalls_desc"
+                    android:entries="@array/colleges_pref"
+                    android:entryValues="@array/colleges_values"
+                    android:defaultValue="@array/colleges_defaults"
+                    />
+        <!--/PreferenceScreen-->
         <CheckBoxPreference android:key="background_load"
             android:title="@string/background_load"
             android:summary="@string/background_load_desc"
             />
+        <CheckBoxPreference android:key="dark_theme"
+            android:title="@string/dark_theme"
+            android:summary="@string/dark_theme_desc"
+            />
         <!-- Hidden preference key for widget enabled: widget_enabled -->
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/licenses" android:key="licences">
-        <Preference android:key="mylicense"
-            android:title="@string/mylicense_title"
-            android:summary="@string/mylicense_desc">
-            <intent android:action="android.intent.action.VIEW"
-                android:data="https://github.com/parkedraccoon/UCSCDining" />
-        </Preference>
-        <Preference android:key="googlicense"
-            android:title="@string/googlicense_title"
-            android:summary="@string/googlicense_desc"
-            />
-        <Preference android:key="jsouplicense"
-            android:title="@string/jsouplicense_title"
-            android:summary="@string/jsouplicense_desc">
-            <intent android:action="android.intent.action.VIEW"
-                android:data="https://jsoup.org" />
-        </Preference>
-        <Preference android:key="fablicense"
-            android:title="@string/fablicense_title"
-            android:summary="@string/fablicense_desc">
-            <intent android:action="android.intent.action.VIEW"
-                android:data="https://github.com/makovkastar/FloatingActionButton" />
-        </Preference>
+    <PreferenceCategory android:title="@string/sub_about" android:key="about">
+        <PreferenceScreen android:key="prefs_licences"
+            android:title="@string/licenses_cat"
+            android:summary="@string/licenses_cat_desc">
+            <Preference android:key="mylicense"
+                android:title="@string/mylicense_title"
+                android:summary="@string/mylicense_desc">
+                <intent android:action="android.intent.action.VIEW"
+                    android:data="https://github.com/parkedraccoon/UCSCDining" />
+            </Preference>
+            <Preference android:key="googlicense"
+                android:title="@string/googlicense_title"
+                android:summary="@string/googlicense_desc"
+                />
+            <Preference android:key="jsouplicense"
+                android:title="@string/jsouplicense_title"
+                android:summary="@string/jsouplicense_desc">
+                <intent android:action="android.intent.action.VIEW"
+                    android:data="https://jsoup.org" />
+            </Preference>
+            <Preference android:key="fablicense"
+                android:title="@string/fablicense_title"
+                android:summary="@string/fablicense_desc">
+                <intent android:action="android.intent.action.VIEW"
+                    android:data="https://github.com/makovkastar/FloatingActionButton" />
+            </Preference>
+        </PreferenceScreen>
     </PreferenceCategory>
 </PreferenceScreen>

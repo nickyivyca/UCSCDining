@@ -64,11 +64,6 @@ public class MenuWidget extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        Intent intent = new Intent(context, BackgroundLoader.class);
-        intent.setAction(Util.TAG_WIDGETENABLED);
-        context.sendBroadcast(intent);
-        Log.v(Util.LOGTAG, "updating here");
-        //setAlarm(context);
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
         }
@@ -104,6 +99,9 @@ public class MenuWidget extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
+        Intent intent = new Intent(context, BackgroundLoader.class);
+        intent.setAction(Util.TAG_WIDGETENABLED);
+        context.sendBroadcast(intent);
         WidgetData thisWidgetData = getWidgetDataById(appWidgetId);
         if (thisWidgetData == null) {
             // Not doing full reinitialization here, this is how we make the initial data when added
@@ -340,7 +338,6 @@ public class MenuWidget extends AppWidgetProvider {
             updateAppWidget(context, appWidgetManager, widgetData.get(thisDataIndex).getWidgetId());
         } else {
             if (TAG_TIMEUPDATE.equals(intent.getAction())) {
-                Log.v(Util.LOGTAG, "received timeupdate in widget receiver");
                 if (widgetData.size() == 0) {
                     reinitializeWidgetData(context);
                 }

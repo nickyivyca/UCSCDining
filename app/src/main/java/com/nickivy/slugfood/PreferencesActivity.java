@@ -1,12 +1,22 @@
 package com.nickivy.slugfood;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.nickivy.slugfood.util.Util;
 
@@ -21,7 +31,7 @@ import com.nickivy.slugfood.util.Util;
  *
  * @author Nicky Ivy parkedraccoon@gmail.com
  */
-public class PreferencesActivity extends ActionBarActivity {
+public class PreferencesActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +51,13 @@ public class PreferencesActivity extends ActionBarActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.prefs);
-            Preference pref = findPreference("mylicense");
+            Preference namePref = findPreference("mylicense");
             // Display the verison number once BuildConfig.VERSION_NAME works. Says 1.3 on bug page?
             //pref.setTitle(getString(R.string.app_name) + " " + BuildConfig.VERSION_NAME);
-            pref.setTitle(getString(R.string.app_name)+ " 1.3");
+            namePref.setTitle(getString(R.string.app_name) + " 1.3");
 
-            pref = findPreference("dark_theme");
-            pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            Preference darkPref = findPreference("dark_theme");
+            darkPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object o) {
                     getActivity().recreate();
@@ -55,21 +65,107 @@ public class PreferencesActivity extends ActionBarActivity {
                 }
             });
             // Gray out background load preference if widget/notifications enabled
-            pref = findPreference("background_load");
-            pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            Preference bgLoadPref = findPreference("background_load");
+            bgLoadPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object o) {
                     Intent intent = new Intent(getActivity(), BackgroundLoader.class);
                     intent.setAction(((Boolean) o)? Util.TAG_ENABLEBACKGROUND :
                             Util.TAG_DISABLEBACKGROUND);
                     getActivity().sendBroadcast(intent);
+                    /*SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    Preference bgLoadPref = findPreference("background_load");
+                    bgLoadPref.setEnabled(!(prefs.getBoolean("widget_enabled", false) ||
+                            prefs.getBoolean("notifications_events", false) ||
+                            prefs.getBoolean("notifications_favorites", false)));*/
                     return true;
                 }
             });
-            pref.setShouldDisableView(true);
+            bgLoadPref.setShouldDisableView(true);
+
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            pref.setEnabled(!(prefs.getBoolean("widget_enabled", false) ||
-                    prefs.getBoolean("notifications_enabled", false)));
+            /*bgLoadPref.setEnabled(!(prefs.getBoolean("widget_enabled", false) ||
+                    prefs.getBoolean("notifications_events", false) ||
+                    prefs.getBoolean("notifications_favorites", false)));*/
+            bgLoadPref.setEnabled(true);
+
+            Preference notifEventsPref = findPreference("notifications_events");
+            notifEventsPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    Intent intent = new Intent(getActivity(), BackgroundLoader.class);
+                    intent.setAction(((Boolean) o) ? Util.TAG_NOTIFICATIONSON :
+                            Util.TAG_NOTIFICATIONSOFF);
+                    getActivity().sendBroadcast(intent);
+
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    CheckBoxPreference bgLoadPref = (CheckBoxPreference) findPreference("background_load");
+                    if ((Boolean) o) {
+                        bgLoadPref.setChecked(true);
+                        intent = new Intent(getActivity(), BackgroundLoader.class);
+                        intent.setAction(Util.TAG_ENABLEBACKGROUND);
+                        getActivity().sendBroadcast(intent);
+                    }
+                    Log.v(Util.LOGTAG, ((prefs.getBoolean("widget_enabled", false) ||
+                            prefs.getBoolean("notifications_favorites", false) ||
+                            (Boolean) o))? "true" : "false");
+                    bgLoadPref.setEnabled(!(prefs.getBoolean("widget_enabled", false) ||
+                            prefs.getBoolean("notifications_favorites", false) ||
+                            (Boolean) o));
+                    return true;
+                }
+            });
+
+            Preference notifFavsPref = findPreference("notifications_favorites");
+            notifFavsPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    Intent intent = new Intent(getActivity(), BackgroundLoader.class);
+                    intent.setAction(((Boolean) o) ? Util.TAG_NOTIFICATIONSON :
+                            Util.TAG_NOTIFICATIONSOFF);
+                    getActivity().sendBroadcast(intent);
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    CheckBoxPreference bgLoadPref = (CheckBoxPreference) findPreference("background_load");
+                    if ((Boolean) o) {
+                        bgLoadPref.setChecked(true);
+                        intent = new Intent(getActivity(), BackgroundLoader.class);
+                        intent.setAction(Util.TAG_ENABLEBACKGROUND);
+                        getActivity().sendBroadcast(intent);
+                    }
+                    Log.v(Util.LOGTAG, ((prefs.getBoolean("widget_enabled", false) ||
+                            prefs.getBoolean("notifications_favorites", false) ||
+                            (Boolean) o))? "true" : "false");
+                    bgLoadPref.setEnabled(!(prefs.getBoolean("widget_enabled", false) ||
+                            prefs.getBoolean("notifications_events", false) ||
+                            (Boolean) o));
+                    return true;
+                }
+            });
+
+            Preference favsListPref = findPreference("favslist");
+            favsListPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                public boolean onPreferenceClick(Preference preference) {
+                    //open browser or intent here
+                    Fragment notifsettings = new NotificationSettingsFragment();
+                    FragmentManager fManager = getActivity().getFragmentManager();
+                    //FragmentTransaction fragTrans = getChildFragmentManager().beginTransaction();
+                    FragmentTransaction fragTrans = fManager.beginTransaction();
+                    //fragTrans.replace(android.R.id.content, notifsettings);
+                    //fragTrans.addToBackStack(null);
+                    //fragTrans.commit();
+                    return true;
+                }
+            });
+        }
+    }
+
+    public static class NotificationSettingsFragment extends ListFragment {
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            getActivity().setTitle(getString(R.string.favorites_title));
+            return inflater.inflate(R.layout.favorites_list, container, false);
         }
     }
 }

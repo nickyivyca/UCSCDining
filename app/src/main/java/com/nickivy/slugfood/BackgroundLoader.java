@@ -72,6 +72,14 @@ public class BackgroundLoader extends BroadcastReceiver {
             SharedPreferences.Editor edit = prefs.edit();
             edit.putBoolean("widget_enabled", false);
             edit.commit();
+        } else if (Util.TAG_NOTIFICATIONSON.equals(intent.getAction())) {
+            Log.v(Util.LOGTAG, "Notifications enabled");
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            /*SharedPreferences.Editor edit = prefs.edit();
+            edit.putBoolean("background_load", true);
+            edit.commit();*/
+        } else if (Util.TAG_NOTIFICATIONSOFF.equals(intent.getAction())) {
+            Log.v(Util.LOGTAG, "Notifications disabled");
         } else if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             Log.v(Util.LOGTAG, "received boot completed");
             // Reset alarm in onReceive if enabled from boot
@@ -79,6 +87,21 @@ public class BackgroundLoader extends BroadcastReceiver {
             if (prefs.getBoolean("background_load", false)) {
                 setAlarm(context);
             }
+
+
+            //Log.v(Util.LOGTAG, "Received timeupdate");
+            setAlarm(context);
+            // Run background data load
+            int today[] = Util.getToday();
+            new BackgroundLoadTask(today[0], today[1],
+                    today[2], context).execute();
+            // Also send time update to widget
+            Intent timeIntent = new Intent(context, MenuWidget.class);
+            timeIntent.setAction(Util.TAG_TIMEUPDATE);
+            context.sendBroadcast(timeIntent);
+
+
+
         }
     }
 
@@ -202,6 +225,10 @@ public class BackgroundLoader extends BroadcastReceiver {
 
         protected void onPostExecute(Long result) {
             // call notification system here
+            Intent notificationsIntent = new Intent(mContext, Notifications.class);
+            notificationsIntent.setAction(Util.TAG_TIMEUPDATE);
+            mContext.sendBroadcast(notificationsIntent);
+            Log.v(Util.LOGTAG, "sent notifications intent");
         }
 
     }

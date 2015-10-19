@@ -107,7 +107,8 @@ public class MainActivity extends AppCompatActivity{
 
             // If data in intent, it's from the widget. Highest priority
             if (!(getIntent().getIntExtra(Util.TAG_COLLEGE, -1) == -1)) {
-                if (savedInstanceState != null && savedInstanceState.getBoolean(KEY_WIDGETINTENT)) {
+                if (savedInstanceState != null && savedInstanceState.getBoolean(KEY_WIDGETINTENT) &&
+                        !getIntent().getBooleanExtra(Util.TAG_FROMNOTIFICATION, false) ){
                     intentCollege = getCurrentCollege(this);
                     int date[] = getCurrentDispDate(this);
                     if (date[0] == 0) {
@@ -252,6 +253,7 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onNewIntent(Intent intent) {
+        Log.v(Util.LOGTAG, "new intent received");
         // Need to reset intent when new one is sent
         super.onNewIntent(intent);
         // If intent has no extras, it's a launch or return intent, do nothing
