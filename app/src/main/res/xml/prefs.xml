@@ -26,10 +26,18 @@
                     android:title="@string/notifications_favorites"
                     android:summary="@string/notifications_favorites_desc"
                     />
-                <Preference android:key="favslist"
+                <!--Preference android:key="favslist"
                     android:title="@string/notifications_favoriteslist"
                     android:summary="@string/notifications_favoriteslist_desc">
-                </Preference>
+                    <intent android:action="android.intent.action.VIEW"
+                        android:targetPackage="com.nickivy.ucscdining"
+                        android:targetClass="com.nickivy.ucscdining.FavoritesListActivity"/>
+                </Preference-->
+            <Preference android:key="favslist"
+                android:title="@string/notifications_favoriteslist"
+                android:summary="@string/notifications_favoriteslist_desc">
+                <!-- Name for set of actual stored list of items: favorites_items_list -->
+            </Preference>
                 <MultiSelectListPreference android:key="notification_dhalls"
                     android:title="@string/notifications_dhalls"
                     android:summary="@string/notifications_dhalls_desc"

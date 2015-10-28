@@ -47,6 +47,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nickivy.slugfood.MainActivity" />
         </activity>
+        <activity
+            android:name=".FavoritesListActivity"
+            android:label="@string/favorites_title"
+            android:parentActivityName="com.nickivy.slugfood.PreferencesActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nickivy.slugfood.PreferencesActivity" />
+        </activity>
 
         <receiver android:name=".widget.MenuWidget"
             android:exported="true">

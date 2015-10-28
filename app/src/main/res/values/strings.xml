@@ -62,6 +62,14 @@
     <string name="notifications_favoriteslist">Favorite Items</string>
     <string name="notifications_favoriteslist_desc">Manage favorite items</string>
 
+    <string name="favorites_confirm_delete">Remove this item from favorites?</string>
+    <string name="favorites_confirm_delete_pos">OK</string>
+    <string name="favorites_confirm_delete_neg">Cancel</string>
+
+    <string name="favorites_add">Add to favorites</string>
+    <string name="favorites_add_pos">OK</string>
+    <string name="favorites_add_neg">Cancel</string>
+
     <string name="notifications_dhalls">Dining Halls</string>
     <string name="notifications_dhalls_desc">Only give notifications for these dining halls.</string>
 

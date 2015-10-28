@@ -34,9 +34,7 @@ public class BackgroundLoader extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.v(Util.LOGTAG, "Received a thing");
         if (Util.TAG_TIMEUPDATE.equals(intent.getAction())) {
-            Log.v(Util.LOGTAG, "Received timeupdate");
             setAlarm(context);
             // Run background data load
             int today[] = Util.getToday();
@@ -47,7 +45,6 @@ public class BackgroundLoader extends BroadcastReceiver {
             timeIntent.setAction(Util.TAG_TIMEUPDATE);
             context.sendBroadcast(timeIntent);
         } else if (Util.TAG_ENABLEBACKGROUND.equals(intent.getAction())) {
-            Log.v(Util.LOGTAG, "Received enable background");
             setAlarm(context);
 
             Intent timeIntent = new Intent(context, MenuWidget.class);
@@ -55,7 +52,6 @@ public class BackgroundLoader extends BroadcastReceiver {
             context.sendBroadcast(timeIntent);
 
         } else if (Util.TAG_WIDGETENABLED.equals(intent.getAction())) {
-            Log.v(Util.LOGTAG, "Received widget enabled");
             setAlarm(context);
             // Set preferences to force background load on for when widget active
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -64,44 +60,24 @@ public class BackgroundLoader extends BroadcastReceiver {
             edit.putBoolean("background_load", true);
             edit.commit();
         } else if (Util.TAG_DISABLEBACKGROUND.equals(intent.getAction())) {
-            Log.v(Util.LOGTAG, "Received disable background");
             disableAlarm(context);
         } else if (Util.TAG_WIDGETGONE.equals(intent.getAction())) {
-            Log.v(Util.LOGTAG, "Removed widget");
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             SharedPreferences.Editor edit = prefs.edit();
             edit.putBoolean("widget_enabled", false);
             edit.commit();
         } else if (Util.TAG_NOTIFICATIONSON.equals(intent.getAction())) {
-            Log.v(Util.LOGTAG, "Notifications enabled");
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             /*SharedPreferences.Editor edit = prefs.edit();
             edit.putBoolean("background_load", true);
             edit.commit();*/
         } else if (Util.TAG_NOTIFICATIONSOFF.equals(intent.getAction())) {
-            Log.v(Util.LOGTAG, "Notifications disabled");
         } else if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
-            Log.v(Util.LOGTAG, "received boot completed");
             // Reset alarm in onReceive if enabled from boot
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             if (prefs.getBoolean("background_load", false)) {
                 setAlarm(context);
             }
-
-
-            //Log.v(Util.LOGTAG, "Received timeupdate");
-            setAlarm(context);
-            // Run background data load
-            int today[] = Util.getToday();
-            new BackgroundLoadTask(today[0], today[1],
-                    today[2], context).execute();
-            // Also send time update to widget
-            Intent timeIntent = new Intent(context, MenuWidget.class);
-            timeIntent.setAction(Util.TAG_TIMEUPDATE);
-            context.sendBroadcast(timeIntent);
-
-
-
         }
     }
 
@@ -132,10 +108,8 @@ public class BackgroundLoader extends BroadcastReceiver {
                 (PendingIntent.getBroadcast(context, Util.DINNER_SWITCH_TIME,
                         timeIntent, PendingIntent.FLAG_NO_CREATE) != null);
         if (alarmEnabled) {
-            Log.v(Util.LOGTAG, "alarms already enabled");
             return;
         }
-        Log.v(Util.LOGTAG, "setting alarm");
 
         final AlarmManager m = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
@@ -188,7 +162,6 @@ public class BackgroundLoader extends BroadcastReceiver {
         breakfastIntent.cancel();
         lunchIntent.cancel();
         dinnerIntent.cancel();
-        Log.v(Util.LOGTAG, "disabling alarm");
     }
 
 
@@ -228,7 +201,6 @@ public class BackgroundLoader extends BroadcastReceiver {
             Intent notificationsIntent = new Intent(mContext, Notifications.class);
             notificationsIntent.setAction(Util.TAG_TIMEUPDATE);
             mContext.sendBroadcast(notificationsIntent);
-            Log.v(Util.LOGTAG, "sent notifications intent");
         }
 
     }

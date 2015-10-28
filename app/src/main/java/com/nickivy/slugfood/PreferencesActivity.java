@@ -1,7 +1,5 @@
 package com.nickivy.slugfood;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,14 +7,8 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.nickivy.slugfood.util.Util;
 
@@ -24,8 +16,6 @@ import com.nickivy.slugfood.util.Util;
  * Displays some info about the app, as well as option to look at license information for the app.
  *
  * Also display default college preferences.
- *
- * <p>Not using AppCompatActivity because preferencefragment isn't in support library.
  *
  * <p>Released under GNU GPL v2 - see doc/LICENCES.txt for more info.
  *
@@ -37,7 +27,7 @@ public class PreferencesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         // Set theme based on pref
-        setTheme(prefs.getBoolean("dark_theme",false)? R.style.MainTheme_Dark :
+        setTheme(prefs.getBoolean("dark_theme", false) ? R.style.MainTheme_Dark :
                 R.style.MainTheme_Colorful);
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction()
@@ -70,7 +60,7 @@ public class PreferencesActivity extends AppCompatActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object o) {
                     Intent intent = new Intent(getActivity(), BackgroundLoader.class);
-                    intent.setAction(((Boolean) o)? Util.TAG_ENABLEBACKGROUND :
+                    intent.setAction(((Boolean) o) ? Util.TAG_ENABLEBACKGROUND :
                             Util.TAG_DISABLEBACKGROUND);
                     getActivity().sendBroadcast(intent);
                     /*SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -84,10 +74,10 @@ public class PreferencesActivity extends AppCompatActivity {
             bgLoadPref.setShouldDisableView(true);
 
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            /*bgLoadPref.setEnabled(!(prefs.getBoolean("widget_enabled", false) ||
+            bgLoadPref.setEnabled(!(prefs.getBoolean("widget_enabled", false) ||
                     prefs.getBoolean("notifications_events", false) ||
-                    prefs.getBoolean("notifications_favorites", false)));*/
-            bgLoadPref.setEnabled(true);
+                    prefs.getBoolean("notifications_favorites", false)));
+            //bgLoadPref.setEnabled(true);
 
             Preference notifEventsPref = findPreference("notifications_events");
             notifEventsPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -106,9 +96,6 @@ public class PreferencesActivity extends AppCompatActivity {
                         intent.setAction(Util.TAG_ENABLEBACKGROUND);
                         getActivity().sendBroadcast(intent);
                     }
-                    Log.v(Util.LOGTAG, ((prefs.getBoolean("widget_enabled", false) ||
-                            prefs.getBoolean("notifications_favorites", false) ||
-                            (Boolean) o))? "true" : "false");
                     bgLoadPref.setEnabled(!(prefs.getBoolean("widget_enabled", false) ||
                             prefs.getBoolean("notifications_favorites", false) ||
                             (Boolean) o));
@@ -132,9 +119,6 @@ public class PreferencesActivity extends AppCompatActivity {
                         intent.setAction(Util.TAG_ENABLEBACKGROUND);
                         getActivity().sendBroadcast(intent);
                     }
-                    Log.v(Util.LOGTAG, ((prefs.getBoolean("widget_enabled", false) ||
-                            prefs.getBoolean("notifications_favorites", false) ||
-                            (Boolean) o))? "true" : "false");
                     bgLoadPref.setEnabled(!(prefs.getBoolean("widget_enabled", false) ||
                             prefs.getBoolean("notifications_events", false) ||
                             (Boolean) o));
@@ -145,27 +129,12 @@ public class PreferencesActivity extends AppCompatActivity {
             Preference favsListPref = findPreference("favslist");
             favsListPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {
-                    //open browser or intent here
-                    Fragment notifsettings = new NotificationSettingsFragment();
-                    FragmentManager fManager = getActivity().getFragmentManager();
-                    //FragmentTransaction fragTrans = getChildFragmentManager().beginTransaction();
-                    FragmentTransaction fragTrans = fManager.beginTransaction();
-                    //fragTrans.replace(android.R.id.content, notifsettings);
-                    //fragTrans.addToBackStack(null);
-                    //fragTrans.commit();
+                    Intent intent = new Intent(getActivity().getApplicationContext(),
+                            FavoritesListActivity.class);
+                    startActivity(intent);
                     return true;
                 }
             });
-        }
-    }
-
-    public static class NotificationSettingsFragment extends ListFragment {
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            getActivity().setTitle(getString(R.string.favorites_title));
-            return inflater.inflate(R.layout.favorites_list, container, false);
         }
     }
 }

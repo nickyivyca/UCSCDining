@@ -14,6 +14,9 @@ import android.util.Log;
 import com.nickivy.slugfood.parser.MenuParser;
 import com.nickivy.slugfood.util.Util;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Class for managing and delivering notifications. When it receives an intent
  * with TAG_TIMEUPDATE action, it will check and deliver notifications, based on
@@ -28,9 +31,7 @@ public class Notifications extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.v(Util.LOGTAG, "Notifications: Received a thing");
         if (Util.TAG_TIMEUPDATE.equals(intent.getAction())) {
-            Log.v(Util.LOGTAG, "Received timeupdate");
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             if (prefs.getBoolean("notifications_events", false)) {
                 runEventNotifications(context);
@@ -45,7 +46,13 @@ public class Notifications extends BroadcastReceiver {
     private void runEventNotifications(Context context) {
         NotificationCompat.Builder mBuilder;
 
-        for (int i = 0; i < 5; i++) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Set<String> selectedDhalls = prefs.getStringSet("notification_dhalls", null);
+
+        for (String s : selectedDhalls.toArray(new String[0])) {
+            int i = Integer.parseInt(s);
+
+        //for (int i = 0; i < 5; i++) {
             mBuilder = null;
 
             /*
@@ -93,12 +100,103 @@ public class Notifications extends BroadcastReceiver {
                 NotificationManager mNotifyManager = (NotificationManager)
                         context.getSystemService(context.NOTIFICATION_SERVICE);
 
+                // Don't notify if notification has already been posted?
                 mNotifyManager.notify(i, mBuilder.build());
             }
         }
     }
 
     private void runFavoritesNotifications(Context context) {
+        NotificationCompat.Builder mBuilder;
+        int notNum = -1; // keep track of how many notifications are made - adds negatively
+        NotificationManager mNotifyManager = (NotificationManager)
+                context.getSystemService(context.NOTIFICATION_SERVICE);
+
+        /*
+         * If current day for showing has been adjusted because it is past dining closing,
+         * say 'tomorrow' instead of 'today' in notification
+         */
+        int[] today = Util.getToday();
+        boolean sayTomorrow = (today[1] != today[3]);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String[] favsList = prefs.getStringSet("favorites_items_list", new HashSet<String>()).toArray(new String[0]);
+        for (String item : favsList) {
+            Set<String> selectedDhalls = prefs.getStringSet("notification_dhalls", null);
+
+            for (String s : selectedDhalls.toArray(new String[0])) {
+                int i = Integer.parseInt(s);
+                switch(Util.getCurrentMeal(i)) {
+                    case Util.BREAKFAST:
+                        if (MenuParser.fullMenuObj.get(i).getBreakfastList().contains(item)) {
+                            mBuilder = new NotificationCompat.Builder(context)
+                                    .setSmallIcon(R.drawable.ic_icon)
+                                    .setDefaults(Notification.DEFAULT_ALL)
+                                    .setContentTitle(item)
+                                    .setContentText("At " + Util.collegeList[i] + " Breakfast " +
+                                            (sayTomorrow ? "tomorrow" : "today"))
+                                    .setAutoCancel(true);
+                            Intent notificationIntent = new Intent(context, MainActivity.class);
+                            notificationIntent.putExtra(Util.TAG_COLLEGE, i);
+                            notificationIntent.putExtra(Util.TAG_MEAL, Util.BREAKFAST);
+                            notificationIntent.putExtra(Util.TAG_FROMNOTIFICATION, true);
+
+                            PendingIntent pendingNotification = PendingIntent.getActivity(context, notNum,
+                                    notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                            mBuilder.setContentIntent(pendingNotification);
+
+                            mNotifyManager.notify(notNum--, mBuilder.build());
+                        }
+                        break;
+                    case Util.LUNCH:
+                        if (MenuParser.fullMenuObj.get(i).getLunchList().contains(item)) {
+                            mBuilder = new NotificationCompat.Builder(context)
+                                    .setSmallIcon(R.drawable.ic_icon)
+                                    .setDefaults(Notification.DEFAULT_ALL)
+                                    .setContentTitle(item)
+                                    .setContentText("At " + Util.collegeList[i] + " Lunch " +
+                                            (sayTomorrow ? "tomorrow" : "today"))
+                                    .setAutoCancel(true);
+                            Intent notificationIntent = new Intent(context, MainActivity.class);
+                            notificationIntent.putExtra(Util.TAG_COLLEGE, i);
+                            notificationIntent.putExtra(Util.TAG_MEAL, Util.LUNCH);
+                            notificationIntent.putExtra(Util.TAG_FROMNOTIFICATION, true);
+
+                            PendingIntent pendingNotification = PendingIntent.getActivity(context, notNum,
+                                    notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                            mBuilder.setContentIntent(pendingNotification);
+
+                            mNotifyManager.notify(notNum--, mBuilder.build());
+                        }
+                        break;
+                    case Util.DINNER:
+                        if (MenuParser.fullMenuObj.get(i).getDinnerList().contains(item)) {
+                            mBuilder = new NotificationCompat.Builder(context)
+                                    .setSmallIcon(R.drawable.ic_icon)
+                                    .setDefaults(Notification.DEFAULT_ALL)
+                                    .setContentTitle(item)
+                                    .setContentText("At " + Util.collegeList[i] + " Dinner " +
+                                            (sayTomorrow ? "tomorrow" : "today"))
+                                    .setAutoCancel(true);
+                            Intent notificationIntent = new Intent(context, MainActivity.class);
+                            notificationIntent.putExtra(Util.TAG_COLLEGE, i);
+                            notificationIntent.putExtra(Util.TAG_MEAL, Util.DINNER);
+                            notificationIntent.putExtra(Util.TAG_FROMNOTIFICATION, true);
+
+                            PendingIntent pendingNotification = PendingIntent.getActivity(context, notNum,
+                                    notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                            mBuilder.setContentIntent(pendingNotification);
+
+                            mNotifyManager.notify(notNum--, mBuilder.build());
+                        }
+                        break;
+
+                }
+            }
+        }
 
     }
 }

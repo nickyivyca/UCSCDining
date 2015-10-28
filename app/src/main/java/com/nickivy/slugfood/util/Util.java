@@ -87,14 +87,14 @@ public class Util {
     public static int[] getToday() {
         Calendar cal = Calendar.getInstance();
         // realDay is for notifications, when we need to phrase 'today' or 'tomorrow'
-        int realDay = cal.get(Calendar.DAY_OF_MONTH);
+        int realDay = cal.get(Calendar.DAY_OF_MONTH) - 3;
         // If time is past dining hall closing (which is the breakfast switch time) return tomorrow
         if (cal.get(Calendar.HOUR_OF_DAY) >= BREAKFAST_SWITCH_TIME) {
             cal.add(Calendar.DATE, 1);
         }
 
         int month = cal.get(Calendar.MONTH) + 1;
-        int day = cal.get(Calendar.DAY_OF_MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH) - 3;
         int year = cal.get(Calendar.YEAR);
 
         int ret[] = {month, day, year, realDay};

@@ -44,7 +44,7 @@ import com.nickivy.slugfood.util.Util;
  * @author Nicky Ivy parkedraccoon@gmail.com
  */
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     private ListView mDrawerList;
     private ListView mAboutList;
@@ -253,7 +253,6 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onNewIntent(Intent intent) {
-        Log.v(Util.LOGTAG, "new intent received");
         // Need to reset intent when new one is sent
         super.onNewIntent(intent);
         // If intent has no extras, it's a launch or return intent, do nothing
