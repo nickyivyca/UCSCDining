@@ -42,11 +42,6 @@ public class BackgroundLoader extends BroadcastReceiver {
                     today[2], context).execute();
         } else if (Util.TAG_ENABLEBACKGROUND.equals(intent.getAction())) {
             setAlarm(context);
-
-            Intent timeIntent = new Intent(context, MenuWidget.class);
-            timeIntent.setAction(Util.TAG_TIMEUPDATE);
-            context.sendBroadcast(timeIntent);
-
         } else if (Util.TAG_WIDGETENABLED.equals(intent.getAction())) {
             setAlarm(context);
             // Set preferences to force background load on for when widget active
@@ -62,12 +57,8 @@ public class BackgroundLoader extends BroadcastReceiver {
             SharedPreferences.Editor edit = prefs.edit();
             edit.putBoolean("widget_enabled", false);
             edit.commit();
-        } else if (Util.TAG_NOTIFICATIONSON.equals(intent.getAction())) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            /*SharedPreferences.Editor edit = prefs.edit();
-            edit.putBoolean("background_load", true);
-            edit.commit();*/
-        } else if (Util.TAG_NOTIFICATIONSOFF.equals(intent.getAction())) {
+        /*} else if (Util.TAG_NOTIFICATIONSON.equals(intent.getAction())) {
+        } else if (Util.TAG_NOTIFICATIONSOFF.equals(intent.getAction())) {*/
         } else if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             // Reset alarm in onReceive if enabled from boot
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
