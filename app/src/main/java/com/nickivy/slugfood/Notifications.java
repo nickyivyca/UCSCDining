@@ -52,56 +52,59 @@ public class Notifications extends BroadcastReceiver {
         for (String s : selectedDhalls.toArray(new String[0])) {
             int i = Integer.parseInt(s);
 
-        //for (int i = 0; i < 5; i++) {
-            mBuilder = null;
+            // Only give notifications at breakfast time - don't need 3 notifications during the day
+            if (Util.getCurrentMeal(i) == Util.BREAKFAST) {
 
-            /*
-             * If current day for showing has been adjusted because it is past dining closing,
-             * say 'tomorrow' instead of 'today' in notification
-             */
-            int[] today = Util.getToday();
-            boolean sayTomorrow = (today[1] != today[3]);
+                mBuilder = null;
 
-            if (Util.fullMenuObj.get(i).getIsCollegeNight()) {
-                mBuilder = new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.ic_icon)
-                        .setDefaults(Notification.DEFAULT_ALL)
-                        .setContentTitle("College Night")
-                        .setContentText(Util.collegeList[i] + " College Night " +
-                                (sayTomorrow ? "tomorrow" : "today"))
-                        .setAutoCancel(true);
-            } else if (Util.fullMenuObj.get(i).getIsHealthyMonday()) {
-                mBuilder = new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.ic_icon)
-                        .setDefaults(Notification.DEFAULT_ALL)
-                        .setContentTitle("Healthy Monday")
-                        .setContentText(Util.collegeList[i] + " Healthy Monday " +
-                                (sayTomorrow ? "tomorrow" : "today"))
-                        .setAutoCancel(true);
-            } else if (Util.fullMenuObj.get(i).getIsFarmFriday()) {
-                mBuilder = new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.ic_icon)
-                        .setDefaults(Notification.DEFAULT_ALL)
-                        .setContentTitle("Farm Friday")
-                        .setContentText(Util.collegeList[i] + " Farm Friday " +
-                                (sayTomorrow ? "tomorrow" : "today"))
-                        .setAutoCancel(true);
-            }
-            if (mBuilder != null) {
-                Intent notificationIntent = new Intent(context, MainActivity.class);
-                notificationIntent.putExtra(Util.TAG_COLLEGE, i);
-                notificationIntent.putExtra(Util.TAG_FROMNOTIFICATION, true);
+                /*
+                 * If current day for showing has been adjusted because it is past dining closing,
+                 * say 'tomorrow' instead of 'today' in notification
+                 */
+                int[] today = Util.getToday();
+                boolean sayTomorrow = (today[1] != today[3]);
 
-                PendingIntent pendingNotification = PendingIntent.getActivity(context, i,
-                        notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                if (Util.fullMenuObj.get(i).getIsCollegeNight()) {
+                    mBuilder = new NotificationCompat.Builder(context)
+                            .setSmallIcon(R.drawable.ic_icon)
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setContentTitle("College Night")
+                            .setContentText(Util.collegeList[i] + " College Night " +
+                                    (sayTomorrow ? "tomorrow" : "today"))
+                            .setAutoCancel(true);
+                } else if (Util.fullMenuObj.get(i).getIsHealthyMonday()) {
+                    mBuilder = new NotificationCompat.Builder(context)
+                            .setSmallIcon(R.drawable.ic_icon)
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setContentTitle("Healthy Monday")
+                            .setContentText(Util.collegeList[i] + " Healthy Monday " +
+                                    (sayTomorrow ? "tomorrow" : "today"))
+                            .setAutoCancel(true);
+                } else if (Util.fullMenuObj.get(i).getIsFarmFriday()) {
+                    mBuilder = new NotificationCompat.Builder(context)
+                            .setSmallIcon(R.drawable.ic_icon)
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setContentTitle("Farm Friday")
+                            .setContentText(Util.collegeList[i] + " Farm Friday " +
+                                    (sayTomorrow ? "tomorrow" : "today"))
+                            .setAutoCancel(true);
+                }
+                if (mBuilder != null) {
+                    Intent notificationIntent = new Intent(context, MainActivity.class);
+                    notificationIntent.putExtra(Util.TAG_COLLEGE, i);
+                    notificationIntent.putExtra(Util.TAG_FROMNOTIFICATION, true);
 
-                mBuilder.setContentIntent(pendingNotification);
+                    PendingIntent pendingNotification = PendingIntent.getActivity(context, i,
+                            notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-                NotificationManager mNotifyManager = (NotificationManager)
-                        context.getSystemService(context.NOTIFICATION_SERVICE);
+                    mBuilder.setContentIntent(pendingNotification);
 
-                // Don't notify if notification has already been posted?
-                mNotifyManager.notify(i, mBuilder.build());
+                    NotificationManager mNotifyManager = (NotificationManager)
+                            context.getSystemService(context.NOTIFICATION_SERVICE);
+
+                    // Don't notify if notification has already been posted?
+                    mNotifyManager.notify(i, mBuilder.build());
+                }
             }
         }
     }
