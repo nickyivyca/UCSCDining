@@ -117,12 +117,12 @@ public class MealDataFetcher {
 
             for(int j = 0; j < 5; j++) {
                 statement.clearBindings();
-                for (int i = 0; i < MenuParser.fullMenuObj.get(j).getBreakfast().size(); i++) {
+                for (int i = 0; i < Util.fullMenuObj.get(j).getBreakfast().size(); i++) {
                     statement.bindLong(1, j);
                     statement.bindLong(2, 0);
-                    statement.bindString(3, MenuParser.fullMenuObj.get(j).getBreakfast().get(i)
+                    statement.bindString(3, Util.fullMenuObj.get(j).getBreakfast().get(i)
                             .getItemName());
-                    statement.bindString(4, MenuParser.fullMenuObj.get(j).getBreakfast().get(i)
+                    statement.bindString(4, Util.fullMenuObj.get(j).getBreakfast().get(i)
                             .getCode());
                     statement.bindLong(5, month);
                     statement.bindLong(6, day);
@@ -135,12 +135,12 @@ public class MealDataFetcher {
                         return Util.GETLIST_DATABASE_FAILURE;
                     }
                 }
-                for (int i = 0; i < MenuParser.fullMenuObj.get(j).getLunch().size(); i++) {
+                for (int i = 0; i < Util.fullMenuObj.get(j).getLunch().size(); i++) {
                     statement.bindLong(1, j);
                     statement.bindLong(2, 1);
-                    statement.bindString(3, MenuParser.fullMenuObj.get(j).getLunch().get(i)
+                    statement.bindString(3, Util.fullMenuObj.get(j).getLunch().get(i)
                             .getItemName());
-                    statement.bindString(4, MenuParser.fullMenuObj.get(j).getLunch().get(i)
+                    statement.bindString(4, Util.fullMenuObj.get(j).getLunch().get(i)
                             .getCode());
                     statement.bindLong(5, month);
                     statement.bindLong(6, day);
@@ -152,12 +152,12 @@ public class MealDataFetcher {
                         return Util.GETLIST_DATABASE_FAILURE;
                     }
                 }
-                for (int i = 0; i < MenuParser.fullMenuObj.get(j).getDinner().size(); i++) {
+                for (int i = 0; i < Util.fullMenuObj.get(j).getDinner().size(); i++) {
                     statement.bindLong(1,j);
                     statement.bindLong(2, 2);
-                    statement.bindString(3, MenuParser.fullMenuObj.get(j).getDinner().get(i)
+                    statement.bindString(3, Util.fullMenuObj.get(j).getDinner().get(i)
                             .getItemName());
-                    statement.bindString(4, MenuParser.fullMenuObj.get(j).getDinner().get(i)
+                    statement.bindString(4, Util.fullMenuObj.get(j).getDinner().get(i)
                             .getCode());
                     statement.bindLong(5, month);
                     statement.bindLong(6, day);
@@ -218,7 +218,7 @@ public class MealDataFetcher {
                             c.getString(c.getColumnIndexOrThrow(MealStorage.COLUMN_NUTID))));
                     c.moveToNext();
                 }
-                MenuParser.fullMenuObj.get(j).setBreakfast(breakfastLoaded);
+                Util.fullMenuObj.get(j).setBreakfast(breakfastLoaded);
                 c.close();
 
                 mainSelectionArgs[1] = "" + 1;
@@ -235,7 +235,7 @@ public class MealDataFetcher {
                             c.getString(c.getColumnIndexOrThrow(MealStorage.COLUMN_NUTID))));
                     c.moveToNext();
                 }
-                MenuParser.fullMenuObj.get(j).setLunch(lunchLoaded);
+                Util.fullMenuObj.get(j).setLunch(lunchLoaded);
                 c.close();
 
                 mainSelectionArgs[1] = "" + 2;
@@ -252,7 +252,7 @@ public class MealDataFetcher {
                             c.getString(c.getColumnIndexOrThrow(MealStorage.COLUMN_NUTID))));
                     c.moveToNext();
                 }
-                MenuParser.fullMenuObj.get(j).setDinner(dinnerLoaded);
+                Util.fullMenuObj.get(j).setDinner(dinnerLoaded);
                 c.close();
 
             }

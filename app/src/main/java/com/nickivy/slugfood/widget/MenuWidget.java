@@ -174,7 +174,7 @@ public class MenuWidget extends AppWidgetProvider {
             // Check if all dining halls are closed
             boolean allClosed = true;
             for (int i = 0; i < 5; i++) {
-                allClosed = !MenuParser.fullMenuObj.get(i).getIsOpen();
+                allClosed = !Util.fullMenuObj.get(i).getIsOpen();
                 if (!allClosed) {
                     break;
                 }
@@ -190,8 +190,8 @@ public class MenuWidget extends AppWidgetProvider {
             } else {
                 // Check if brunch message present - if so skip past it
                 if (mData.getMeal() == Util.BREAKFAST &&
-                        MenuParser.fullMenuObj.get(mData.getCollege()).getBreakfast().size() > 0) {
-                    if (MenuParser.fullMenuObj.get(mData.getCollege()).getBreakfast().get(0)
+                        Util.fullMenuObj.get(mData.getCollege()).getBreakfast().size() > 0) {
+                    if (Util.fullMenuObj.get(mData.getCollege()).getBreakfast().get(0)
                             .getItemName().equals(Util.brunchMessage)) {
                         mData.setMeal(mData.getDirectionRight() ? Util.LUNCH : Util.DINNER);
                         mData.getViews().setTextViewText(R.id.widget_mealname, mData.getMonth()
@@ -204,11 +204,11 @@ public class MenuWidget extends AppWidgetProvider {
                  * main college afterwards
                  */
                 if (mTimeUpdate && mData.getBackupCollege() != Util.NO_BACKUP_COLLEGE &&
-                        MenuParser.fullMenuObj.get(mData.getBackupCollege()).getIsOpen()) {
+                        Util.fullMenuObj.get(mData.getBackupCollege()).getIsOpen()) {
                     mData.setCollege(mData.getBackupCollege());
                 }
 
-                if (mTimeUpdate && !MenuParser.fullMenuObj.get(mData.getCollege()).getIsOpen()) {
+                if (mTimeUpdate && !Util.fullMenuObj.get(mData.getCollege()).getIsOpen()) {
                     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences
                             (mContext.getApplicationContext());
                     mData.setBackupCollege();
@@ -220,13 +220,13 @@ public class MenuWidget extends AppWidgetProvider {
 
                 mData.getViews().setTextViewText(R.id.widget_collegename,
                         Util.collegeList[mData.getCollege()]);
-                if (MenuParser.fullMenuObj.get(mData.getCollege()).getIsCollegeNight()) {
+                if (Util.fullMenuObj.get(mData.getCollege()).getIsCollegeNight()) {
                     mData.getViews().setTextColor(R.id.widget_collegename, Color.BLUE);
-                } else if (MenuParser.fullMenuObj.get(mData.getCollege()).getIsFarmFriday() ||
-                        MenuParser.fullMenuObj.get(mData.getCollege()).getIsHealthyMonday()) {
+                } else if (Util.fullMenuObj.get(mData.getCollege()).getIsFarmFriday() ||
+                        Util.fullMenuObj.get(mData.getCollege()).getIsHealthyMonday()) {
                     mData.getViews().setTextColor(R.id.widget_collegename,
                             mContext.getResources().getColor(R.color.healthy));
-                } else if (!MenuParser.fullMenuObj.get(mData.getCollege()).getIsOpen()) {
+                } else if (!Util.fullMenuObj.get(mData.getCollege()).getIsOpen()) {
                     mData.getViews().setTextColor(R.id.widget_collegename, Color.LTGRAY);
                 } else {
                     mData.getViews().setTextColor(R.id.widget_collegename, mContext.getResources()

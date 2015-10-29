@@ -2,6 +2,7 @@ package com.nickivy.slugfood.util;
 
 import com.nickivy.slugfood.parser.MenuParser;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -37,6 +38,14 @@ public class Util {
             "Eight/Oakes",
             "Nine/Ten"
     };
+
+    public static ArrayList<CollegeMenu> fullMenuObj = new ArrayList<CollegeMenu>(){{
+        add(new CollegeMenu());
+        add(new CollegeMenu());
+        add(new CollegeMenu());
+        add(new CollegeMenu());
+        add(new CollegeMenu());
+    }};
 
     // Enums for returns of data fetching status
     public static final int GETLIST_SUCCESS = 1,
@@ -87,14 +96,14 @@ public class Util {
     public static int[] getToday() {
         Calendar cal = Calendar.getInstance();
         // realDay is for notifications, when we need to phrase 'today' or 'tomorrow'
-        int realDay = cal.get(Calendar.DAY_OF_MONTH) - 3;
+        int realDay = cal.get(Calendar.DAY_OF_MONTH);
         // If time is past dining hall closing (which is the breakfast switch time) return tomorrow
         if (cal.get(Calendar.HOUR_OF_DAY) >= BREAKFAST_SWITCH_TIME) {
             cal.add(Calendar.DATE, 1);
         }
 
         int month = cal.get(Calendar.MONTH) + 1;
-        int day = cal.get(Calendar.DAY_OF_MONTH) - 3;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
         int year = cal.get(Calendar.YEAR);
 
         int ret[] = {month, day, year, realDay};
@@ -119,8 +128,8 @@ public class Util {
         }
         if(cal.get(Calendar.HOUR_OF_DAY) >= BREAKFAST_SWITCH_TIME ||
                 cal.get(Calendar.HOUR_OF_DAY) < LUNCH_SWITCH_TIME) {
-            if (MenuParser.fullMenuObj.get(college).getBreakfast().size() > 0) {
-                if (MenuParser.fullMenuObj.get(college).getBreakfast().get(0).getItemName()
+            if (fullMenuObj.get(college).getBreakfast().size() > 0) {
+                if (fullMenuObj.get(college).getBreakfast().get(0).getItemName()
                         .equals(brunchMessage)) {
                     return LUNCH;
                 }

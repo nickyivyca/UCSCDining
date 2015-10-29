@@ -169,8 +169,8 @@ public class WidgetData {
             changeDay(-1);
         }
         if (currentMeal == Util.BREAKFAST &&
-                MenuParser.fullMenuObj.get(currentCollege).getBreakfast().size() > 0) {
-            if (MenuParser.fullMenuObj.get(currentCollege).getBreakfast().get(0).getItemName()
+                Util.fullMenuObj.get(currentCollege).getBreakfast().size() > 0) {
+            if (Util.fullMenuObj.get(currentCollege).getBreakfast().get(0).getItemName()
                     .equals(Util.brunchMessage)) {
                 changeDay(-1);
                 currentMeal = Util.DINNER;

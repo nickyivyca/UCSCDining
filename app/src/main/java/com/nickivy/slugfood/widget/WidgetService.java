@@ -74,13 +74,13 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         }
         switch (MenuWidget.getWidgetDataById(appWidgetId).getMeal()) {
             case Util.BREAKFAST:
-                return MenuParser.fullMenuObj.get(MenuWidget.getWidgetDataById
+                return Util.fullMenuObj.get(MenuWidget.getWidgetDataById
                         (appWidgetId).getCollege()).getBreakfast().size();
             case Util.LUNCH:
-                return MenuParser.fullMenuObj.get(MenuWidget.getWidgetDataById
+                return Util.fullMenuObj.get(MenuWidget.getWidgetDataById
                         (appWidgetId).getCollege()).getLunch().size();
             case Util.DINNER:
-                return MenuParser.fullMenuObj.get(MenuWidget.getWidgetDataById
+                return Util.fullMenuObj.get(MenuWidget.getWidgetDataById
                         (appWidgetId).getCollege()).getDinner().size();
             default:
                 return -1;
@@ -115,7 +115,7 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
      * @return
      */
     private ArrayList<String> getCurrentMenu(final int college) {
-        /*if (!MenuParser.fullMenuObj.get(college).getIsOpen()) {
+        /*if (!Util.fullMenuObj.get(college).getIsOpen()) {
             ArrayList<String> ret = new ArrayList<String>();
             ret.add(Util.collegeList[college] +
                     "dining hall closed today");
@@ -123,11 +123,11 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         }*/
         switch(MenuWidget.getWidgetDataById(appWidgetId).getMeal()) {
             case Util.BREAKFAST:
-                return MenuParser.fullMenuObj.get(college).getBreakfastList();
+                return Util.fullMenuObj.get(college).getBreakfastList();
             case Util.LUNCH:
-                return MenuParser.fullMenuObj.get(college).getLunchList();
+                return Util.fullMenuObj.get(college).getLunchList();
             case Util.DINNER:
-                return MenuParser.fullMenuObj.get(college).getDinnerList();
+                return Util.fullMenuObj.get(college).getDinnerList();
             default:
                 return null;
         }

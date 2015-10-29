@@ -62,7 +62,7 @@ public class Notifications extends BroadcastReceiver {
             int[] today = Util.getToday();
             boolean sayTomorrow = (today[1] != today[3]);
 
-            if (MenuParser.fullMenuObj.get(i).getIsCollegeNight()) {
+            if (Util.fullMenuObj.get(i).getIsCollegeNight()) {
                 mBuilder = new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_icon)
                         .setDefaults(Notification.DEFAULT_ALL)
@@ -70,7 +70,7 @@ public class Notifications extends BroadcastReceiver {
                         .setContentText(Util.collegeList[i] + " College Night " +
                                 (sayTomorrow ? "tomorrow" : "today"))
                         .setAutoCancel(true);
-            } else if (MenuParser.fullMenuObj.get(i).getIsHealthyMonday()) {
+            } else if (Util.fullMenuObj.get(i).getIsHealthyMonday()) {
                 mBuilder = new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_icon)
                         .setDefaults(Notification.DEFAULT_ALL)
@@ -78,7 +78,7 @@ public class Notifications extends BroadcastReceiver {
                         .setContentText(Util.collegeList[i] + " Healthy Monday " +
                                 (sayTomorrow ? "tomorrow" : "today"))
                         .setAutoCancel(true);
-            } else if (MenuParser.fullMenuObj.get(i).getIsFarmFriday()) {
+            } else if (Util.fullMenuObj.get(i).getIsFarmFriday()) {
                 mBuilder = new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_icon)
                         .setDefaults(Notification.DEFAULT_ALL)
@@ -128,7 +128,7 @@ public class Notifications extends BroadcastReceiver {
                 int i = Integer.parseInt(s);
                 switch(Util.getCurrentMeal(i)) {
                     case Util.BREAKFAST:
-                        if (MenuParser.fullMenuObj.get(i).getBreakfastList().contains(item)) {
+                        if (Util.fullMenuObj.get(i).getBreakfastList().contains(item)) {
                             mBuilder = new NotificationCompat.Builder(context)
                                     .setSmallIcon(R.drawable.ic_icon)
                                     .setDefaults(Notification.DEFAULT_ALL)
@@ -150,7 +150,7 @@ public class Notifications extends BroadcastReceiver {
                         }
                         break;
                     case Util.LUNCH:
-                        if (MenuParser.fullMenuObj.get(i).getLunchList().contains(item)) {
+                        if (Util.fullMenuObj.get(i).getLunchList().contains(item)) {
                             mBuilder = new NotificationCompat.Builder(context)
                                     .setSmallIcon(R.drawable.ic_icon)
                                     .setDefaults(Notification.DEFAULT_ALL)
@@ -172,7 +172,7 @@ public class Notifications extends BroadcastReceiver {
                         }
                         break;
                     case Util.DINNER:
-                        if (MenuParser.fullMenuObj.get(i).getDinnerList().contains(item)) {
+                        if (Util.fullMenuObj.get(i).getDinnerList().contains(item)) {
                             mBuilder = new NotificationCompat.Builder(context)
                                     .setSmallIcon(R.drawable.ic_icon)
                                     .setDefaults(Notification.DEFAULT_ALL)

@@ -176,8 +176,8 @@ public class MealViewFragmentLarge extends Fragment {
 
     public void selectItem(int position) {
         // update the main content by replacing listview adapters
-        if (MenuParser.fullMenuObj.get(position).getIsOpen()) {
-            if (MenuParser.fullMenuObj.get(position).getIsSet()) {
+        if (Util.fullMenuObj.get(position).getIsOpen()) {
+            if (Util.fullMenuObj.get(position).getIsSet()) {
                 collegeNum = position;
                 // Set title to include date and color, based on events at the dining hall
                 setTitleText(position, ((AppCompatActivity)getActivity()).getSupportActionBar());
@@ -238,8 +238,8 @@ public class MealViewFragmentLarge extends Fragment {
             }
             // Only do secondary preference check here on init
             if (!initialRefreshed) {
-                if (!(MenuParser.fullMenuObj.get(collegeNum).getIsSet() &&
-                        MenuParser.fullMenuObj.get(collegeNum).getIsOpen())) {
+                if (!(Util.fullMenuObj.get(collegeNum).getIsSet() &&
+                        Util.fullMenuObj.get(collegeNum).getIsOpen())) {
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences
                             (mContext);
                     int possibleCollege = Integer.parseInt(prefs.getString("default_college_2nd",
@@ -278,9 +278,9 @@ public class MealViewFragmentLarge extends Fragment {
             displayedYear = mAttemptedYear;
 
             // if all meals empty (dining hall closed), pop open nav drawer
-            if(MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
-                    MenuParser.fullMenuObj.get(collegeNum).getLunch().isEmpty()
-                    && MenuParser.fullMenuObj.get(collegeNum).getDinner().isEmpty()) {
+            if(Util.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
+                    Util.fullMenuObj.get(collegeNum).getLunch().isEmpty()
+                    && Util.fullMenuObj.get(collegeNum).getDinner().isEmpty()) {
                 mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
                 Toast.makeText(getActivity(), Util.collegeList[collegeNum] +
                         " dining hall closed today!", Toast.LENGTH_SHORT).show();
@@ -288,8 +288,8 @@ public class MealViewFragmentLarge extends Fragment {
             }
 
             ListView listView = (ListView) getActivity().findViewById(R.id.breakfast_list);
-            if (!MenuParser.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
-                    MenuParser.fullMenuObj.get(collegeNum).getBreakfast().get(0).getItemName()
+            if (!Util.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
+                    Util.fullMenuObj.get(collegeNum).getBreakfast().get(0).getItemName()
                             .equals(Util.brunchMessage)) {
                 listView.setVisibility(View.INVISIBLE);
             } else {
@@ -319,13 +319,13 @@ public class MealViewFragmentLarge extends Fragment {
         ArrayList<String> array = null;
         switch(meal){
             case Util.BREAKFAST:
-                array = MenuParser.fullMenuObj.get(college).getBreakfastList();
+                array = Util.fullMenuObj.get(college).getBreakfastList();
                 break;
             case Util.LUNCH:
-                array = MenuParser.fullMenuObj.get(college).getLunchList();
+                array = Util.fullMenuObj.get(college).getLunchList();
                 break;
             case Util.DINNER:
-                array = MenuParser.fullMenuObj.get(college).getDinnerList();
+                array = Util.fullMenuObj.get(college).getDinnerList();
                 break;
             default:
                 return;
@@ -342,7 +342,7 @@ public class MealViewFragmentLarge extends Fragment {
                     intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
                             MenuParser.URLPart2s[college] + displayedMonth +
                             "%2F" + displayedDay + "%2F" + displayedYear +
-                            "&RecNumAndPort=" + MenuParser.fullMenuObj.get(college)
+                            "&RecNumAndPort=" + Util.fullMenuObj.get(college)
                             .getDinner().get(pos).getCode());
                     startActivity(intent);
                 }
@@ -395,12 +395,12 @@ public class MealViewFragmentLarge extends Fragment {
         Spannable text = new SpannableString(displayedMonth + "/" + displayedDay + " " +
                 Util.collegeList[college]);
 
-        if (MenuParser.fullMenuObj.get(college).getIsCollegeNight()) {
+        if (Util.fullMenuObj.get(college).getIsCollegeNight()) {
             // Blue for College Night
             text.setSpan(new ForegroundColorSpan(Color.BLUE), 0, text.length(),
                     Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        } else if (MenuParser.fullMenuObj.get(college).getIsFarmFriday() ||
-                MenuParser.fullMenuObj.get(college).getIsHealthyMonday()) {
+        } else if (Util.fullMenuObj.get(college).getIsFarmFriday() ||
+                Util.fullMenuObj.get(college).getIsHealthyMonday()) {
             // Green for Healthy Monday / Farm Friday
             text.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.healthy)), 0,
                     text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
@@ -431,21 +431,21 @@ public class MealViewFragmentLarge extends Fragment {
         public View getView(int position, View convertView, ViewGroup parent){
             View v = super.getView(position,  convertView,  parent);
             // Blue text for college night
-            if (MenuParser.fullMenuObj.get(position).getIsCollegeNight()) {
+            if (Util.fullMenuObj.get(position).getIsCollegeNight()) {
                 ((TextView) v).setTextColor(Color.BLUE); //
             }
             // Grayed out if dining hall is closed
-            if (!MenuParser.fullMenuObj.get(position).getIsOpen()) {
+            if (!Util.fullMenuObj.get(position).getIsOpen()) {
                 TypedArray a = v.getContext().getTheme().obtainStyledAttributes(new int[]
                         {R.attr.closedDiningHallText});
                 ((TextView) v).setTextColor(getResources().getColor(a.getResourceId(0, 0)));
             }
             // Green for Healthy Monday / Farm Friday
-            if (MenuParser.fullMenuObj.get(position).getIsFarmFriday() ||
-                    MenuParser.fullMenuObj.get(position).getIsHealthyMonday()) {
+            if (Util.fullMenuObj.get(position).getIsFarmFriday() ||
+                    Util.fullMenuObj.get(position).getIsHealthyMonday()) {
                 ((TextView) v).setTextColor(getResources().getColor(R.color.healthy));
             }
-            if (collegeNum == position && MenuParser.fullMenuObj.get(position).getIsOpen()) {
+            if (collegeNum == position && Util.fullMenuObj.get(position).getIsOpen()) {
                 TypedArray a = v.getContext().getTheme().obtainStyledAttributes(new int[]
                         {R.attr.tabBackground});
                 ((TextView) v).setBackgroundColor(getResources().getColor(a.getResourceId(0, 0)));

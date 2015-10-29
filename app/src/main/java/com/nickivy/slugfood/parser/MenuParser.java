@@ -51,14 +51,6 @@ public class MenuParser {
     };
     
     public static boolean manualRefresh = false;
-    
-    public static ArrayList<CollegeMenu> fullMenuObj = new ArrayList<CollegeMenu>(){{
-    	add(new CollegeMenu());
-    	add(new CollegeMenu());
-    	add(new CollegeMenu());
-    	add(new CollegeMenu());
-    	add(new CollegeMenu());
-    }};
 
     public static int getSingleMealList(int k, int month, int day, int year) {
         Document breakfastDoc, lunchDoc, dinnerDoc;
@@ -181,23 +173,23 @@ public class MenuParser {
             }
         }
 
-        fullMenuObj.get(k).setBreakfast(breakfastList);
-        fullMenuObj.get(k).setLunch(lunchList);
-        fullMenuObj.get(k).setDinner(dinnerList);
-        if(fullMenuObj.get(k).getBreakfast().isEmpty() &&
-                (!(fullMenuObj.get(k).getLunch().isEmpty()) &&
-                        !(fullMenuObj.get(k).getDinner().isEmpty()))){
+        Util.fullMenuObj.get(k).setBreakfast(breakfastList);
+        Util.fullMenuObj.get(k).setLunch(lunchList);
+        Util.fullMenuObj.get(k).setDinner(dinnerList);
+        if(Util.fullMenuObj.get(k).getBreakfast().isEmpty() &&
+                (!(Util.fullMenuObj.get(k).getLunch().isEmpty()) &&
+                        !(Util.fullMenuObj.get(k).getDinner().isEmpty()))){
             ArrayList<MenuItem> breakfastMessage = new ArrayList<MenuItem>();
             breakfastMessage.add(new MenuItem(Util.brunchMessage, "-1"));
-            fullMenuObj.get(k).setBreakfast(breakfastMessage);
+            Util.fullMenuObj.get(k).setBreakfast(breakfastMessage);
         }
         /*
          * If breakfast and lunch but no dinner, may be college night, check the old page
          * without nutrition info - the page we used to use before nutrition info
          */
-        if(!fullMenuObj.get(k).getBreakfast().isEmpty() &&
-                !(fullMenuObj.get(k).getLunch().isEmpty()) &&
-                        (fullMenuObj.get(k).getDinner().isEmpty())){
+        if(!Util.fullMenuObj.get(k).getBreakfast().isEmpty() &&
+                !(Util.fullMenuObj.get(k).getLunch().isEmpty()) &&
+                        (Util.fullMenuObj.get(k).getDinner().isEmpty())){
             Document collegeNightDoc;
             try {
                 collegeNightDoc = Jsoup.connect(legacyURLPart1 + month + "%2F" + day + "%2F" + year
@@ -245,7 +237,7 @@ public class MenuParser {
                     }
                 }
             }
-            fullMenuObj.get(k).setDinner(dinnerList);
+            Util.fullMenuObj.get(k).setDinner(dinnerList);
         }
         return Util.GETLIST_SUCCESS;
     }
