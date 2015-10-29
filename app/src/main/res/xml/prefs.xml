@@ -15,40 +15,33 @@
             android:entries="@array/colleges_pref"
             android:entryValues="@array/colleges_values"
             />
-        <!--PreferenceScreen android:key="notifications_settings"
-            android:title="@string/notifications_settings"
-            android:summary="@string/notifications_settings_desc"-->
-                <CheckBoxPreference android:key="notifications_events"
-                    android:title="@string/notifications_events"
-                    android:summary="@string/notifications_events_desc"
-                    />
-                <CheckBoxPreference android:key="notifications_favorites"
-                    android:title="@string/notifications_favorites"
-                    android:summary="@string/notifications_favorites_desc"
-                    />
-                <!--Preference android:key="favslist"
-                    android:title="@string/notifications_favoriteslist"
-                    android:summary="@string/notifications_favoriteslist_desc">
-                    <intent android:action="android.intent.action.VIEW"
-                        android:targetPackage="com.nickivy.ucscdining"
-                        android:targetClass="com.nickivy.ucscdining.FavoritesListActivity"/>
-                </Preference-->
-            <Preference android:key="favslist"
-                android:title="@string/notifications_favoriteslist"
-                android:summary="@string/notifications_favoriteslist_desc">
-                <!-- Name for set of actual stored list of items: favorites_items_list -->
-            </Preference>
-                <MultiSelectListPreference android:key="notification_dhalls"
-                    android:title="@string/notifications_dhalls"
-                    android:summary="@string/notifications_dhalls_desc"
-                    android:entries="@array/colleges_pref"
-                    android:entryValues="@array/colleges_values"
-                    android:defaultValue="@array/colleges_defaults"
-                    />
-        <!--/PreferenceScreen-->
+        <CheckBoxPreference android:key="notifications_events"
+            android:title="@string/notifications_events"
+            android:summary="@string/notifications_events_desc"
+            />
+        <CheckBoxPreference android:key="notifications_favorites"
+            android:title="@string/notifications_favorites"
+            android:summary="@string/notifications_favorites_desc"
+            />
+        <Preference android:key="favslist"
+            android:title="@string/notifications_favoriteslist"
+            android:summary="@string/notifications_favoriteslist_desc">
+            <!-- Name for set of actual stored list of items: favorites_items_list -->
+        </Preference>
+            <MultiSelectListPreference android:key="notification_dhalls"
+                android:title="@string/notifications_dhalls"
+                android:summary="@string/notifications_dhalls_desc"
+                android:entries="@array/colleges_pref"
+                android:entryValues="@array/colleges_values"
+                android:defaultValue="@array/colleges_defaults"
+                />
         <CheckBoxPreference android:key="background_load"
             android:title="@string/background_load"
             android:summary="@string/background_load_desc"
+            />
+        <CheckBoxPreference android:key="disable_cache"
+            android:title="@string/disable_cache"
+            android:summary="@string/disable_cache_desc"
             />
         <CheckBoxPreference android:key="dark_theme"
             android:title="@string/dark_theme"

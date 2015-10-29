@@ -40,10 +40,6 @@ public class BackgroundLoader extends BroadcastReceiver {
             int today[] = Util.getToday();
             new BackgroundLoadTask(today[0], today[1],
                     today[2], context).execute();
-            // Also send time update to widget
-            Intent timeIntent = new Intent(context, MenuWidget.class);
-            timeIntent.setAction(Util.TAG_TIMEUPDATE);
-            context.sendBroadcast(timeIntent);
         } else if (Util.TAG_ENABLEBACKGROUND.equals(intent.getAction())) {
             setAlarm(context);
 
@@ -201,6 +197,10 @@ public class BackgroundLoader extends BroadcastReceiver {
             Intent notificationsIntent = new Intent(mContext, Notifications.class);
             notificationsIntent.setAction(Util.TAG_TIMEUPDATE);
             mContext.sendBroadcast(notificationsIntent);
+            // Also send time update to widget
+            Intent widgetIntent = new Intent(mContext, MenuWidget.class);
+            widgetIntent.setAction(Util.TAG_TIMEUPDATE);
+            mContext.sendBroadcast(widgetIntent);
         }
 
     }

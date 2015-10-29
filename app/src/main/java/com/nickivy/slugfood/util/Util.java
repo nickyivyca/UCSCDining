@@ -74,7 +74,7 @@ public class Util {
     TAG_YEAR = "tag_year",
     TAG_URL = "tag_url",
     TAG_USESAVED = "tag_usesaved",
-    TAG_TIMEUPDATE = "time_update",
+    TAG_TIMEUPDATE = "com.nickivy.slugfood.time_update",
     TAG_RELOAD = "tag_reload",
     TAG_WIDGETID = "widget_id",
     TAG_ENABLEBACKGROUND = "enable_bg",

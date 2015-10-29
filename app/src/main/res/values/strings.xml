@@ -30,6 +30,9 @@
     <string name="background_load_desc">Automatically load data in background. Automatically enabled
         when widget or favorite item notifications are enabled.</string>
 
+    <string name="disable_cache">Disable caching data</string>
+    <string name="disable_cache_desc">Will increase data usage, especially with background loading!</string>
+
     <string name="licenses_cat">Licences</string>
     <string name="licenses_cat_desc">View info on licenses for software used in this app.</string>
 

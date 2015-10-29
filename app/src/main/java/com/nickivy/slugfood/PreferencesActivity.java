@@ -44,7 +44,7 @@ public class PreferencesActivity extends AppCompatActivity {
             Preference namePref = findPreference("mylicense");
             // Display the verison number once BuildConfig.VERSION_NAME works. Says 1.3 on bug page?
             //pref.setTitle(getString(R.string.app_name) + " " + BuildConfig.VERSION_NAME);
-            namePref.setTitle(getString(R.string.app_name) + " 1.3");
+            namePref.setTitle(getString(R.string.app_name) + " 1.4");
 
             Preference darkPref = findPreference("dark_theme");
             darkPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {

@@ -1,10 +1,12 @@
 package com.nickivy.slugfood.parser;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.nickivy.slugfood.util.MenuItem;
@@ -64,8 +66,10 @@ public class MealDataFetcher {
         boolean cexists = (c.getCount() == 0);
         c.close();
         db.close();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean nocache = prefs.getBoolean("disable_cache",false);
         // If data for today does not exist, or manual refresh is requested, download/store data
-        if(cexists || MenuParser.manualRefresh){
+        if(cexists || MenuParser.manualRefresh || nocache){
             int res = MenuParser.getMealList(month, day, year);
             if (res != Util.GETLIST_SUCCESS) {
                 running = false;
@@ -88,7 +92,7 @@ public class MealDataFetcher {
 
             int today[] = Util.getToday();
 
-            if (MenuParser.manualRefresh) {
+            if (MenuParser.manualRefresh || nocache) {
                 db.delete(MealStorage.TABLE_MEALS, null,null);
             } else {
                 db.delete(MealStorage.TABLE_MEALS, MealStorage.COLUMN_MONTH + "<? AND " +
@@ -104,75 +108,76 @@ public class MealDataFetcher {
             }
 
             // Begin writing data
+            if (!nocache) {
+                SQLiteStatement statement = db.compileStatement("INSERT INTO " +
+                        MealStorage.TABLE_MEALS + "(" + MealStorage.COLUMN_COLLEGE + ", " +
+                        MealStorage.COLUMN_MEAL + ", " + MealStorage.COLUMN_MENUITEM + ", " +
+                        MealStorage.COLUMN_NUTID + ", " + MealStorage.COLUMN_MONTH + ", " +
+                        MealStorage.COLUMN_DAY + ", " + MealStorage.COLUMN_YEAR +
+                        ") VALUES (?,?,?,?,?,?,?);");
 
-            SQLiteStatement statement = db.compileStatement("INSERT INTO "+
-                    MealStorage.TABLE_MEALS + "(" + MealStorage.COLUMN_COLLEGE + ", " +
-                    MealStorage.COLUMN_MEAL + ", " + MealStorage.COLUMN_MENUITEM + ", " +
-                    MealStorage.COLUMN_NUTID + ", " + MealStorage.COLUMN_MONTH + ", " +
-                    MealStorage.COLUMN_DAY + ", " + MealStorage.COLUMN_YEAR +
-                    ") VALUES (?,?,?,?,?,?,?);");
+                // Using sqlite statement keeps the database 'open' and apparently is a bit faster
+                db.beginTransaction();
 
-            // Using sqlite statement keeps the database 'open' and apparently is a bit faster
-            db.beginTransaction();
-
-            for(int j = 0; j < 5; j++) {
-                statement.clearBindings();
-                for (int i = 0; i < Util.fullMenuObj.get(j).getBreakfast().size(); i++) {
-                    statement.bindLong(1, j);
-                    statement.bindLong(2, 0);
-                    statement.bindString(3, Util.fullMenuObj.get(j).getBreakfast().get(i)
-                            .getItemName());
-                    statement.bindString(4, Util.fullMenuObj.get(j).getBreakfast().get(i)
-                            .getCode());
-                    statement.bindLong(5, month);
-                    statement.bindLong(6, day);
-                    statement.bindLong(7, year);
-                    // Database error will show up here if there is one. Catch it here.
-                    try {
-                        statement.execute();
-                    } catch (SQLiteConstraintException e) {
-                        running = false;
-                        return Util.GETLIST_DATABASE_FAILURE;
+                for (int j = 0; j < 5; j++) {
+                    statement.clearBindings();
+                    for (int i = 0; i < Util.fullMenuObj.get(j).getBreakfast().size(); i++) {
+                        statement.bindLong(1, j);
+                        statement.bindLong(2, 0);
+                        statement.bindString(3, Util.fullMenuObj.get(j).getBreakfast().get(i)
+                                .getItemName());
+                        statement.bindString(4, Util.fullMenuObj.get(j).getBreakfast().get(i)
+                                .getCode());
+                        statement.bindLong(5, month);
+                        statement.bindLong(6, day);
+                        statement.bindLong(7, year);
+                        // Database error will show up here if there is one. Catch it here.
+                        try {
+                            statement.execute();
+                        } catch (SQLiteConstraintException e) {
+                            running = false;
+                            return Util.GETLIST_DATABASE_FAILURE;
+                        }
+                    }
+                    for (int i = 0; i < Util.fullMenuObj.get(j).getLunch().size(); i++) {
+                        statement.bindLong(1, j);
+                        statement.bindLong(2, 1);
+                        statement.bindString(3, Util.fullMenuObj.get(j).getLunch().get(i)
+                                .getItemName());
+                        statement.bindString(4, Util.fullMenuObj.get(j).getLunch().get(i)
+                                .getCode());
+                        statement.bindLong(5, month);
+                        statement.bindLong(6, day);
+                        statement.bindLong(7, year);
+                        try {
+                            statement.execute();
+                        } catch (SQLiteConstraintException e) {
+                            running = false;
+                            return Util.GETLIST_DATABASE_FAILURE;
+                        }
+                    }
+                    for (int i = 0; i < Util.fullMenuObj.get(j).getDinner().size(); i++) {
+                        statement.bindLong(1, j);
+                        statement.bindLong(2, 2);
+                        statement.bindString(3, Util.fullMenuObj.get(j).getDinner().get(i)
+                                .getItemName());
+                        statement.bindString(4, Util.fullMenuObj.get(j).getDinner().get(i)
+                                .getCode());
+                        statement.bindLong(5, month);
+                        statement.bindLong(6, day);
+                        statement.bindLong(7, year);
+                        try {
+                            statement.execute();
+                        } catch (SQLiteConstraintException e) {
+                            running = false;
+                            return Util.GETLIST_DATABASE_FAILURE;
+                        }
                     }
                 }
-                for (int i = 0; i < Util.fullMenuObj.get(j).getLunch().size(); i++) {
-                    statement.bindLong(1, j);
-                    statement.bindLong(2, 1);
-                    statement.bindString(3, Util.fullMenuObj.get(j).getLunch().get(i)
-                            .getItemName());
-                    statement.bindString(4, Util.fullMenuObj.get(j).getLunch().get(i)
-                            .getCode());
-                    statement.bindLong(5, month);
-                    statement.bindLong(6, day);
-                    statement.bindLong(7, year);
-                    try {
-                        statement.execute();
-                    } catch (SQLiteConstraintException e) {
-                        running = false;
-                        return Util.GETLIST_DATABASE_FAILURE;
-                    }
-                }
-                for (int i = 0; i < Util.fullMenuObj.get(j).getDinner().size(); i++) {
-                    statement.bindLong(1,j);
-                    statement.bindLong(2, 2);
-                    statement.bindString(3, Util.fullMenuObj.get(j).getDinner().get(i)
-                            .getItemName());
-                    statement.bindString(4, Util.fullMenuObj.get(j).getDinner().get(i)
-                            .getCode());
-                    statement.bindLong(5, month);
-                    statement.bindLong(6, day);
-                    statement.bindLong(7, year);
-                    try {
-                        statement.execute();
-                    } catch (SQLiteConstraintException e) {
-                        running = false;
-                        return Util.GETLIST_DATABASE_FAILURE;
-                    }
-                }
+                db.setTransactionSuccessful();
+                db.endTransaction();
+                db.close();
             }
-            db.setTransactionSuccessful();
-            db.endTransaction();
-            db.close();
 
         } else {
             // I closed this up above, not sure why I have to do it again here
