@@ -7,7 +7,7 @@
     
     <string name="select_date">Select date</string>
 
-    <string name="internet_failed">Internet connection failed!</string>
+    <string name="internet_failed">Connection to server failed!</string>
     <string name="database_failed">Database error, please swipe down to manually refresh</string>
     <string name="no_nutrition_info">Nutrition info is not available for this item!</string>
 
