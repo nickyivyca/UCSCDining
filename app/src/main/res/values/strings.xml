@@ -28,7 +28,7 @@
 
     <string name="background_load">Load data in background</string>
     <string name="background_load_desc">Automatically load data in background. Automatically enabled
-        when widget or favorite item notifications are enabled.</string>
+        when widget or notifications are enabled.</string>
 
     <string name="disable_cache">Disable caching data</string>
     <string name="disable_cache_desc">Will increase data usage, especially with background loading!</string>
