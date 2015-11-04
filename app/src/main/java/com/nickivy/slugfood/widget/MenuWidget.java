@@ -39,16 +39,10 @@ import java.util.Calendar;
  */
 public class MenuWidget extends AppWidgetProvider {
 
-    private PendingIntent breakfastIntent = null,
-    lunchIntent= null,
-    dinnerIntent = null;
-
     private static final String CLICKTAG_COLLEGELEFT = "COLLEGE_LEFT",
     CLICKTAG_COLLEGERIGHT = "COLLEGE_RIGHT",
     CLICKTAG_MEALLEFT = "MEAL_LEFT",
     CLICKTAG_MEALRIGHT = "MEAL_RIGHT",
-    TAG_TIMEUPDATE = "time_update",
-    TAG_RELOAD = "tag_reload",
     TAG_WIDGETID = "widget_id",
     KEY_COLLEGES = "key_colleges",
     KEY_MEALS = "key_meals",
@@ -337,7 +331,7 @@ public class MenuWidget extends AppWidgetProvider {
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             updateAppWidget(context, appWidgetManager, widgetData.get(thisDataIndex).getWidgetId());
         } else {
-            if (TAG_TIMEUPDATE.equals(intent.getAction())) {
+            if (Util.TAG_TIMEUPDATE.equals(intent.getAction())) {
                 if (widgetData.size() == 0) {
                     reinitializeWidgetData(context);
                 }
