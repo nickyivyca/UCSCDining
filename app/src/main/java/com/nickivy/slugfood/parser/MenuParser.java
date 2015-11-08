@@ -3,16 +3,21 @@ package com.nickivy.slugfood.parser;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import com.nickivy.slugfood.util.CollegeMenu;
 import com.nickivy.slugfood.util.MenuItem;
 import com.nickivy.slugfood.util.Util;
 
 import android.util.Log;
+
+import biweekly.Biweekly;
+import biweekly.ICalendar;
+import biweekly.component.VEvent;
 
 /**
  * Parses the incoming file.
@@ -38,21 +43,11 @@ public class MenuParser {
     };
 
     private static final String URLPart3 = "&mealName=";
-
-    private static final String legacyURLPart1 = "http://nutrition.sa.ucsc.edu/menuSamp.asp?" +
-            "myaction=read&sName=&dtdate=";
-
-    private static final String[] legacyURLListParts2 = {
-            "&locationNum=05&locationName=%20Cowell&naFlag=1",
-            "&locationNum=20&locationName=Crown+Merrill&sName=&naFlag=1",
-            "&locationNum=25&locationName=Porter&sName=&naFlag=1",
-            "&locationNum=30&locationName=College+Eight&sName=&naFlag=1",
-            "&locationNum=40&locationName=College+Nine+%26+Ten&sName=&naFlag=1"
-    };
     
     public static boolean manualRefresh = false;
 
-    public static int getSingleMealList(int k, int month, int day, int year) {
+    public static int getSingleMealList(int k, int month, int day, int year, boolean collegeNight,
+                                        boolean healthyMonday, boolean farmFriday) {
         Document breakfastDoc, lunchDoc, dinnerDoc;
         Elements breakfastNutIds = null,
                 breakfastFoodNames = null,
@@ -66,7 +61,7 @@ public class MenuParser {
                     day + "%2F" + year + URLPart3 + Util.meals[0]).get();
         } catch (UnknownHostException e) {
             // Internet connection completely missing is a separate error from okhttp
-            Log.v(Util.LOGTAG, "Internet connection missing");
+            Log.v(Util.LOGTAG, Util.LOGMSG_INTERNETERROR);
             e.printStackTrace();
             return Util.GETLIST_INTERNET_FAILURE;
         } catch (IOException e) {
@@ -183,61 +178,39 @@ public class MenuParser {
             breakfastMessage.add(new MenuItem(Util.brunchMessage, "-1"));
             Util.fullMenuObj.get(k).setBreakfast(breakfastMessage);
         }
-        /*
-         * If breakfast and lunch but no dinner, may be college night, check the old page
-         * without nutrition info - the page we used to use before nutrition info
-         */
-        if(!Util.fullMenuObj.get(k).getBreakfast().isEmpty() &&
-                !(Util.fullMenuObj.get(k).getLunch().isEmpty()) &&
-                        (Util.fullMenuObj.get(k).getDinner().isEmpty())){
-            Document collegeNightDoc;
-            try {
-                collegeNightDoc = Jsoup.connect(legacyURLPart1 + month + "%2F" + day + "%2F" + year
-                        + legacyURLListParts2[k]).get();
-            } catch (UnknownHostException e) {
-                // Internet connection completely missing is a separate error from okhttp
-                Log.v(Util.LOGTAG, Util.LOGMSG_INTERNETERROR);
-                e.printStackTrace();
-                return Util.GETLIST_INTERNET_FAILURE;
-            } catch (IOException e) {
-                Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
-                try {
-                    collegeNightDoc = Jsoup.connect(legacyURLPart1 + month + "%2F" + day + "%2F" +
-                            year + legacyURLListParts2[k]).get();
-                } catch (IOException e1) {
-                    Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
-                    try {
-                        collegeNightDoc = Jsoup.connect(legacyURLPart1 + month + "%2F" + day + "%2F"
-                                + year + legacyURLListParts2[k]).get();
-                    } catch (IOException e2) {
-                        Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
-                        // Give up after three times
-                        return Util.GETLIST_OKHTTP_FAILURE;
-                    }
-                }
-            }
 
-            dinnerFoodNames = collegeNightDoc.select("td[valign=\"top\"]");
-            for(int j = 0; j < dinnerFoodNames.size(); j++) {
-                //Dinner
-                if(dinnerFoodNames.get(j).text().contains("Dinner")){
-                    Elements dinner = dinnerFoodNames.get(j).select(" div[class=\"menusamprecipes\"]");
-                    for(int i = 0; i < dinner.size(); i++) {
-                        dinnerList = new ArrayList<MenuItem>();
-                        //dinnerList.add(dinner.get(i).text());
-                        Log.v(Util.LOGTAG, "names size: " + dinner.size());
-                        Log.v(Util.LOGTAG, "i: " + i);
-                        if (i == 0) {
-                            dinnerList.add(new MenuItem(dinner.get(i).text(),
-                                    "-1"));
-                        } else {
-                            dinnerList.add(new MenuItem(dinner.get(i).text(),
-                                    dinnerNutIds.get(i - 1).attr("VALUE")));
-                        }
-                    }
-                }
-            }
-            Util.fullMenuObj.get(k).setDinner(dinnerList);
+        // If events are on Calendar but not on menu, insert them.
+
+        if (collegeNight && !Util.fullMenuObj.get(k).getIsCollegeNight()) {
+            // Whenever it's college night the rest of the list should be empty
+            ArrayList<MenuItem> dinner = new ArrayList<MenuItem>();
+            //ArrayList<MenuItem> dinner = Util.fullMenuObj.get(k).getDinner();
+            dinner.add(new MenuItem("College Night", "-1"));
+            Util.fullMenuObj.get(k).setDinner(dinner);
+        }
+
+        if (healthyMonday && !Util.fullMenuObj.get(k).getIsHealthyMonday()) {
+            ArrayList<MenuItem> breakfast = Util.fullMenuObj.get(k).getBreakfast();
+            ArrayList<MenuItem> lunch = Util.fullMenuObj.get(k).getLunch();
+            ArrayList<MenuItem> dinner = Util.fullMenuObj.get(k).getDinner();
+            breakfast.add(0, new MenuItem("Healthy Mondays", "-1"));
+            lunch.add(0, new MenuItem("Healthy Mondays", "-1"));
+            dinner.add(0, new MenuItem("Healthy Mondays", "-1"));
+            Util.fullMenuObj.get(k).setBreakfast(breakfast);
+            Util.fullMenuObj.get(k).setDinner(lunch);
+            Util.fullMenuObj.get(k).setDinner(dinner);
+        }
+
+        if (farmFriday && !Util.fullMenuObj.get(k).getIsFarmFriday()) {
+            ArrayList<MenuItem> breakfast = Util.fullMenuObj.get(k).getBreakfast();
+            ArrayList<MenuItem> lunch = Util.fullMenuObj.get(k).getLunch();
+            ArrayList<MenuItem> dinner = Util.fullMenuObj.get(k).getDinner();
+            breakfast.add(0, new MenuItem("Farm Fridays", "-1"));
+            lunch.add(0, new MenuItem("Farm Fridays", "-1"));
+            dinner.add(0, new MenuItem("Farm Fridays", "-1"));
+            Util.fullMenuObj.get(k).setBreakfast(breakfast);
+            Util.fullMenuObj.get(k).setLunch(lunch);
+            Util.fullMenuObj.get(k).setDinner(dinner);
         }
         return Util.GETLIST_SUCCESS;
     }
@@ -246,8 +219,78 @@ public class MenuParser {
      * Puts downloaded data from specified date (instead of today) into the full menu object.
      */
     public static int getMealList(int month, int day, int year) {
-    	for (int i = 0; i < 5; i++) {
-            int res = getSingleMealList(i, month, day, year);
+        /**
+         * outer array is colleges, inner is [0]
+         * college night, [1] healthy monday, [2] farm friday
+         */
+        boolean[][] eventBools = new boolean[5][3];
+
+        final String icalurl = "https://calendar.google.com/calendar/ical/ucsc.edu_t59u0f85lnvamgj30m22e3fmgo%40group.calendar.google.com/public/basic.ics";
+
+        try {
+            Document icaldoc = Jsoup.connect(icalurl).get();
+            icaldoc.outputSettings(new Document.OutputSettings().prettyPrint(false));
+            String icalstring = icaldoc.body().html();
+
+            // Why does this take so long here?
+            ICalendar ical = Biweekly.parse(icalstring).first();
+
+            List<VEvent> events = ical.getEvents();
+            for (VEvent e : events) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(e.getDateStart().getValue());
+                if (month == (cal.get(Calendar.MONTH) + 1) && day == cal.get(Calendar.DAY_OF_MONTH)
+                        && year == cal.get(Calendar.YEAR)) {
+                    String desc = e.getSummary().getValue();
+                    if (desc.contains("College Night")) {
+                        if (desc.contains("Cowell)") || desc.contains("Stevenson")) {
+                            eventBools[0][0] = true;
+                        } else if (desc.contains("Crown") || desc.contains("Merrill")) {
+                            eventBools[1][0] = true;
+                        } else if (desc.contains("Porter") || desc.contains("Kresge")) {
+                            eventBools[2][0] = true;
+                        } else if (desc.contains("Eight") || desc.contains("Oakes")) {
+                            eventBools[3][0] = true;
+                        } else if (desc.contains("Nine") || desc.contains("Ten")) {
+                            eventBools[4][0] = true;
+                        }
+                    }
+                    if (desc.contains("Healthy Monday")) {
+                        if (desc.contains("Cowell)")) {
+                            eventBools[0][1] = true;
+                        } else if (desc.contains("Crown")) {
+                            eventBools[1][1] = true;
+                        } else if (desc.contains("Porter")) {
+                            eventBools[2][1] = true;
+                        } else if (desc.contains("Eight")) {
+                            eventBools[3][1] = true;
+                        } else if (desc.contains("Nine")) {
+                            eventBools[4][1] = true;
+                        }
+                    }
+                    if (desc.contains("Farm Friday")) {
+                        if (desc.contains("Cowell)")) {
+                            eventBools[0][2] = true;
+                        } else if (desc.contains("Crown")) {
+                            eventBools[1][2] = true;
+                        } else if (desc.contains("Porter")) {
+                            eventBools[2][2] = true;
+                        } else if (desc.contains("Eight")) {
+                            eventBools[3][2] = true;
+                        } else if (desc.contains("Nine")) {
+                            eventBools[4][2] = true;
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        for (int i = 0; i < 5; i++) {
+            int res = getSingleMealList(i, month, day, year, eventBools[i][0], eventBools[i][1],
+                    eventBools[i][2]);
             /*
              * For some stupid reason, it throws these stupid unexpected status line errors half the
              * time on mobile data. So we have to intercept those somehow. getsinglemeallist returns
@@ -256,11 +299,14 @@ public class MenuParser {
              * though.
              */
             if (res == Util.GETLIST_OKHTTP_FAILURE) {
-                res = getSingleMealList(i, month, day, year);
+                res = getSingleMealList(i, month, day, year, eventBools[i][0], eventBools[i][1],
+                        eventBools[i][2]);
                 if (res == Util.GETLIST_OKHTTP_FAILURE) {
-                    res = getSingleMealList(i, month, day, year);
+                    res = getSingleMealList(i, month, day, year, eventBools[i][0], eventBools[i][1],
+                            eventBools[i][2]);
                     if (res == Util.GETLIST_OKHTTP_FAILURE) {
-                        res = getSingleMealList(i, month, day, year);
+                        res = getSingleMealList(i, month, day, year, eventBools[i][0], eventBools[i][1],
+                                eventBools[i][2]);
                         if (res == Util.GETLIST_OKHTTP_FAILURE) {
                             return Util.GETLIST_INTERNET_FAILURE;
                         }
