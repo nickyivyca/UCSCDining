@@ -43,6 +43,8 @@ public class MenuParser {
     };
 
     private static final String URLPart3 = "&mealName=";
+
+    private static final String icalurl = "https://calendar.google.com/calendar/ical/ucsc.edu_t59u0f85lnvamgj30m22e3fmgo%40group.calendar.google.com/public/basic.ics";
     
     public static boolean manualRefresh = false;
 
@@ -224,67 +226,84 @@ public class MenuParser {
          * college night, [1] healthy monday, [2] farm friday
          */
         boolean[][] eventBools = new boolean[5][3];
-
-        final String icalurl = "https://calendar.google.com/calendar/ical/ucsc.edu_t59u0f85lnvamgj30m22e3fmgo%40group.calendar.google.com/public/basic.ics";
+        Document icaldoc = null;
 
         try {
-            Document icaldoc = Jsoup.connect(icalurl).get();
-            icaldoc.outputSettings(new Document.OutputSettings().prettyPrint(false));
-            String icalstring = icaldoc.body().html();
+            icaldoc = Jsoup.connect(icalurl).get();
+        } catch (UnknownHostException e) {
+            // Internet connection completely missing is a separate error from okhttp
+            Log.v(Util.LOGTAG, Util.LOGMSG_INTERNETERROR);
+            e.printStackTrace();
+            return Util.GETLIST_INTERNET_FAILURE;
+        } catch (IOException e) {
+            Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
+            try {
+                icaldoc = Jsoup.connect(icalurl).get();
+            } catch (IOException e1) {
+                Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
+                try {
+                    icaldoc = Jsoup.connect(icalurl).get();
+                } catch (IOException e2) {
+                    Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
+                    // Give up after three times
+                    return Util.GETLIST_OKHTTP_FAILURE;
+                }
+            }
+        }
 
-            // Why does this take so long here?
-            ICalendar ical = Biweekly.parse(icalstring).first();
+        icaldoc.outputSettings(new Document.OutputSettings().prettyPrint(false));
+        String icalstring = icaldoc.body().html();
 
-            List<VEvent> events = ical.getEvents();
-            for (VEvent e : events) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(e.getDateStart().getValue());
-                if (month == (cal.get(Calendar.MONTH) + 1) && day == cal.get(Calendar.DAY_OF_MONTH)
-                        && year == cal.get(Calendar.YEAR)) {
-                    String desc = e.getSummary().getValue();
-                    if (desc.contains("College Night")) {
-                        if (desc.contains("Cowell)") || desc.contains("Stevenson")) {
-                            eventBools[0][0] = true;
-                        } else if (desc.contains("Crown") || desc.contains("Merrill")) {
-                            eventBools[1][0] = true;
-                        } else if (desc.contains("Porter") || desc.contains("Kresge")) {
-                            eventBools[2][0] = true;
-                        } else if (desc.contains("Eight") || desc.contains("Oakes")) {
-                            eventBools[3][0] = true;
-                        } else if (desc.contains("Nine") || desc.contains("Ten")) {
-                            eventBools[4][0] = true;
-                        }
+        // Why does this take so long here?
+        ICalendar ical = Biweekly.parse(icalstring).first();
+
+        List<VEvent> events = ical.getEvents();
+        for (VEvent e : events) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(e.getDateStart().getValue());
+            if (month == (cal.get(Calendar.MONTH) + 1) && day == cal.get(Calendar.DAY_OF_MONTH)
+                    && year == cal.get(Calendar.YEAR)) {
+                String desc = e.getSummary().getValue();
+                if (desc.contains("College Night")) {
+                    if (desc.contains("Cowell)") || desc.contains("Stevenson")) {
+                        eventBools[0][0] = true;
+                    } else if (desc.contains("Crown") || desc.contains("Merrill")) {
+                        eventBools[1][0] = true;
+                    } else if (desc.contains("Porter") || desc.contains("Kresge")) {
+                        eventBools[2][0] = true;
+                    } else if (desc.contains("Eight") || desc.contains("Oakes")) {
+                        eventBools[3][0] = true;
+                    } else if (desc.contains("Nine") || desc.contains("Ten")) {
+                        eventBools[4][0] = true;
                     }
-                    if (desc.contains("Healthy Monday")) {
-                        if (desc.contains("Cowell)")) {
-                            eventBools[0][1] = true;
-                        } else if (desc.contains("Crown")) {
-                            eventBools[1][1] = true;
-                        } else if (desc.contains("Porter")) {
-                            eventBools[2][1] = true;
-                        } else if (desc.contains("Eight")) {
-                            eventBools[3][1] = true;
-                        } else if (desc.contains("Nine")) {
-                            eventBools[4][1] = true;
-                        }
+                }
+                if (desc.contains("Healthy Monday")) {
+                    if (desc.contains("Cowell)")) {
+                        eventBools[0][1] = true;
+                    } else if (desc.contains("Crown")) {
+                        eventBools[1][1] = true;
+                    } else if (desc.contains("Porter")) {
+                        eventBools[2][1] = true;
+                    } else if (desc.contains("Eight")) {
+                        eventBools[3][1] = true;
+                    } else if (desc.contains("Nine")) {
+                        eventBools[4][1] = true;
                     }
-                    if (desc.contains("Farm Friday")) {
-                        if (desc.contains("Cowell)")) {
-                            eventBools[0][2] = true;
-                        } else if (desc.contains("Crown")) {
-                            eventBools[1][2] = true;
-                        } else if (desc.contains("Porter")) {
-                            eventBools[2][2] = true;
-                        } else if (desc.contains("Eight")) {
-                            eventBools[3][2] = true;
-                        } else if (desc.contains("Nine")) {
-                            eventBools[4][2] = true;
-                        }
+                }
+                if (desc.contains("Farm Friday")) {
+                    if (desc.contains("Cowell)")) {
+                        eventBools[0][2] = true;
+                    } else if (desc.contains("Crown")) {
+                        eventBools[1][2] = true;
+                    } else if (desc.contains("Porter")) {
+                        eventBools[2][2] = true;
+                    } else if (desc.contains("Eight")) {
+                        eventBools[3][2] = true;
+                    } else if (desc.contains("Nine")) {
+                        eventBools[4][2] = true;
                     }
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
 

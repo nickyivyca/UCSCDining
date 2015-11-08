@@ -1,7 +1,8 @@
 My code is all released under the GNU GPL2 license (see below). This applies to 
 all files under the com.nickivy package. Google's SlidingTab files are released under 
 the Apache 2.0 license, as noted at the top of the files. The Jsoup library is released
-under the MIT license.
+under the MIT license. The biweekly library is released under the BSD license. makovkastar's
+FloatingActionButton library is released under the MIT license.
 
 Copyright (C) 2015 Nicholas Ivy
 
