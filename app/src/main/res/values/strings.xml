@@ -44,9 +44,6 @@
     <string name="jsouplicense_title">jsoup 1.8.2</string>
     <string name="jsouplicense_desc">Released under MIT license. Click here to visit the jsoup
     webpage.</string>
-    <string name="biweeklylicense_title">biweekly 0.4.3</string>
-    <string name="biweeklylicense_desc">Released under BSD license. Click here to visit the biweekly
-    webpage.</string>
     <string name="fablicense_title">FloatingActionButton 1.3.0</string>
     <string name="fablicense_desc">Maintained by makovkastar. Released under MIT license. Click
         here to visit the FloatingActionButton Github page.</string>

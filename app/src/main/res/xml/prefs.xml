@@ -69,12 +69,6 @@
                 <intent android:action="android.intent.action.VIEW"
                     android:data="https://jsoup.org" />
             </Preference>
-            <Preference android:key="biweelylicense"
-                android:title="@string/biweeklylicense_title"
-                android:summary="@string/biweeklylicense_desc">
-                <intent android:action="android.intent.action.VIEW"
-                    android:data="https://sourceforge.net/projects/biweekly/" />
-            </Preference>
             <Preference android:key="fablicense"
                 android:title="@string/fablicense_title"
                 android:summary="@string/fablicense_desc">

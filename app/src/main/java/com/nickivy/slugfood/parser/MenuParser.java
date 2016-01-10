@@ -15,10 +15,6 @@ import com.nickivy.slugfood.util.Util;
 
 import android.util.Log;
 
-import biweekly.Biweekly;
-import biweekly.ICalendar;
-import biweekly.component.VEvent;
-
 /**
  * Parses the incoming file.
  * 
@@ -252,58 +248,60 @@ public class MenuParser {
         }
 
         icaldoc.outputSettings(new Document.OutputSettings().prettyPrint(false));
+
         String icalstring = icaldoc.body().html();
 
-        // Why does this take so long here?
-        ICalendar ical = Biweekly.parse(icalstring).first();
+        String dayStr = (day > 9)? "" + day : "0" + day;
+        String monthStr = (month > 9)? "" + month : "0" + month;
 
-        List<VEvent> events = ical.getEvents();
-        for (VEvent e : events) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(e.getDateStart().getValue());
-            if (month == (cal.get(Calendar.MONTH) + 1) && day == cal.get(Calendar.DAY_OF_MONTH)
-                    && year == cal.get(Calendar.YEAR)) {
-                String desc = e.getSummary().getValue();
-                if (desc.contains("College Night")) {
-                    if (desc.contains("Cowell)") || desc.contains("Stevenson")) {
-                        eventBools[0][0] = true;
-                    } else if (desc.contains("Crown") || desc.contains("Merrill")) {
-                        eventBools[1][0] = true;
-                    } else if (desc.contains("Porter") || desc.contains("Kresge")) {
-                        eventBools[2][0] = true;
-                    } else if (desc.contains("Eight") || desc.contains("Oakes")) {
-                        eventBools[3][0] = true;
-                    } else if (desc.contains("Nine") || desc.contains("Ten")) {
-                        eventBools[4][0] = true;
-                    }
-                }
-                if (desc.contains("Healthy Monday")) {
-                    if (desc.contains("Cowell)")) {
-                        eventBools[0][1] = true;
-                    } else if (desc.contains("Crown")) {
-                        eventBools[1][1] = true;
-                    } else if (desc.contains("Porter")) {
-                        eventBools[2][1] = true;
-                    } else if (desc.contains("Eight")) {
-                        eventBools[3][1] = true;
-                    } else if (desc.contains("Nine")) {
-                        eventBools[4][1] = true;
-                    }
-                }
-                if (desc.contains("Farm Friday")) {
-                    if (desc.contains("Cowell)")) {
-                        eventBools[0][2] = true;
-                    } else if (desc.contains("Crown")) {
-                        eventBools[1][2] = true;
-                    } else if (desc.contains("Porter")) {
-                        eventBools[2][2] = true;
-                    } else if (desc.contains("Eight")) {
-                        eventBools[3][2] = true;
-                    } else if (desc.contains("Nine")) {
-                        eventBools[4][2] = true;
-                    }
+        String date = "" + year + monthStr + dayStr;
+
+        int indexof = icalstring.indexOf("DTSTART;VALUE=DATE:" + date);
+
+        while (indexof != -1) {
+            String desc = icalstring.substring(icalstring.indexOf("SUMMARY", indexof),
+                    icalstring.indexOf("END:VEVENT", indexof))
+                    .replace("\n", "").replace("\r", "");
+            if (desc.contains("College Night")) {
+                if (desc.contains("Cowell)") || desc.contains("Stevenson")) {
+                    eventBools[0][0] = true;
+                } else if (desc.contains("Crown") || desc.contains("Merrill")) {
+                    eventBools[1][0] = true;
+                } else if (desc.contains("Porter") || desc.contains("Kresge")) {
+                    eventBools[2][0] = true;
+                } else if (desc.contains("Eight") || desc.contains("Oakes")) {
+                    eventBools[3][0] = true;
+                } else if (desc.contains("Nine") || desc.contains("Ten")) {
+                    eventBools[4][0] = true;
                 }
             }
+            if (desc.contains("Healthy Monday")) {
+                if (desc.contains("Cowell)")) {
+                    eventBools[0][1] = true;
+                } else if (desc.contains("Crown")) {
+                    eventBools[1][1] = true;
+                } else if (desc.contains("Porter")) {
+                    eventBools[2][1] = true;
+                } else if (desc.contains("Eight")) {
+                    eventBools[3][1] = true;
+                } else if (desc.contains("Nine")) {
+                    eventBools[4][1] = true;
+                }
+            }
+            if (desc.contains("Farm Friday")) {
+                if (desc.contains("Cowell)")) {
+                    eventBools[0][2] = true;
+                } else if (desc.contains("Crown")) {
+                    eventBools[1][2] = true;
+                } else if (desc.contains("Porter")) {
+                    eventBools[2][2] = true;
+                } else if (desc.contains("Eight")) {
+                    eventBools[3][2] = true;
+                } else if (desc.contains("Nine")) {
+                    eventBools[4][2] = true;
+                }
+            }
+            indexof = icalstring.indexOf("DTSTART;VALUE=DATE:" + date, indexof + 1);
         }
 
 
