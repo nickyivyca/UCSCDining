@@ -45,7 +45,8 @@ public class MenuParser {
     public static boolean manualRefresh = false;
 
     public static int getSingleMealList(int k, int month, int day, int year, boolean collegeNight,
-                                        boolean healthyMonday, boolean farmFriday) {
+                                        boolean otherCollegeforCNight, boolean healthyMonday,
+                                        boolean farmFriday) {
         Document breakfastDoc, lunchDoc, dinnerDoc;
         Elements breakfastNutIds = null,
                 breakfastFoodNames = null,
@@ -183,7 +184,26 @@ public class MenuParser {
             // Whenever it's college night the rest of the list should be empty
             ArrayList<MenuItem> dinner = new ArrayList<MenuItem>();
             //ArrayList<MenuItem> dinner = Util.fullMenuObj.get(k).getDinner();
-            dinner.add(new MenuItem("College Night", "-1"));
+            String college = "";
+            switch (k) {
+                case 0:
+                    college = otherCollegeforCNight? "Stevenson " : "Cowell ";
+                    break;
+                case 1:
+                    college = otherCollegeforCNight? "Merrill " : "Crown ";
+                    break;
+                case 2:
+                    college = otherCollegeforCNight? "Kresge " : "Porter ";
+                    break;
+                case 3:
+                    college = otherCollegeforCNight? "Oakes " : "College Eight ";
+                    break;
+                case 4:
+                    college = "College 9/10 ";
+                    break;
+            }
+
+            dinner.add(new MenuItem(college + "College Night", "-1"));
             Util.fullMenuObj.get(k).setDinner(dinner);
         }
 
@@ -219,9 +239,10 @@ public class MenuParser {
     public static int getMealList(int month, int day, int year) {
         /**
          * outer array is colleges, inner is [0]
-         * college night, [1] healthy monday, [2] farm friday
+         * college night, [1] if college night is 'secondary' college, [2]healthy monday,
+         * [3] farm friday
          */
-        boolean[][] eventBools = new boolean[5][3];
+        boolean[][] eventBools = new boolean[5][4];
         Document icaldoc = null;
 
         try {
@@ -263,42 +284,60 @@ public class MenuParser {
                     icalstring.indexOf("END:VEVENT", indexof))
                     .replace("\n", "").replace("\r", "");
             if (desc.contains("College Night")) {
-                if (desc.contains("Cowell)") || desc.contains("Stevenson")) {
+                if (desc.contains("Cowell")) {
                     eventBools[0][0] = true;
-                } else if (desc.contains("Crown") || desc.contains("Merrill")) {
+                    eventBools[0][1] = false;
+                } else if (desc.contains("Stevenson")) {
+                    eventBools[0][0] = true;
+                    eventBools[0][1] = true;
+                } else if (desc.contains("Crown")) {
                     eventBools[1][0] = true;
-                } else if (desc.contains("Porter") || desc.contains("Kresge")) {
+                    eventBools[1][1] = false;
+                } else if (desc.contains("Merrill")) {
+                    eventBools[1][0] = true;
+                    eventBools[1][1] = true;
+                } else if (desc.contains("Porter")) {
                     eventBools[2][0] = true;
-                } else if (desc.contains("Eight") || desc.contains("Oakes")) {
+                    eventBools[2][1] = false;
+                } else if (desc.contains("Kresge")) {
+                    eventBools[2][0] = true;
+                    eventBools[2][1] = true;
+                } else if (desc.contains("Eight") || desc.contains("College 8")) {
                     eventBools[3][0] = true;
-                } else if (desc.contains("Nine") || desc.contains("Ten")) {
+                    eventBools[3][1] = false;
+                } else if (desc.contains("Oakes")) {
+                    eventBools[3][0] = true;
+                    eventBools[3][1] = true;
+                } else if (desc.contains("Nine") || desc.contains("College 9") || desc.contains("Ten")) {
+                    // Nine/Ten have their college nights together
                     eventBools[4][0] = true;
+                    eventBools[4][1] = false;
                 }
             }
             if (desc.contains("Healthy Monday")) {
-                if (desc.contains("Cowell)")) {
-                    eventBools[0][1] = true;
-                } else if (desc.contains("Crown")) {
-                    eventBools[1][1] = true;
-                } else if (desc.contains("Porter")) {
-                    eventBools[2][1] = true;
-                } else if (desc.contains("Eight")) {
-                    eventBools[3][1] = true;
-                } else if (desc.contains("Nine")) {
-                    eventBools[4][1] = true;
-                }
-            }
-            if (desc.contains("Farm Friday")) {
-                if (desc.contains("Cowell)")) {
+                if (desc.contains("Cowell")) {
                     eventBools[0][2] = true;
                 } else if (desc.contains("Crown")) {
                     eventBools[1][2] = true;
                 } else if (desc.contains("Porter")) {
                     eventBools[2][2] = true;
-                } else if (desc.contains("Eight")) {
+                } else if (desc.contains("Eight") || desc.contains("College 8")) {
                     eventBools[3][2] = true;
-                } else if (desc.contains("Nine")) {
+                } else if (desc.contains("Nine") || desc.contains("College 9")) {
                     eventBools[4][2] = true;
+                }
+            }
+            if (desc.contains("Farm Friday")) {
+                if (desc.contains("Cowell")) {
+                    eventBools[0][3] = true;
+                } else if (desc.contains("Crown")) {
+                    eventBools[1][3] = true;
+                } else if (desc.contains("Porter")) {
+                    eventBools[2][3] = true;
+                } else if (desc.contains("Eight") || desc.contains("College 8")) {
+                    eventBools[3][3] = true;
+                } else if (desc.contains("Nine") || desc.contains("College 9")) {
+                    eventBools[4][3] = true;
                 }
             }
             indexof = icalstring.indexOf("DTSTART;VALUE=DATE:" + date, indexof + 1);
@@ -307,7 +346,7 @@ public class MenuParser {
 
         for (int i = 0; i < 5; i++) {
             int res = getSingleMealList(i, month, day, year, eventBools[i][0], eventBools[i][1],
-                    eventBools[i][2]);
+                    eventBools[i][2], eventBools[i][3]);
             /*
              * For some stupid reason, it throws these stupid unexpected status line errors half the
              * time on mobile data. So we have to intercept those somehow. getsinglemeallist returns
@@ -317,13 +356,13 @@ public class MenuParser {
              */
             if (res == Util.GETLIST_OKHTTP_FAILURE) {
                 res = getSingleMealList(i, month, day, year, eventBools[i][0], eventBools[i][1],
-                        eventBools[i][2]);
+                        eventBools[i][2], eventBools[i][3]);
                 if (res == Util.GETLIST_OKHTTP_FAILURE) {
                     res = getSingleMealList(i, month, day, year, eventBools[i][0], eventBools[i][1],
-                            eventBools[i][2]);
+                            eventBools[i][2], eventBools[i][3]);
                     if (res == Util.GETLIST_OKHTTP_FAILURE) {
                         res = getSingleMealList(i, month, day, year, eventBools[i][0], eventBools[i][1],
-                                eventBools[i][2]);
+                                eventBools[i][2], eventBools[i][3]);
                         if (res == Util.GETLIST_OKHTTP_FAILURE) {
                             return Util.GETLIST_INTERNET_FAILURE;
                         }

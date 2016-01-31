@@ -65,12 +65,13 @@ public class Notifications extends BroadcastReceiver {
                 boolean sayTomorrow = (today[1] != today[3]);
 
                 if (Util.fullMenuObj.get(i).getIsCollegeNight()) {
+                    String title = Util.fullMenuObj.get(i).getDinnerList().get(0);
                     mBuilder = new NotificationCompat.Builder(context)
                             .setSmallIcon(R.drawable.ic_icon)
                             .setDefaults(Notification.DEFAULT_ALL)
-                            .setContentTitle("College Night")
-                            .setContentText(Util.collegeList[i] + " College Night " +
-                                    (sayTomorrow ? "tomorrow" : "today"))
+                            //.setContentTitle("College Night")
+                            .setContentTitle(title)
+                            .setContentText(title + (sayTomorrow ? " tomorrow" : " today"))
                             .setAutoCancel(true);
                 } else if (Util.fullMenuObj.get(i).getIsHealthyMonday()) {
                     mBuilder = new NotificationCompat.Builder(context)
