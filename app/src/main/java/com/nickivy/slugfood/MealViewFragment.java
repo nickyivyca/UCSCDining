@@ -355,11 +355,12 @@ public class MealViewFragment extends ListFragment{
             if (!initialRefreshed) {
                 Handler handler = new Handler();
                 final int nummeal = mealnum;
+                final ViewGroup cont = container;
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity()
-                                .findViewById(nummeal + SWIPEREF_ID1);
+                        mSwipeRefreshLayout = (SwipeRefreshLayout) cont.findViewById(nummeal +
+                                SWIPEREF_ID1);
                         if (mSwipeRefreshLayout != null) {
                             mSwipeRefreshLayout.setRefreshing(true);
                         }

@@ -180,10 +180,9 @@ public class MenuParser {
 
         // If events are on Calendar but not on menu, insert them.
 
-        if (collegeNight && !Util.fullMenuObj.get(k).getIsCollegeNight()) {
+        if (collegeNight) {
             // Whenever it's college night the rest of the list should be empty
             ArrayList<MenuItem> dinner = new ArrayList<MenuItem>();
-            //ArrayList<MenuItem> dinner = Util.fullMenuObj.get(k).getDinner();
             String college = "";
             switch (k) {
                 case 0:
