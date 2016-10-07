@@ -28,14 +28,15 @@ public class Util {
     public static final String[] meals = {
             "Breakfast",
             "Lunch",
-            "Dinner"
+            "Dinner",
+            "Late Night"
     };
 
     public static final String[] collegeList = {
             "Cowell/Stevenson",
             "Crown/Merrill",
             "Porter/Kresge",
-            "Eight/Oakes",
+            "Rachel Carson/Oakes",
             "Nine/Ten"
     };
 
