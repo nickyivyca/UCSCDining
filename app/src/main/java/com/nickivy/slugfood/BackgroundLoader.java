@@ -14,6 +14,8 @@ import com.nickivy.slugfood.parser.MealDataFetcher;
 import com.nickivy.slugfood.util.Util;
 import com.nickivy.slugfood.widget.MenuWidget;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.Calendar;
 
 /**
@@ -178,8 +180,18 @@ public class BackgroundLoader extends BroadcastReceiver {
 
         @Override
         protected Long doInBackground(Void... voids) {
-            int res = MealDataFetcher.fetchData(mContext, mAttemptedMonth, mAttemptedDay,
-                    mAttemptedYear);
+            int res = Util.GETLIST_SUCCESS;
+
+            try {
+                MealDataFetcher.fetchData(mContext, mAttemptedMonth, mAttemptedDay,
+                        mAttemptedYear);
+            } catch (UnknownHostException un) {
+                un.printStackTrace();
+                res = Util.GETLIST_INTERNET_FAILURE;
+            } catch (IOException io) {
+                io.printStackTrace();
+                res = Util.GETLIST_OKHTTP_FAILURE;
+            }
             return Double.valueOf(res).longValue();
         }
 

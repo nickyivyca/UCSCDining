@@ -1,5 +1,7 @@
 package com.nickivy.slugfood;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -171,8 +173,17 @@ public class MealViewFragment extends ListFragment{
 
         @Override
         protected Long doInBackground(Void... voids) {
-            int res = MealDataFetcher.fetchData(getActivity(), mAttemptedMonth, mAttemptedDay,
-                mAttemptedYear);
+            int res = Util.GETLIST_SUCCESS;
+            try {
+                MealDataFetcher.fetchData(getActivity(), mAttemptedMonth, mAttemptedDay,
+                        mAttemptedYear);
+            } catch (UnknownHostException un) {
+                un.printStackTrace();
+                res = Util.GETLIST_INTERNET_FAILURE;
+            } catch (IOException io) {
+                io.printStackTrace();
+                res = Util.GETLIST_OKHTTP_FAILURE;
+            }
             return Double.valueOf(res).longValue();
         }
 

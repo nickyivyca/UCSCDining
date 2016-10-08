@@ -12,6 +12,8 @@ import android.util.Log;
 import com.nickivy.slugfood.util.MenuItem;
 import com.nickivy.slugfood.util.Util;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 /**
@@ -29,7 +31,7 @@ public class MealDataFetcher {
     /**
      * Loads data from database or web into the full menu object.
      */
-    public static int fetchData(Context context, int month, int day, int year) {
+    public static int fetchData(Context context, int month, int day, int year) throws IOException {
         // If called multiple times, hold the second call until the first one exits.
         if (running) {
             Log.v(Util.LOGTAG, "waiting for another fetchdata to complete");

@@ -37,6 +37,8 @@ import com.nickivy.slugfood.parser.MealDataFetcher;
 import com.nickivy.slugfood.parser.MenuParser;
 import com.nickivy.slugfood.util.Util;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -226,8 +228,17 @@ public class MealViewFragmentLarge extends Fragment {
 
         @Override
         protected Long doInBackground(Void... voids) {
-            int res = MealDataFetcher.fetchData(getActivity(), mAttemptedMonth, mAttemptedDay,
-                    mAttemptedYear);
+            int res = Util.GETLIST_SUCCESS;
+            try {
+                MealDataFetcher.fetchData(getActivity(), mAttemptedMonth, mAttemptedDay,
+                        mAttemptedYear);
+            } catch (UnknownHostException un) {
+                un.printStackTrace();
+                res = Util.GETLIST_INTERNET_FAILURE;
+            } catch (IOException io) {
+                io.printStackTrace();
+                res = Util.GETLIST_OKHTTP_FAILURE;
+            }
             return Double.valueOf(res).longValue();
         }
 
