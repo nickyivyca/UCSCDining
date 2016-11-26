@@ -171,6 +171,23 @@ public class MealViewFragmentLarge extends Fragment {
                         topRowVerticalPosition >= 0);
             }
         });
+        final ListView listViewLateNight = (ListView) getActivity().findViewById(R.id.latenight_list);
+        listViewLateNight.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem,
+                                 int visibleItemCount, int totalItemCount) {
+                int topRowVerticalPosition =
+                        (listViewLateNight == null || listViewLateNight.getChildCount() == 0) ?
+                                0 : listViewLateNight.getChildAt(0).getTop();
+                mSwipeRefreshLayout.setEnabled(firstVisibleItem == 0 &&
+                        topRowVerticalPosition >= 0);
+            }
+        });
         mFab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         mFab.setBackgroundTintList(prefs.getBoolean("dark_theme",false)?
@@ -197,6 +214,7 @@ public class MealViewFragmentLarge extends Fragment {
                 setAdapter((ListView) getActivity().findViewById(R.id.breakfast_list), collegeNum, Util.BREAKFAST);
                 setAdapter((ListView) getActivity().findViewById(R.id.lunch_list), collegeNum, Util.LUNCH);
                 setAdapter((ListView) getActivity().findViewById(R.id.dinner_list), collegeNum, Util.DINNER);
+                setAdapter((ListView) getActivity().findViewById(R.id.latenight_list), collegeNum, Util.LATENIGHT);
 
                 mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer_list);
                 mDrawerList.setAdapter(new ColorAdapter(getActivity(),
@@ -324,6 +342,7 @@ public class MealViewFragmentLarge extends Fragment {
             setAdapter((ListView) getActivity().findViewById(R.id.breakfast_list), collegeNum, Util.BREAKFAST);
             setAdapter((ListView) getActivity().findViewById(R.id.lunch_list), collegeNum, Util.LUNCH);
             setAdapter((ListView) getActivity().findViewById(R.id.dinner_list), collegeNum, Util.DINNER);
+            setAdapter((ListView) getActivity().findViewById(R.id.latenight_list), collegeNum, Util.LATENIGHT);
 
             // Set title text
             setTitleText(collegeNum, ((AppCompatActivity)getActivity()).getSupportActionBar());
@@ -347,6 +366,9 @@ public class MealViewFragmentLarge extends Fragment {
                 break;
             case Util.DINNER:
                 array = Util.fullMenuObj.get(college).getDinnerList();
+                break;
+            case Util.LATENIGHT:
+                array = Util.fullMenuObj.get(college).getLateNightList();
                 break;
             default:
                 return;
@@ -398,6 +420,26 @@ public class MealViewFragmentLarge extends Fragment {
                                     "&RecNumAndPort=" + Util.fullMenuObj.get(college)
                                     .getDinner().get(pos).getCode());
                             startActivity(intent);
+                        }
+                    });
+                    break;
+                case Util.LATENIGHT:
+                    view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
+                            if (Util.fullMenuObj.get(college).getLateNight().get(pos).getCode().compareTo(Util.RCNONUT) == 0) {
+                                Toast.makeText(getActivity(), getString(R.string.rc_nonut),
+                                        Toast.LENGTH_SHORT).show();
+                            } else {
+                                Intent intent = new Intent(getActivity().getApplicationContext(),
+                                        NutritionViewActivity.class);
+                                intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
+                                        MenuParser.URLPart2s[college] + displayedMonth +
+                                        "%2F" + displayedDay + "%2F" + displayedYear +
+                                        "&RecNumAndPort=" + Util.fullMenuObj.get(college)
+                                        .getLateNight().get(pos).getCode());
+                                startActivity(intent);
+                            }
                         }
                     });
                     break;
