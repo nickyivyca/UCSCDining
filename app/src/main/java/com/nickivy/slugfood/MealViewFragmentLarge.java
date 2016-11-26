@@ -9,8 +9,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -32,7 +34,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.melnykov.fab.FloatingActionButton;
 import com.nickivy.slugfood.parser.MealDataFetcher;
 import com.nickivy.slugfood.parser.MenuParser;
 import com.nickivy.slugfood.util.Util;
@@ -170,10 +171,19 @@ public class MealViewFragmentLarge extends Fragment {
                         topRowVerticalPosition >= 0);
             }
         });
-        mFab = (FloatingActionButton) getActivity().findViewById(R.id.fab_large);
-        mFab.setOnClickListener(new FloatingActionButtonListener());
-        // Attach to dinner list view
-        //fab.attachToListView(listViewDinner);
+        mFab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        mFab.setBackgroundTintList(prefs.getBoolean("dark_theme",false)?
+                ContextCompat.getColorStateList(getContext(), R.color.fab_ripple_color_dark) :
+                ContextCompat.getColorStateList(getContext(), R.color.fab_ripple_color));
+        mFab.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                MainActivity.DatePicker.setSavedContext(view.getContext());
+                DialogFragment newFragment = new MainActivity.DatePicker();
+                newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
+            }
+        });
     }
 
     public void selectItem(int position) {
@@ -492,20 +502,10 @@ public class MealViewFragmentLarge extends Fragment {
             }
             if (collegeNum == position && Util.fullMenuObj.get(position).getIsOpen()) {
                 TypedArray a = v.getContext().getTheme().obtainStyledAttributes(new int[]
-                        {R.attr.tabBackground});
+                        {R.attr.tabBG});
                 ((TextView) v).setBackgroundColor(getResources().getColor(a.getResourceId(0, 0)));
             }
             return v;
-        }
-    }
-
-    public class FloatingActionButtonListener implements FloatingActionButton.OnClickListener {
-
-        @Override
-        public void onClick(View view) {
-            MainActivity.DatePicker.setSavedContext(view.getContext());
-            DialogFragment newFragment = new MainActivity.DatePicker();
-            newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
         }
     }
 

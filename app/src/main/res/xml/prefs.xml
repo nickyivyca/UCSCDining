@@ -69,12 +69,6 @@
                 <intent android:action="android.intent.action.VIEW"
                     android:data="https://jsoup.org" />
             </Preference>
-            <Preference android:key="fablicense"
-                android:title="@string/fablicense_title"
-                android:summary="@string/fablicense_desc">
-                <intent android:action="android.intent.action.VIEW"
-                    android:data="https://github.com/makovkastar/FloatingActionButton" />
-            </Preference>
         </PreferenceScreen>
     </PreferenceCategory>
 </PreferenceScreen>

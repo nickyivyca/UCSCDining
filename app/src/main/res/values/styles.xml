@@ -2,7 +2,7 @@
 <resources>
 
     <attr name="actionBarText" format="reference|color" />
-    <attr name="tabBackground" format="reference|color" />
+    <attr name="tabBG" format="reference|color" />
     <attr name="tabSelector" format="reference|color" />
     <attr name="fabMain" format="reference|color" />
     <attr name="fabPressed" format="reference|color" />
@@ -31,7 +31,7 @@
         <item name="android:textColorSecondary">@color/dark_secondary_text</item>
         <item name="android:divider">@color/dark_divider</item>
         <item name="actionBarText">@color/dark_primary_text</item>
-        <item name="tabBackground">@color/dark_primary_light</item>
+        <item name="tabBG">@color/dark_primary_light</item>
         <item name="tabSelector">@color/dark_primary_text</item>
         <item name="fabMain">#eeeeee</item>
         <item name="fabPressed">#ffffff</item>
@@ -60,7 +60,7 @@
         <item name="android:textColorSecondary">@color/secondary_text</item>
         <item name="android:divider">@color/divider</item>
         <item name="actionBarText">@color/primary_text</item>
-        <item name="tabBackground">@color/primary_light</item>
+        <item name="tabBG">@color/primary_light</item>
         <item name="tabSelector">@color/primary</item>
         <item name="fabMain">@color/primary</item>
         <item name="fabPressed">@color/primary_dark</item>

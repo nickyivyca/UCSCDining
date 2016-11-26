@@ -6,6 +6,9 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -15,8 +18,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-
-import com.melnykov.fab.FloatingActionButton;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -93,8 +94,11 @@ public class FavoritesListActivity extends AppCompatActivity {
 
         final Context tContext = getSupportActionBar().getThemedContext();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.favorites_fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setBackgroundTintList(prefs.getBoolean("dark_theme",false)?
+                ContextCompat.getColorStateList(this, R.color.fab_ripple_color_dark) :
+                ContextCompat.getColorStateList(this, R.color.fab_ripple_color));
+        fab.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 final AlertDialog.Builder alertBuild = new AlertDialog.Builder(tContext);

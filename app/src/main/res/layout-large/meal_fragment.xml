@@ -2,7 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/tools">
     <android.support.v4.widget.SwipeRefreshLayout
     android:id="@+id/large_refresh_layout"
     android:layout_height="fill_parent"
@@ -28,7 +29,7 @@
                     android:gravity="center"
                     android:paddingBottom="16dp"
                     android:paddingTop="16dp"
-                    android:background="?attr/tabBackground"/>
+                    android:background="?attr/tabBG"/>
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -41,7 +42,7 @@
                     android:gravity="center"
                     android:paddingBottom="16dp"
                     android:paddingTop="16dp"
-                    android:background="?attr/tabBackground"/>
+                    android:background="?attr/tabBG"/>
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -54,7 +55,7 @@
                     android:gravity="center"
                     android:paddingBottom="16dp"
                     android:paddingTop="16dp"
-                    android:background="?attr/tabBackground"/>
+                    android:background="?attr/tabBG"/>
             </LinearLayout>
 
             <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -87,14 +88,14 @@
 
         </LinearLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
-    <com.melnykov.fab.FloatingActionButton
-        android:id="@+id/fab_large"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_margin="16dp"
         android:src="@drawable/ic_action_go_to_today"
-        fab:fab_colorNormal="?attr/fabMain"
-        fab:fab_colorPressed="?attr/fabPressed"
-        fab:fab_colorRipple="?attr/fabRipple" />
+        android:layout_gravity="bottom|right"
+        app:fabSize="normal"
+        app:elevation="6dp"
+        android:layout_margin="24dp"
+        />
 </FrameLayout>

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.samples.apps.iosched.ui.widget.SlidingTabLayout;
-import com.melnykov.fab.FloatingActionButton;
 import com.nickivy.slugfood.parser.MealDataFetcher;
 import com.nickivy.slugfood.parser.MenuParser;
 import com.nickivy.slugfood.util.Util;
@@ -22,8 +21,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.ListFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -367,7 +368,18 @@ public class MealViewFragment extends ListFragment{
             });
             mFab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
             mFab.setId(mealnum + FAB_ID1);
-            mFab.setOnClickListener(new FloatingActionButtonListener());
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+            mFab.setBackgroundTintList(prefs.getBoolean("dark_theme",false)?
+                    ContextCompat.getColorStateList(getContext(), R.color.fab_ripple_color_dark) :
+                    ContextCompat.getColorStateList(getContext(), R.color.fab_ripple_color));
+            mFab.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view) {
+                    MainActivity.DatePicker.setSavedContext(view.getContext());
+                    DialogFragment newFragment = new MainActivity.DatePicker();
+                    newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
+                }
+            });
             //mFab.attachToListView(mealList);
 
             /*
@@ -561,7 +573,7 @@ public class MealViewFragment extends ListFragment{
             }
             if (collegeNum == position && Util.fullMenuObj.get(position).getIsOpen()) {
                 TypedArray a = v.getContext().getTheme().obtainStyledAttributes(new int[]
-                        {R.attr.tabBackground});
+                        {R.attr.tabBG});
                 ((TextView) v).setBackgroundColor(getResources().getColor(a.getResourceId(0, 0)));
             }
             return v;
@@ -637,16 +649,6 @@ public class MealViewFragment extends ListFragment{
                     0, text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         }
         bar.setTitle(text);
-    }
-
-    public class FloatingActionButtonListener implements FloatingActionButton.OnClickListener {
-
-        @Override
-        public void onClick(View view) {
-            MainActivity.DatePicker.setSavedContext(view.getContext());
-            DialogFragment newFragment = new MainActivity.DatePicker();
-            newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
-        }
     }
 
 }
