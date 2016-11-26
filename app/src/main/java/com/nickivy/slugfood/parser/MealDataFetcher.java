@@ -175,6 +175,23 @@ public class MealDataFetcher {
                             return Util.GETLIST_DATABASE_FAILURE;
                         }
                     }
+                    for (int i = 0; i < Util.fullMenuObj.get(j).getLateNight().size(); i++) {
+                        statement.bindLong(1, j);
+                        statement.bindLong(2, 3);
+                        statement.bindString(3, Util.fullMenuObj.get(j).getLateNight().get(i)
+                                .getItemName());
+                        statement.bindString(4, Util.fullMenuObj.get(j).getLateNight().get(i)
+                                .getCode());
+                        statement.bindLong(5, month);
+                        statement.bindLong(6, day);
+                        statement.bindLong(7, year);
+                        try {
+                            statement.execute();
+                        } catch (SQLiteConstraintException e) {
+                            running = false;
+                            return Util.GETLIST_DATABASE_FAILURE;
+                        }
+                    }
                 }
                 db.setTransactionSuccessful();
                 db.endTransaction();
@@ -196,7 +213,7 @@ public class MealDataFetcher {
             };
 
             ArrayList<MenuItem> breakfastLoaded,
-                    lunchLoaded, dinnerLoaded;
+                    lunchLoaded, dinnerLoaded, latenightLoaded;
 
                     selection = MealStorage.COLUMN_COLLEGE + "= ? AND " + MealStorage.COLUMN_MEAL +
                             "= ? AND " + MealStorage.COLUMN_MONTH + "= ? AND " +
@@ -260,6 +277,23 @@ public class MealDataFetcher {
                     c.moveToNext();
                 }
                 Util.fullMenuObj.get(j).setDinner(dinnerLoaded);
+                c.close();
+
+                mainSelectionArgs[1] = "" + 3;
+
+                c = db.query(MealStorage.TABLE_MEALS,
+                        mainProjection, selection, mainSelectionArgs, null, null, null);
+
+                c.moveToFirst();
+                latenightLoaded = new ArrayList<MenuItem>();
+
+                for(int i = 0; i < c.getCount(); i++){
+                    latenightLoaded.add(new MenuItem(c.getString
+                            (c.getColumnIndexOrThrow(MealStorage.COLUMN_MENUITEM)),
+                            c.getString(c.getColumnIndexOrThrow(MealStorage.COLUMN_NUTID))));
+                    c.moveToNext();
+                }
+                Util.fullMenuObj.get(j).setLateNight(latenightLoaded);
                 c.close();
 
             }

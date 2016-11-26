@@ -26,7 +26,7 @@ import android.util.Log;
  * @author Nicky Ivy parkedraccoon@gmail.com
  */
 
-public class        MenuParser {
+public class MenuParser {
 
     public static final String URLPart1 = "http://nutrition.sa.ucsc.edu/pickMenu.asp";
 
@@ -40,25 +40,48 @@ public class        MenuParser {
 
     private static final String URLPart3 = "&mealName=";
 
+    private static final String rcURLPart1 = "http://nutrition.sa.ucsc.edu/menuSamp.asp?" +
+            "myaction=read&sName=&dtdate=";
+
+    private static final String rcURLPart2 = "&locationNum=30&locationName=College+Eight&sName=&naFlag=1";
+
     private static final String icalurl = "https://calendar.google.com/calendar/ical/ucsc.edu_t59u0f85lnvamgj30m22e3fmgo%40group.calendar.google.com/public/basic.ics";
-    
+
     public static boolean manualRefresh = false;
 
+    /*
+     * Cowell and 9/10 have late night and post nutrition info for all meals. Crown and Porter do
+     * not have late night. Rachel Carson has late night but does not post nutrition info for the
+     * late night meal itself. This pulls in the empty late night info for Crown and Porter, then
+     * uses a separate method (the old method I used to use, before I would show nutrition info)
+     * to get the menu items for Rachel Carson dining hall's late night menu.
+     */
+
     public static int getSingleMealList(int k, int month, int day, int year, boolean collegeNight,
-                                        boolean otherCollegeforCNight, boolean healthyMonday,
-                                        boolean farmFriday) throws IOException {
+                                           boolean otherCollegeforCNight, boolean healthyMonday,
+                                           boolean farmFriday) throws IOException {
         Elements breakfastNutIds = null,
                 breakfastFoodNames = null,
                 lunchNutIds = null,
                 lunchFoodNames = null,
                 dinnerNutIds = null,
-                dinnerFoodNames = null;
+                dinnerFoodNames = null,
+                latenightNutIds = null,
+                latenightFoodNames = null;
         Document breakfastDoc = fetchDocument(URLPart1 + URLPart2s[k] + month + "%2F" +
                 day + "%2F" + year + URLPart3 + Util.meals[0]);
         Document lunchDoc = fetchDocument(URLPart1 + URLPart2s[k] + month + "%2F" +
                 day + "%2F" + year + URLPart3 + Util.meals[1]);
         Document dinnerDoc = fetchDocument(URLPart1 + URLPart2s[k] + month + "%2F" +
                 day + "%2F" + year + URLPart3 + Util.meals[2]);
+        Document latenightDoc;
+        if (k == 3) {
+            latenightDoc = fetchDocument(rcURLPart1 + month + "%2F" + day + "%2F" + year +
+                    rcURLPart2);
+        } else {
+            latenightDoc = fetchDocument(URLPart1 + URLPart2s[k] + month + "%2F" +
+                    day + "%2F" + year + URLPart3 + "Late+Night");
+        }
 
         breakfastFoodNames = breakfastDoc.select("div[class=\"pickmenucoldispname\"]");
         breakfastNutIds = breakfastDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
@@ -69,9 +92,17 @@ public class        MenuParser {
         dinnerFoodNames = dinnerDoc.select("div[class=\"pickmenucoldispname\"]");
         dinnerNutIds = dinnerDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
 
+        if (k == 3) {
+            latenightFoodNames = latenightDoc.select("td[valign=\"top\"]");
+        } else {
+            latenightFoodNames = latenightDoc.select("div[class=\"pickmenucoldispname\"]");
+            latenightNutIds = latenightDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
+        }
+
         ArrayList<MenuItem> breakfastList = new ArrayList<MenuItem>(),
                 lunchList = new ArrayList<MenuItem>(),
-                dinnerList = new ArrayList<MenuItem>();
+                dinnerList = new ArrayList<MenuItem>(),
+                latenightList = new ArrayList<MenuItem>();
 
         //Catch if the dining hall is closed for that day
         if(breakfastFoodNames != null && breakfastFoodNames.size() > 0){
@@ -95,9 +126,36 @@ public class        MenuParser {
             }
         }
 
+        if (k == 3) {
+            if(latenightFoodNames != null && latenightFoodNames.size() > 0){
+                for(int j = 0; j < latenightFoodNames.size(); j++){                //Dinner
+                    if(latenightFoodNames.get(j).text().contains("Late Night")){
+                        Elements latenight = latenightFoodNames.get(j).select(" div[class=\"menusamprecipes\"]");
+                        for(int i = 0; i < latenight.size(); i++){
+                            latenightList.add(new MenuItem(latenight.get(i).text(), Util.RCNONUT));
+                        }
+                    }
+                }
+            }
+        } else {
+            //Catch if the dining hall is closed for that day
+            if(latenightFoodNames != null && latenightFoodNames.size() > 0){
+                for(int i = 0; i < latenightFoodNames.size(); i++){
+                    latenightList.add(new MenuItem(latenightFoodNames.get(i).text(),
+                            latenightNutIds.get(i).attr("VALUE")));
+                }
+            }
+        }
+
         Util.fullMenuObj.get(k).setBreakfast(breakfastList);
         Util.fullMenuObj.get(k).setLunch(lunchList);
         Util.fullMenuObj.get(k).setDinner(dinnerList);
+        Util.fullMenuObj.get(k).setLateNight(latenightList);
+
+        /*
+         * Dining halls seem to post breakfast menus for weekend brunch now, so no real need for
+         * this code anymore.
+         */
         if(Util.fullMenuObj.get(k).getBreakfast().isEmpty() &&
                 (!(Util.fullMenuObj.get(k).getLunch().isEmpty()) &&
                         !(Util.fullMenuObj.get(k).getDinner().isEmpty()))){
@@ -160,7 +218,7 @@ public class        MenuParser {
         }
         return Util.GETLIST_SUCCESS;
     }
-    
+
     /**
      * Puts downloaded data from specified date (instead of today) into the full menu object.
      */
@@ -253,13 +311,13 @@ public class        MenuParser {
         for (int i = 0; i < 5; i++) {
             int res = getSingleMealList(i, month, day, year, eventBools[i][0], eventBools[i][1],
                     eventBools[i][2], eventBools[i][3]);
-            /*
-             * For some stupid reason, it throws these stupid unexpected status line errors half the
-             * time on mobile data. So we have to intercept those somehow. getsinglemeallist returns
-             * okhttp failure if it gets one - and getsinglemeallist also tries multiple times
-             * before returning the error. It will only try once for lost internet connection,
-             * though.
-             */
+                /*
+                 * For some stupid reason, it throws these stupid unexpected status line errors half the
+                 * time on mobile data. So we have to intercept those somehow. getsinglemeallist returns
+                 * okhttp failure if it gets one - and getsinglemeallist also tries multiple times
+                 * before returning the error. It will only try once for lost internet connection,
+                 * though.
+                 */
             if (res == Util.GETLIST_OKHTTP_FAILURE) {
                 res = getSingleMealList(i, month, day, year, eventBools[i][0], eventBools[i][1],
                         eventBools[i][2], eventBools[i][3]);
@@ -278,6 +336,7 @@ public class        MenuParser {
                 return res;
             }
     	}
+
         return Util.GETLIST_SUCCESS;
     }
 

@@ -10,6 +10,7 @@
     <string name="internet_failed">Connection to server failed!</string>
     <string name="database_failed">Database error, please swipe down to manually refresh</string>
     <string name="no_nutrition_info">Nutrition info is not available for this item!</string>
+    <string name="rc_nonut">Nutrition info for Late Night at Rachel Carson College is not posted</string>
 
     <string name="about">Settings / About</string>
     <string name="settings">Settings</string>

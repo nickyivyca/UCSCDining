@@ -62,12 +62,15 @@ public class MealViewFragment extends ListFragment{
     private static final int LISTVIEW_ID1 = 12,
     LISTVIEW_ID2 = 13,
     LISTVIEW_ID3 = 14,
-    SWIPEREF_ID1 = 15,
-    SWIPEREF_ID2 = 16,
-    SWIPEREF_ID3 = 17,
-    FAB_ID1 = 18,
-    FAB_ID2 = 19,
-    FAB_ID3 = 20;
+    LISTVIEW_ID4 = 15,
+    SWIPEREF_ID1 = 16,
+    SWIPEREF_ID2 = 17,
+    SWIPEREF_ID3 = 18,
+    SWIPEREF_ID4 = 19,
+    FAB_ID1 = 20,
+    FAB_ID2 = 21,
+    FAB_ID3 = 22,
+    FAB_ID4 = 23;
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private ViewPager mViewPager;
@@ -107,6 +110,8 @@ public class MealViewFragment extends ListFragment{
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mViewPager = (ViewPager) view.findViewById(R.id.viewpager);
         mViewPager.setAdapter(new MenuAdapter());
+        // Otherwise pages will fall out of memory and this will cause errors
+        mViewPager.setOffscreenPageLimit(5);
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setDistributeEvenly(true);
         mSlidingTabLayout.setViewPager(mViewPager);
@@ -125,6 +130,7 @@ public class MealViewFragment extends ListFragment{
                 setAdapter((ListView) getActivity().findViewById(LISTVIEW_ID1), collegeNum, Util.BREAKFAST);
                 setAdapter((ListView) getActivity().findViewById(LISTVIEW_ID2), collegeNum, Util.LUNCH);
                 setAdapter((ListView) getActivity().findViewById(LISTVIEW_ID3), collegeNum, Util.DINNER);
+                setAdapter((ListView) getActivity().findViewById(LISTVIEW_ID4), collegeNum, Util.LATENIGHT);
 
                 mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
                 mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer_list);
@@ -232,6 +238,10 @@ public class MealViewFragment extends ListFragment{
             if (mSwipeRefreshLayout != null) {
                 mSwipeRefreshLayout.setRefreshing(false);
             }
+            mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID4);
+            if (mSwipeRefreshLayout != null) {
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
 
             /*
              * We want the spinners canceled no matter what, but all the other stuff should not
@@ -297,6 +307,7 @@ public class MealViewFragment extends ListFragment{
             setAdapter((ListView) getActivity().findViewById(LISTVIEW_ID1), collegeNum, Util.BREAKFAST);
             setAdapter((ListView) getActivity().findViewById(LISTVIEW_ID2), collegeNum, Util.LUNCH);
             setAdapter((ListView) getActivity().findViewById(LISTVIEW_ID3), collegeNum, Util.DINNER);
+            setAdapter((ListView) getActivity().findViewById(LISTVIEW_ID4), collegeNum, Util.LATENIGHT);
 
             // Set title text
             setTitleText(collegeNum, ((AppCompatActivity)getActivity()).getSupportActionBar());
@@ -308,7 +319,7 @@ public class MealViewFragment extends ListFragment{
 
         @Override
         public int getCount() {
-            return 3;
+            return 4;
         }
 
         @Override
@@ -326,7 +337,11 @@ public class MealViewFragment extends ListFragment{
         // Inflate a new layout from our resources
             View view = getActivity().getLayoutInflater().inflate(R.layout.meal,
                 container, false);
+            try {
                 container.addView(view, mealnum);
+            } catch (IndexOutOfBoundsException e) {
+                return view;
+            }
 
             ListView mealList = (ListView) view.findViewById(android.R.id.list);
             /*
@@ -337,7 +352,7 @@ public class MealViewFragment extends ListFragment{
             mealList.setId(mealnum + LISTVIEW_ID1);
 
             mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.meal_refresh_layout);
-            //Add 15 instead of 12 for swipelayout
+            //Add 16 instead of 12 for swipelayout
             mSwipeRefreshLayout.setId(mealnum + SWIPEREF_ID1);
             TypedArray a = mealList.getContext().getTheme().obtainStyledAttributes(new int[] {R.attr.tabSelector});
             mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(a.getResourceId(0, 0)));
@@ -406,6 +421,9 @@ public class MealViewFragment extends ListFragment{
             case Util.DINNER:
                 array = Util.fullMenuObj.get(college).getDinnerList();
                 break;
+            case Util.LATENIGHT:
+                array = Util.fullMenuObj.get(college).getLateNightList();
+                break;
             default:
                 return;
         }
@@ -456,6 +474,26 @@ public class MealViewFragment extends ListFragment{
                                     "&RecNumAndPort=" + Util.fullMenuObj.get(college)
                                     .getDinner().get(pos).getCode());
                             startActivity(intent);
+                        }
+                    });
+                    break;
+                case Util.LATENIGHT:
+                    view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
+                            if (Util.fullMenuObj.get(college).getLateNight().get(pos).getCode().compareTo(Util.RCNONUT) == 0) {
+                                Toast.makeText(getActivity(), getString(R.string.rc_nonut),
+                                        Toast.LENGTH_SHORT).show();
+                            } else {
+                                Intent intent = new Intent(getActivity().getApplicationContext(),
+                                        NutritionViewActivity.class);
+                                intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
+                                        MenuParser.URLPart2s[college] + displayedMonth +
+                                        "%2F" + displayedDay + "%2F" + displayedYear +
+                                        "&RecNumAndPort=" + Util.fullMenuObj.get(college)
+                                        .getLateNight().get(pos).getCode());
+                                startActivity(intent);
+                            }
                         }
                     });
                     break;
@@ -555,6 +593,15 @@ public class MealViewFragment extends ListFragment{
             @Override
             public void run() {
                 mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID3);
+                if (mSwipeRefreshLayout != null) {
+                    mSwipeRefreshLayout.setRefreshing(true);
+                }
+            }
+        });
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout = (SwipeRefreshLayout) getActivity().findViewById(SWIPEREF_ID4);
                 if (mSwipeRefreshLayout != null) {
                     mSwipeRefreshLayout.setRefreshing(true);
                 }

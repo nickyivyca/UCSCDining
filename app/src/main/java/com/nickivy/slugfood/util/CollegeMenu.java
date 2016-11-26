@@ -16,7 +16,8 @@ public class CollegeMenu {
 	private ArrayList<MenuItem> mBreakfast = new ArrayList<MenuItem>();
 	private ArrayList<MenuItem> mLunch = new ArrayList<MenuItem>();
 	private ArrayList<MenuItem> mDinner = new ArrayList<MenuItem>();
-	
+	private ArrayList<MenuItem> mLateNight = new ArrayList<MenuItem>();
+
 	private boolean isSet = false;
 	
 	public CollegeMenu(){}
@@ -36,9 +37,14 @@ public class CollegeMenu {
 		mLunch = meal;
 		isSet = true;
 	}
-	
+
 	public void setDinner(ArrayList<MenuItem> meal){
 		mDinner = meal;
+		isSet = true;
+	}
+
+	public void setLateNight(ArrayList<MenuItem> meal){
+		mLateNight = meal;
 		isSet = true;
 	}
 	
@@ -55,10 +61,17 @@ public class CollegeMenu {
 		}
 		return new ArrayList<MenuItem>();
 	}
-	
+
 	public ArrayList<MenuItem> getDinner(){
 		if(mDinner != null && mDinner.size() > 0){
 			return mDinner;
+		}
+		return new ArrayList<MenuItem>();
+	}
+
+	public ArrayList<MenuItem> getLateNight(){
+		if(mLateNight != null && mLateNight.size() > 0){
+			return mLateNight;
 		}
 		return new ArrayList<MenuItem>();
 	}
@@ -89,18 +102,31 @@ public class CollegeMenu {
         return ret;
     }
 
-    /**
-     * @return Titles of meals as arraylist of strings
-     */
-    public ArrayList<String> getDinnerList(){
-        ArrayList<String> ret = new ArrayList<String>();
-        if(mDinner != null && mDinner.size() > 0){
-            for (MenuItem m : mDinner) {
-                ret.add(m.getItemName());
-            }
-        }
-        return ret;
-    }
+	/**
+	 * @return Titles of meals as arraylist of strings
+	 */
+	public ArrayList<String> getDinnerList(){
+		ArrayList<String> ret = new ArrayList<String>();
+		if(mDinner != null && mDinner.size() > 0){
+			for (MenuItem m : mDinner) {
+				ret.add(m.getItemName());
+			}
+		}
+		return ret;
+	}
+
+	/**
+	 * @return Titles of meals as arraylist of strings
+	 */
+	public ArrayList<String> getLateNightList(){
+		ArrayList<String> ret = new ArrayList<String>();
+		if(mLateNight != null && mLateNight.size() > 0){
+			for (MenuItem m : mLateNight) {
+				ret.add(m.getItemName());
+			}
+		}
+		return ret;
+	}
 	
 	/**
 	 * Get if data has been written to the 

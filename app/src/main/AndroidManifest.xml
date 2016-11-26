@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="14"
-        android:targetSdkVersion="24" />
+        android:targetSdkVersion="25" />
 
     <!-- To connect to servers -->
     <uses-permission android:name="android.permission.INTERNET" />

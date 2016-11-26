@@ -23,7 +23,8 @@ public class Util {
     // Enums for meal constants. They match the indexes in the meals array.
     public static final int BREAKFAST = 0,
             LUNCH = 1,
-            DINNER = 2;
+            DINNER = 2,
+            LATENIGHT = 3;
 
     public static final String[] meals = {
             "Breakfast",
@@ -41,6 +42,7 @@ public class Util {
     };
 
     public static ArrayList<CollegeMenu> fullMenuObj = new ArrayList<CollegeMenu>(){{
+        add(new CollegeMenu());
         add(new CollegeMenu());
         add(new CollegeMenu());
         add(new CollegeMenu());
@@ -87,6 +89,7 @@ public class Util {
     TAG_FROMNOTIFICATION = "from_notification";
 
     public static final int NO_BACKUP_COLLEGE = 6;
+    public static final String RCNONUT = "12345";
 
     /**
      * Returns today's date as a 3-number int array. [month, day, year]
