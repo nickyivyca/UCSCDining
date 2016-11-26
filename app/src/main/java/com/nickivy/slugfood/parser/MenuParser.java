@@ -74,11 +74,11 @@ public class MenuParser {
                 day + "%2F" + year + URLPart3 + Util.meals[1]);
         Document dinnerDoc = fetchDocument(URLPart1 + URLPart2s[k] + month + "%2F" +
                 day + "%2F" + year + URLPart3 + Util.meals[2]);
-        Document latenightDoc;
+        Document latenightDoc = null;
         if (k == 3) {
             latenightDoc = fetchDocument(rcURLPart1 + month + "%2F" + day + "%2F" + year +
                     rcURLPart2);
-        } else {
+        } else if (k != 1 && k != 2 ) {
             latenightDoc = fetchDocument(URLPart1 + URLPart2s[k] + month + "%2F" +
                     day + "%2F" + year + URLPart3 + "Late+Night");
         }
@@ -94,7 +94,7 @@ public class MenuParser {
 
         if (k == 3) {
             latenightFoodNames = latenightDoc.select("td[valign=\"top\"]");
-        } else {
+        } else if (k != 1 && k != 2 ){
             latenightFoodNames = latenightDoc.select("div[class=\"pickmenucoldispname\"]");
             latenightNutIds = latenightDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
         }
@@ -137,7 +137,7 @@ public class MenuParser {
                     }
                 }
             }
-        } else {
+        } else if (k != 1 && k != 2 ){
             //Catch if the dining hall is closed for that day
             if(latenightFoodNames != null && latenightFoodNames.size() > 0){
                 for(int i = 0; i < latenightFoodNames.size(); i++){

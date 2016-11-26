@@ -72,6 +72,8 @@ public class Util {
 
     public static final String brunchMessage = "See lunch for today\'s brunch menu";
 
+    public static final String nuturlpart1 = "http://nutrition.sa.ucsc.edu/label.asp?locationNum=";
+
     // Tags for intent passed to main activity from widget
     public static final String TAG_COLLEGE = "tag_college",
     TAG_MEAL = "tag_meal",
