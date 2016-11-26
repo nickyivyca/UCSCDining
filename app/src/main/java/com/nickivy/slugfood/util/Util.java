@@ -18,7 +18,8 @@ public class Util {
     // Times that the app decides to switch over to the specified meal.
     public static final int DINNER_SWITCH_TIME = 15, // 3 PM
             LUNCH_SWITCH_TIME = 11, // 11 AM
-            BREAKFAST_SWITCH_TIME = 21;// 9 PM
+            BREAKFAST_SWITCH_TIME = 23,// 9 PM
+            LATENIGHT_SWITCH_TIME = 20;
 
     // Enums for meal constants. They match the indexes in the meals array.
     public static final int BREAKFAST = 0,
@@ -122,8 +123,12 @@ public class Util {
      */
     public static int getCurrentMeal(int college) {
         Calendar cal = Calendar.getInstance();
-        if (cal.get(Calendar.HOUR_OF_DAY) >= DINNER_SWITCH_TIME &&
+        if (cal.get(Calendar.HOUR_OF_DAY) >= LATENIGHT_SWITCH_TIME &&
                 cal.get(Calendar.HOUR_OF_DAY) < BREAKFAST_SWITCH_TIME) {
+            return LATENIGHT;
+        }
+        if (cal.get(Calendar.HOUR_OF_DAY) >= DINNER_SWITCH_TIME &&
+                cal.get(Calendar.HOUR_OF_DAY) < LATENIGHT_SWITCH_TIME) {
             return DINNER;
         }
         if (cal.get(Calendar.HOUR_OF_DAY) >= LUNCH_SWITCH_TIME &&

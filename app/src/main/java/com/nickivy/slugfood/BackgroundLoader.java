@@ -32,7 +32,8 @@ public class BackgroundLoader extends BroadcastReceiver {
 
     private PendingIntent breakfastIntent = null,
             lunchIntent= null,
-            dinnerIntent = null;
+            dinnerIntent = null,
+            latenightIntent = null;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -67,6 +68,12 @@ public class BackgroundLoader extends BroadcastReceiver {
             if (prefs.getBoolean("background_load", false)) {
                 setAlarm(context);
             }
+            /*
+            // Test code for testing time-based events
+            int today[] = Util.getToday();
+            new BackgroundLoadTask(today[0], today[1],
+                    today[2], context).execute();
+            Log.v(Util.LOGTAG, "boot completed received");*/
         }
     }
 
@@ -95,6 +102,8 @@ public class BackgroundLoader extends BroadcastReceiver {
                 (PendingIntent.getBroadcast(context, Util.LUNCH_SWITCH_TIME,
                         timeIntent, PendingIntent.FLAG_NO_CREATE) != null) &&
                 (PendingIntent.getBroadcast(context, Util.DINNER_SWITCH_TIME,
+                        timeIntent, PendingIntent.FLAG_NO_CREATE) != null) &&
+                (PendingIntent.getBroadcast(context, Util.LATENIGHT_SWITCH_TIME,
                         timeIntent, PendingIntent.FLAG_NO_CREATE) != null);
         if (alarmEnabled) {
             return;
@@ -129,6 +138,15 @@ public class BackgroundLoader extends BroadcastReceiver {
         calendar.set(Calendar.MILLISECOND, 0);
         m.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, dinnerIntent);
+
+        latenightIntent = PendingIntent.getBroadcast(context, Util.LATENIGHT_SWITCH_TIME,
+                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        calendar.set(Calendar.HOUR_OF_DAY, Util.LATENIGHT_SWITCH_TIME);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        m.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, dinnerIntent);
     }
 
     public void disableAlarm(Context context) {
@@ -143,14 +161,18 @@ public class BackgroundLoader extends BroadcastReceiver {
                 timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         dinnerIntent = PendingIntent.getBroadcast(context, Util.DINNER_SWITCH_TIME,
                 timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        latenightIntent = PendingIntent.getBroadcast(context, Util.LATENIGHT_SWITCH_TIME,
+                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         // Cancel the alarms
         m.cancel(breakfastIntent);
         m.cancel(lunchIntent);
         m.cancel(dinnerIntent);
+        m.cancel(latenightIntent);
         // Cancel the intents themselves (so the alarmenabled calculations will work properly)
         breakfastIntent.cancel();
         lunchIntent.cancel();
         dinnerIntent.cancel();
+        latenightIntent.cancel();
     }
 
 
