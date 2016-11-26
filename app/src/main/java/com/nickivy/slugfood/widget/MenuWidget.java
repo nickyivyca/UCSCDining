@@ -41,7 +41,7 @@ import java.util.Calendar;
  */
 public class MenuWidget extends AppWidgetProvider {
 
-    private static final String CLICKTAG_COLLEGELEFT = "COLLEGE_LEFT",
+    public static final String CLICKTAG_COLLEGELEFT = "COLLEGE_LEFT",
     CLICKTAG_COLLEGERIGHT = "COLLEGE_RIGHT",
     CLICKTAG_MEALLEFT = "MEAL_LEFT",
     CLICKTAG_MEALRIGHT = "MEAL_RIGHT",
@@ -56,7 +56,7 @@ public class MenuWidget extends AppWidgetProvider {
 
     public static ArrayList<WidgetData> widgetData = new ArrayList<WidgetData>();
 
-    private static boolean timeUpdate;
+    public static boolean timeUpdate;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -65,15 +65,6 @@ public class MenuWidget extends AppWidgetProvider {
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds);
         timeUpdate = false;
-    }
-
-    @Override
-    public void onEnabled(Context context) {
-        Intent intent = new Intent(context, BackgroundLoader.class);
-        intent.setAction(Util.TAG_WIDGETENABLED);
-        context.sendBroadcast(intent);
-
-        super.onEnabled(context);
     }
 
     @Override
@@ -99,6 +90,7 @@ public class MenuWidget extends AppWidgetProvider {
         intent.setAction(Util.TAG_WIDGETENABLED);
         context.sendBroadcast(intent);
         WidgetData thisWidgetData = getWidgetDataById(appWidgetId);
+
         if (thisWidgetData == null) {
             // Not doing full reinitialization here, this is how we make the initial data when added
             SharedPreferences prefs = context.getSharedPreferences(Util.WIDGETSTATE_PREFS, 0);
@@ -185,6 +177,8 @@ public class MenuWidget extends AppWidgetProvider {
                     break;
                 }
             }
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences
+                    (mContext.getApplicationContext());
 
             // If so display 'All Closed' and nothing else, but still set date
             mData.getViews().setTextViewText(R.id.widget_mealname, mData.getMonth() + "/" +
@@ -213,8 +207,6 @@ public class MenuWidget extends AppWidgetProvider {
                         Util.fullMenuObj.get(mData.getBackupCollege()).getIsOpen()) {
                     mData.setCollege(mData.getBackupCollege());
                 }
-                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences
-                        (mContext.getApplicationContext());
 
                 int secondcollege = Integer.parseInt(settings.getString("default_college_2nd", "0"));
 
@@ -254,11 +246,15 @@ public class MenuWidget extends AppWidgetProvider {
                     intent, PendingIntent.FLAG_UPDATE_CURRENT);
             mData.getViews().setOnClickPendingIntent(R.id.widget_college_leftbutton,
                     pendingIntent);
+            mData.getViews().setOnClickPendingIntent(R.id.widget_dark_college_leftbutton,
+                    pendingIntent);
 
             intent.setAction(CLICKTAG_COLLEGERIGHT);
             pendingIntent = PendingIntent.getBroadcast(mContext, mData.getWidgetId(), intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
             mData.getViews().setOnClickPendingIntent(R.id.widget_college_rightbutton,
+                    pendingIntent);
+            mData.getViews().setOnClickPendingIntent(R.id.widget_dark_college_rightbutton,
                     pendingIntent);
 
             intent.setAction(CLICKTAG_MEALLEFT);
@@ -266,11 +262,15 @@ public class MenuWidget extends AppWidgetProvider {
                     PendingIntent.FLAG_UPDATE_CURRENT);
             mData.getViews().setOnClickPendingIntent(R.id.widget_mealname_leftbutton,
                     pendingIntent);
+            mData.getViews().setOnClickPendingIntent(R.id.widget_dark_mealname_leftbutton,
+                    pendingIntent);
 
             intent.setAction(CLICKTAG_MEALRIGHT);
             pendingIntent = PendingIntent.getBroadcast(mContext, mData.getWidgetId(), intent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
             mData.getViews().setOnClickPendingIntent(R.id.widget_mealname_rightbutton,
+                    pendingIntent);
+            mData.getViews().setOnClickPendingIntent(R.id.widget_dark_mealname_rightbutton,
                     pendingIntent);
 
             // Set intent on other bits for launching main app
@@ -297,6 +297,43 @@ public class MenuWidget extends AppWidgetProvider {
             mData.getViews().setRemoteAdapter(R.id.widget_list, svcIntent);
             mAppWidgetManager.notifyAppWidgetViewDataChanged(mData.getWidgetId(),
                     R.id.widget_list);
+
+            // Apply theme to widget
+            if (settings.getBoolean("dark_theme",false)) {
+                mData.getViews().setInt(R.id.widget_collegename, "setBackgroundColor", mContext.getResources().getColor(R.color.dark_primary));
+                mData.getViews().setTextColor(R.id.widget_collegename, mContext.getResources().getColor(R.color.dark_primary_text));
+                mData.getViews().setInt(R.id.widget_mealname, "setBackgroundColor", mContext.getResources().getColor(R.color.dark_primary));
+                mData.getViews().setTextColor(R.id.widget_mealname, mContext.getResources().getColor(R.color.dark_primary_text));
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_college_leftbutton, View.VISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_college_leftbutton, View.INVISIBLE);
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_college_rightbutton, View.VISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_college_rightbutton, View.INVISIBLE);
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_mealname_leftbutton, View.VISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_mealname_leftbutton, View.INVISIBLE);
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_mealname_rightbutton, View.VISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_mealname_rightbutton, View.INVISIBLE);
+            } else {
+                mData.getViews().setInt(R.id.widget_collegename, "setBackgroundColor", mContext.getResources().getColor(R.color.primary));
+                mData.getViews().setTextColor(R.id.widget_collegename, mContext.getResources().getColor(R.color.primary_text));
+                mData.getViews().setInt(R.id.widget_mealname, "setBackgroundColor", mContext.getResources().getColor(R.color.primary));
+                mData.getViews().setTextColor(R.id.widget_mealname, mContext.getResources().getColor(R.color.primary_text));
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_college_leftbutton, View.INVISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_college_leftbutton, View.VISIBLE);
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_college_rightbutton, View.INVISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_college_rightbutton, View.VISIBLE);
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_mealname_leftbutton, View.INVISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_mealname_leftbutton, View.VISIBLE);
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_mealname_rightbutton, View.INVISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_mealname_rightbutton, View.VISIBLE);
+            }
 
             mAppWidgetManager.updateAppWidget(mData.getWidgetId(), mData.getViews());
             saveData(mContext);

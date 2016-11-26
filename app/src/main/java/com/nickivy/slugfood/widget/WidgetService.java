@@ -2,16 +2,16 @@ package com.nickivy.slugfood.widget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
+import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.nickivy.slugfood.R;
-import com.nickivy.slugfood.parser.MenuParser;
 import com.nickivy.slugfood.util.Util;
 
 import java.util.ArrayList;
@@ -112,6 +112,18 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                         (appWidgetId).getCollege()).get(position));
         intent.putExtras(extras);// Set intent on other bits for launching main app
         row.setOnClickFillInIntent(android.R.id.text1, intent);
+
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences
+                (context.getApplicationContext());
+
+        // Apply theme
+        if (settings.getBoolean("dark_theme",false)) {
+            row.setTextColor(android.R.id.text1, context.getResources().getColor(R.color.dark_primary_text));
+            row.setInt(android.R.id.text1, "setBackgroundColor", context.getResources().getColor(R.color.dark_primary));
+        } else {
+            row.setTextColor(android.R.id.text1, context.getResources().getColor(R.color.primary_text));
+            row.setInt(android.R.id.text1, "setBackgroundColor", Color.WHITE);
+        }
         return row;
     }
 

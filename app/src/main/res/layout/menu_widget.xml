@@ -34,6 +34,13 @@
         android:src="@drawable/arrow_left_black"
         android:background="@drawable/arrow_background"/>
     <ImageButton
+        android:id="@+id/widget_dark_college_leftbutton"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@id/widget_collegename"
+        android:src="@drawable/arrow_left_white"
+        android:background="@drawable/arrow_background_dark"/>
+    <ImageButton
         android:id="@+id/widget_college_rightbutton"
         android:layout_alignBottom="@id/widget_collegename"
         android:layout_alignParentRight="true"
@@ -41,6 +48,14 @@
         android:layout_height="fill_parent"
         android:src="@drawable/arrow_right_black"
         android:background="@drawable/arrow_background"/>
+    <ImageButton
+        android:id="@+id/widget_dark_college_rightbutton"
+        android:layout_alignBottom="@id/widget_collegename"
+        android:layout_alignParentRight="true"
+        android:layout_width="50dp"
+        android:layout_height="fill_parent"
+        android:src="@drawable/arrow_right_white"
+        android:background="@drawable/arrow_background_dark"/>
     <ImageButton
         android:id="@+id/widget_mealname_leftbutton"
         android:layout_below="@id/widget_college_leftbutton"
@@ -50,6 +65,14 @@
         android:src="@drawable/arrow_left_black"
         android:background="@drawable/arrow_background"/>
     <ImageButton
+        android:id="@+id/widget_dark_mealname_leftbutton"
+        android:layout_below="@id/widget_dark_college_leftbutton"
+        android:layout_alignBottom="@+id/widget_mealname"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:src="@drawable/arrow_left_white"
+        android:background="@drawable/arrow_background_dark"/>
+    <ImageButton
         android:id="@+id/widget_mealname_rightbutton"
         android:layout_below="@id/widget_college_rightbutton"
         android:layout_alignBottom="@+id/widget_mealname"
@@ -58,6 +81,15 @@
         android:layout_height="fill_parent"
         android:src="@drawable/arrow_right_black"
         android:background="@drawable/arrow_background"/>
+    <ImageButton
+        android:id="@+id/widget_dark_mealname_rightbutton"
+        android:layout_below="@id/widget_dark_college_rightbutton"
+        android:layout_alignBottom="@+id/widget_mealname"
+        android:layout_alignParentRight="true"
+        android:layout_width="50dp"
+        android:layout_height="fill_parent"
+        android:src="@drawable/arrow_right_white"
+        android:background="@drawable/arrow_background_dark"/>
     <ListView
         android:id="@+id/widget_list"
         android:layout_below="@id/widget_mealname_leftbutton"

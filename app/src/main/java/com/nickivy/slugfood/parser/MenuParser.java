@@ -28,14 +28,14 @@ import android.util.Log;
 
 public class MenuParser {
 
-    public static final String URLPart1 = "http://nutrition.sa.ucsc.edu/pickMenu.asp";
+    public static final String URLPart1 = "http://nutrition.sa.ucsc.edu/pickMenu.asp?locationNum=";
 
     public static final String[] URLPart2s = {
-            "?locationNum=05&locationName=Cowell&dtdate=",
-            "?locationNum=20&locationName=+Crown+Merrill&dtdate=",
-            "?locationNum=25&locationName=Porter&dtdate=",
-            "?locationNum=30&locationName=College+Eight&dtdate=",
-            "?locationNum=40&locationName=College+Nine+%26+Ten&dtdate="
+            "05&locationName=Cowell&dtdate=",
+            "20&locationName=+Crown+Merrill&dtdate=",
+            "25&locationName=Porter&dtdate=",
+            "30&locationName=+Rachel+Carson+Oakes+Dining+Hall&dtdate=",
+            "40&locationName=College+Nine+%26+Ten&dtdate="
     };
 
     private static final String URLPart3 = "&mealName=";
@@ -43,7 +43,7 @@ public class MenuParser {
     private static final String rcURLPart1 = "http://nutrition.sa.ucsc.edu/menuSamp.asp?" +
             "myaction=read&sName=&dtdate=";
 
-    private static final String rcURLPart2 = "&locationNum=30&locationName=College+Eight&sName=&naFlag=1";
+    private static final String rcURLPart2 = "&locationNum=30&locationName=Rachel+Carson+Oakes+Dining+Hall&sName=&naFlag=1";
 
     private static final String icalurl = "https://calendar.google.com/calendar/ical/ucsc.edu_t59u0f85lnvamgj30m22e3fmgo%40group.calendar.google.com/public/basic.ics";
 

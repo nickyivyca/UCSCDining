@@ -8,6 +8,6 @@
   <color name="dark_secondary_text">#eeeeee</color>
   <color name="dark_icons">#212121</color>
   <color name="dark_divider">#333333</color>
-  <color name="dark_primary_superdark">#FF9800</color>
+  <color name="dark_primary_superdark">#000000</color>
   <color name="dark_disabled_text">#333333</color>
 </resources>

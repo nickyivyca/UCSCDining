@@ -1,5 +1,7 @@
 package com.nickivy.slugfood.util;
 
+import android.util.Log;
+
 import com.nickivy.slugfood.parser.MenuParser;
 
 import java.util.ArrayList;
@@ -146,5 +148,9 @@ public class Util {
             return BREAKFAST;
         }
         return -1;
+    }
+
+    public static void log(String str) {
+        android.util.Log.v(Util.LOGTAG, str);
     }
 }
