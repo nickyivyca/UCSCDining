@@ -82,6 +82,9 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
             case Util.DINNER:
                 return Util.fullMenuObj.get(MenuWidget.getWidgetDataById
                         (appWidgetId).getCollege()).getDinner().size();
+            case Util.LATENIGHT:
+                return Util.fullMenuObj.get(MenuWidget.getWidgetDataById
+                        (appWidgetId).getCollege()).getLateNight().size();
             default:
                 return -1;
         }
@@ -131,6 +134,8 @@ class MealWidgetViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                 return Util.fullMenuObj.get(college).getLunchList();
             case Util.DINNER:
                 return Util.fullMenuObj.get(college).getDinnerList();
+            case Util.LATENIGHT:
+                return Util.fullMenuObj.get(college).getLateNightList();
             default:
                 return null;
         }

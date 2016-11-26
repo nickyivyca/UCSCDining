@@ -68,8 +68,7 @@ public class BackgroundLoader extends BroadcastReceiver {
             if (prefs.getBoolean("background_load", false)) {
                 setAlarm(context);
             }
-            /*
-            // Test code for testing time-based events
+            /*// Test code for testing time-based events
             int today[] = Util.getToday();
             new BackgroundLoadTask(today[0], today[1],
                     today[2], context).execute();

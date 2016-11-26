@@ -149,8 +149,8 @@ public class WidgetData {
     public void incrementMeal() {
         directionRight = true;
         currentMeal++;
-        if (currentMeal == 3) {
-            currentMeal = 0;
+        if (currentMeal == 4) {
+            currentMeal = Util.BREAKFAST;
             // If at dinner, and right button pressed, advance to next day
             changeDay(1);
             /*
@@ -164,7 +164,7 @@ public class WidgetData {
         directionRight = false;
         currentMeal--;
         if (currentMeal == -1) {
-            currentMeal = 2;
+            currentMeal = Util.LATENIGHT;
             // If at breakfast and left button pressed, go to previous day
             changeDay(-1);
         }

@@ -213,13 +213,17 @@ public class MenuWidget extends AppWidgetProvider {
                         Util.fullMenuObj.get(mData.getBackupCollege()).getIsOpen()) {
                     mData.setCollege(mData.getBackupCollege());
                 }
+                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences
+                        (mContext.getApplicationContext());
 
-                if (mTimeUpdate && !Util.fullMenuObj.get(mData.getCollege()).getIsOpen()) {
-                    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences
-                            (mContext.getApplicationContext());
+                int secondcollege = Integer.parseInt(settings.getString("default_college_2nd", "0"));
+
+                // Setting for if dining hall is closed, or also use alternate colleges for late night
+                if (mTimeUpdate && (!Util.fullMenuObj.get(mData.getCollege()).getIsOpen() ||
+                        (Util.fullMenuObj.get(mData.getCollege()).getLateNight().size() == 0 &&
+                                Util.fullMenuObj.get(secondcollege).getLateNight().size() > 0))) {
                     mData.setBackupCollege();
-                    mData.setCollege(Integer.parseInt(
-                            settings.getString("default_college_2nd", "0")));
+                    mData.setCollege(secondcollege);
                 }
 
                 // Set view text of college and current meal
