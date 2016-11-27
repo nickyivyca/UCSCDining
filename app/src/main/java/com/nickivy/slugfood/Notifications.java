@@ -122,13 +122,11 @@ public class Notifications extends BroadcastReceiver {
          */
         int[] today = Util.getToday();
         boolean sayTomorrow = (today[1] != today[3]);
-        Log.v(Util.LOGTAG, "current date is " + today[1] + " " + today[3]);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String[] favsList = prefs.getStringSet("favorites_items_list", new HashSet<String>()).toArray(new String[0]);
         for (String item : favsList) {
             Set<String> selectedDhalls = prefs.getStringSet("notification_dhalls", null);
-            Log.v(Util.LOGTAG, "checking item " + item);
 
             for (String s : selectedDhalls.toArray(new String[0])) {
                 int i = Integer.parseInt(s);

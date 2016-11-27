@@ -384,7 +384,7 @@ public class MealViewFragmentLarge extends Fragment {
                         public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
                             Intent intent = new Intent(getActivity().getApplicationContext(),
                                     NutritionViewActivity.class);
-                            intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
+                            intent.putExtra(Util.TAG_URL, Util.nuturlpart1 +
                                     MenuParser.URLPart2s[college] + displayedMonth +
                                     "%2F" + displayedDay + "%2F" + displayedYear +
                                     "&RecNumAndPort=" + Util.fullMenuObj.get(college)
@@ -399,7 +399,7 @@ public class MealViewFragmentLarge extends Fragment {
                         public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
                             Intent intent = new Intent(getActivity().getApplicationContext(),
                                     NutritionViewActivity.class);
-                            intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
+                            intent.putExtra(Util.TAG_URL, Util.nuturlpart1 +
                                     MenuParser.URLPart2s[college] + displayedMonth +
                                     "%2F" + displayedDay + "%2F" + displayedYear +
                                     "&RecNumAndPort=" + Util.fullMenuObj.get(college)
@@ -414,7 +414,7 @@ public class MealViewFragmentLarge extends Fragment {
                         public void onItemClick(AdapterView<?> a, View v, int pos, long id) {
                             Intent intent = new Intent(getActivity().getApplicationContext(),
                                     NutritionViewActivity.class);
-                            intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
+                            intent.putExtra(Util.TAG_URL, Util.nuturlpart1 +
                                     MenuParser.URLPart2s[college] + displayedMonth +
                                     "%2F" + displayedDay + "%2F" + displayedYear +
                                     "&RecNumAndPort=" + Util.fullMenuObj.get(college)
@@ -433,7 +433,7 @@ public class MealViewFragmentLarge extends Fragment {
                             } else {
                                 Intent intent = new Intent(getActivity().getApplicationContext(),
                                         NutritionViewActivity.class);
-                                intent.putExtra(Util.TAG_URL, "http://nutrition.sa.ucsc.edu/label.asp" +
+                                intent.putExtra(Util.TAG_URL, Util.nuturlpart1 +
                                         MenuParser.URLPart2s[college] + displayedMonth +
                                         "%2F" + displayedDay + "%2F" + displayedYear +
                                         "&RecNumAndPort=" + Util.fullMenuObj.get(college)
