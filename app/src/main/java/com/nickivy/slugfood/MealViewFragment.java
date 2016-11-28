@@ -114,7 +114,7 @@ public class MealViewFragment extends ListFragment{
         // Otherwise pages will fall out of memory and this will cause errors
         mViewPager.setOffscreenPageLimit(5);
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
-        mSlidingTabLayout.setDistributeEvenly(true);
+        mSlidingTabLayout.setDistributeEvenly(false);
         mSlidingTabLayout.setViewPager(mViewPager);
         TypedArray a = view.getContext().getTheme().obtainStyledAttributes(new int[] {R.attr.tabSelector});
         mSlidingTabLayout.setSelectedIndicatorColors(getResources().getColor(a.getResourceId(0, 0)));
