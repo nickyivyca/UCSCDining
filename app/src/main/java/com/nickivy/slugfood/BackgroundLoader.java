@@ -145,7 +145,7 @@ public class BackgroundLoader extends BroadcastReceiver {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         m.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, dinnerIntent);
+                AlarmManager.INTERVAL_DAY, latenightIntent);
     }
 
     public void disableAlarm(Context context) {
