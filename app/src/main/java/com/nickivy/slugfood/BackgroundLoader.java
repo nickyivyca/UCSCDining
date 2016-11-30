@@ -94,6 +94,14 @@ public class BackgroundLoader extends BroadcastReceiver {
         final Intent timeIntent = new Intent(context, BackgroundLoader.class);
         timeIntent.setAction(Util.TAG_TIMEUPDATE);
 
+        final AlarmManager m = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        // Clearing the old breakfast intent.
+        PendingIntent oldIntent = PendingIntent.getBroadcast(context, 21,
+                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        m.cancel(oldIntent);
+        oldIntent.cancel();
+
         // If getBroadcast with the NO_CREATE flag returns null for all of these all alarms are set
         // Don't reset them or else the alarm manager will run off with them
         boolean alarmEnabled = (PendingIntent.getBroadcast(context, Util.BREAKFAST_SWITCH_TIME,
@@ -107,8 +115,6 @@ public class BackgroundLoader extends BroadcastReceiver {
         if (alarmEnabled) {
             return;
         }
-
-        final AlarmManager m = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
 
         breakfastIntent = PendingIntent.getBroadcast(context, Util.BREAKFAST_SWITCH_TIME,
@@ -162,16 +168,23 @@ public class BackgroundLoader extends BroadcastReceiver {
                 timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         latenightIntent = PendingIntent.getBroadcast(context, Util.LATENIGHT_SWITCH_TIME,
                 timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // Clearing the old breakfast intent.
+        PendingIntent oldIntent = PendingIntent.getBroadcast(context, 21,
+                timeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         // Cancel the alarms
         m.cancel(breakfastIntent);
         m.cancel(lunchIntent);
         m.cancel(dinnerIntent);
         m.cancel(latenightIntent);
+        m.cancel(oldIntent);
         // Cancel the intents themselves (so the alarmenabled calculations will work properly)
         breakfastIntent.cancel();
         lunchIntent.cancel();
         dinnerIntent.cancel();
         latenightIntent.cancel();
+        oldIntent.cancel();
     }
 
 
