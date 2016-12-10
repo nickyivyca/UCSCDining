@@ -213,7 +213,8 @@ public class MenuWidget extends AppWidgetProvider {
                 // Setting for if dining hall is closed, or also use alternate colleges for late night
                 if (mTimeUpdate && (!Util.fullMenuObj.get(mData.getCollege()).getIsOpen() ||
                         (Util.fullMenuObj.get(mData.getCollege()).getLateNight().size() == 0 &&
-                                Util.fullMenuObj.get(secondcollege).getLateNight().size() > 0))) {
+                                Util.fullMenuObj.get(secondcollege).getLateNight().size() > 0 &&
+                                Util.getCurrentMeal(mData.getCollege()) == Util.LATENIGHT))) {
                     mData.setBackupCollege();
                     mData.setCollege(secondcollege);
                 }
