@@ -47,6 +47,10 @@ public class MealDataFetcher {
         }
 
         db = mealStore.getReadableDatabase();
+        if (db == null) {
+            running = false;
+            return Util.GETLIST_DATABASE_FAILURE;
+        }
 
         String selection = MealStorage.COLUMN_MONTH + "= ? AND " + MealStorage.COLUMN_DAY +
                 "= ? AND " + MealStorage.COLUMN_YEAR + "= ?";
