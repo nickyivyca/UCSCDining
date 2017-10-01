@@ -174,31 +174,31 @@ public class NutritionViewActivity extends AppCompatActivity {
                 calories_fat = fonts.get(4).text();
                 totalfat_amount = fonts.get(11).text();
                 satfat = "Saturated Fat " + fonts.get(18).text();
-                satfat_percent = fonts.get(55).text().substring(1);
-                transfat = "Trans Fat " + fonts.get(25).text();
-                cholesterol_amount = fonts.get(31).text();
-                cholesterol_percent = fonts.get(59).text().substring(1);
-                sodium_amount = fonts.get(37).text();
-                sodium_percent = fonts.get(38).text() + "%";
+                satfat_percent = fonts.get(57).text().substring(1);
+                transfat = "Trans Fat " + fonts.get(26).text();
+                cholesterol_amount = fonts.get(32).text();
+                cholesterol_percent = fonts.get(61).text().substring(1);
+                sodium_amount = fonts.get(39).text();
+                sodium_percent = fonts.get(40).text() + "%";
                 carbs_amount = fonts.get(14).text();
                 carbs_percent = fonts.get(15).text() + "%";
-                fiber_amount = fonts.get(21).text();
-                fiber_percent = fonts.get(22).text() + "%";
-                sugars = "Sugars " + fonts.get(28).text();
+                fiber_amount = fonts.get(22).text();
+                fiber_percent = fonts.get(23).text() + "%";
+                sugars = "Sugars " + fonts.get(29).text();
 
-                protein_amount = fonts.get(34).text();
-                protein_percent = fonts.get(59).text().substring(1);
+                protein_amount = fonts.get(36).text();
+                protein_percent = fonts.get(47).text().substring(1);
 
                 /*
                  * Percents appearing below normal list. Strangely, the page includes 2 often different
                  * amounts of sodium and fiber.
                  */
-                percent_vitamina = "Vitamin A - IU" + fonts.get(65).text().substring(1);
-                percent_vitb12 = "Vitamin B12" + fonts.get(69).text().substring(1);
-                percent_vitaminc = "Vitamin C" + fonts.get(67).text().substring(1);
-                percent_iron = "Iron" + fonts.get(61).text().substring(1);
-                percent_sodium = "Sodium" + fonts.get(63).text().substring(1);
-                percent_fiber = "Dietary Fiber" + fonts.get(49).text().substring(1);
+                percent_vitamina = "Vitamin A - IU" + fonts.get(67).text().substring(1);
+                percent_vitb12 = "Vitamin B12" + fonts.get(71).text().substring(1);
+                percent_vitaminc = "Vitamin C" + fonts.get(69).text().substring(1);
+                percent_iron = "Iron" + fonts.get(63).text().substring(1);
+                percent_sodium = "Sodium" + fonts.get(65).text().substring(1);
+                percent_fiber = "Dietary Fiber" + fonts.get(51).text().substring(1);
 
                 ingredients_list = page.select("span").get(1).text();
                 allergens_list = page.select("span").get(3).text();
