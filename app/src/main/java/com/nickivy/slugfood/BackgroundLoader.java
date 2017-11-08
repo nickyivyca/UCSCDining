@@ -17,6 +17,8 @@ import com.nickivy.slugfood.widget.MenuWidget;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * This class controls the background loading of the app. The
@@ -102,10 +104,14 @@ public class BackgroundLoader extends BroadcastReceiver {
         m.cancel(oldIntent);
         oldIntent.cancel();
 
+
+        SharedPreferences settings = context.getSharedPreferences(Util.DST_PREF, 0);
+        SharedPreferences.Editor editor = settings.edit();
+
         // If getBroadcast with the NO_CREATE flag returns null for all of these all alarms are set
         // Don't reset them or else the alarm manager will run off with them
         boolean alarmEnabled = (PendingIntent.getBroadcast(context, Util.BREAKFAST_SWITCH_TIME,
-                timeIntent, PendingIntent.FLAG_NO_CREATE) != null) &&
+                        timeIntent, PendingIntent.FLAG_NO_CREATE) != null) &&
                 (PendingIntent.getBroadcast(context, Util.LUNCH_SWITCH_TIME,
                         timeIntent, PendingIntent.FLAG_NO_CREATE) != null) &&
                 (PendingIntent.getBroadcast(context, Util.DINNER_SWITCH_TIME,
@@ -113,7 +119,14 @@ public class BackgroundLoader extends BroadcastReceiver {
                 (PendingIntent.getBroadcast(context, Util.LATENIGHT_SWITCH_TIME,
                         timeIntent, PendingIntent.FLAG_NO_CREATE) != null);
         if (alarmEnabled) {
-            return;
+            if (settings.getBoolean(Util.KEY_DST_PREF, true) != TimeZone.getDefault().inDaylightTime(new Date())) {
+                Util.log("Resetting alarm to change DST mode");
+                disableAlarm(context);
+                editor.putBoolean(Util.KEY_DST_PREF, TimeZone.getDefault().inDaylightTime(new Date()));
+                editor.commit();
+            } else {
+                return;
+            }
         }
         Calendar calendar = Calendar.getInstance();
 

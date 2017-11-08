@@ -69,6 +69,9 @@ public class Util {
 
 
     public static final String WIDGETSTATE_PREFS = "widgetstate_prefs";
+    public static final String DST_PREF = "dst_prefs";
+
+    public static final String KEY_DST_PREF = "dst_key_pref";
 
     public static final String brunchMessage = "See lunch for today\'s brunch menu";
 

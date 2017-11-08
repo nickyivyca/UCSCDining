@@ -46,7 +46,12 @@ public class MealDataFetcher {
             return Util.GETLIST_DATABASE_FAILURE;
         }
 
-        db = mealStore.getReadableDatabase();
+        try {
+            db = mealStore.getReadableDatabase();
+        } catch (NullPointerException e) {
+            running = false;
+            return Util.GETLIST_DATABASE_FAILURE;
+        }
         if (db == null) {
             running = false;
             return Util.GETLIST_DATABASE_FAILURE;
