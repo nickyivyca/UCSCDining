@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nickivy.slugfood"
-    android:versionCode="23"
-    android:versionName="1.6.6" >
+    android:versionCode="24"
+    android:versionName="1.6.7" >
 
-    <uses-sdk
+    <!--uses-sdk
         android:minSdkVersion="14"
-        android:targetSdkVersion="26" />
+        android:targetSdkVersion="28" /-->
 
     <!-- To connect to servers -->
     <uses-permission android:name="android.permission.INTERNET" />
