@@ -277,6 +277,7 @@ public class MealViewFragmentLarge extends Fragment {
             }
             // Only do secondary preference check here on init
             if (!initialRefreshed) {
+                // swap if dining hall completely closed
                 if (!(Util.fullMenuObj.get(collegeNum).getIsSet() &&
                         Util.fullMenuObj.get(collegeNum).getIsOpen())) {
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences
@@ -286,6 +287,21 @@ public class MealViewFragmentLarge extends Fragment {
                     // If no value set on backup college, do nothing
                     if (possibleCollege != Util.NO_BACKUP_COLLEGE) {
                         collegeNum = possibleCollege;
+                        selectItem(collegeNum);
+                    }
+                }
+                // swap if open but not for late night
+                if ( Util.fullMenuObj.get(collegeNum).getIsSet() && (Util.getCurrentMeal(collegeNum) == Util.LATENIGHT) &&
+                        Util.fullMenuObj.get(collegeNum).getLateNight().isEmpty() ) {
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences
+                            (mContext);
+                    int possibleCollege = Integer.parseInt(prefs.getString("default_college_2nd",
+                            "" + Util.NO_BACKUP_COLLEGE));
+
+                    if (possibleCollege != Util.NO_BACKUP_COLLEGE &&
+                            !Util.fullMenuObj.get(possibleCollege).getLateNight().isEmpty()) {
+                        collegeNum = possibleCollege;
+                        selectItem(collegeNum);
                     }
                 }
             }
