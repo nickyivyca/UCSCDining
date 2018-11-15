@@ -201,6 +201,7 @@ public class MealViewFragment extends ListFragment{
             }
             // Only do secondary preference check here on init
             if (!initialRefreshed) {
+                // swap if dining hall completely closed
                 if (!(Util.fullMenuObj.get(collegeNum).getIsSet() &&
                         Util.fullMenuObj.get(collegeNum).getIsOpen())) {
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences
@@ -209,8 +210,8 @@ public class MealViewFragment extends ListFragment{
                             "" + Util.NO_BACKUP_COLLEGE));
                     // If no value set on backup college, do nothing
                     if (possibleCollege != Util.NO_BACKUP_COLLEGE) {
-                        selectItem(collegeNum);
                         collegeNum = possibleCollege;
+                        selectItem(collegeNum);
                     }
                 }
                 // swap if open but not for late night
@@ -229,6 +230,7 @@ public class MealViewFragment extends ListFragment{
                 }
             }
             MenuParser.manualRefresh = false;
+            initialRefreshed = true;
 
 
             // Post-execute: set array adapters, reload animation, set title
@@ -287,6 +289,7 @@ public class MealViewFragment extends ListFragment{
             }
 
             // if all meals empty (dining hall closed), pop open nav drawer
+            // this block maybe deprecated by the one above?
             if(Util.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
                 Util.fullMenuObj.get(collegeNum).getLunch().isEmpty()
                 && Util.fullMenuObj.get(collegeNum).getDinner().isEmpty()) {
@@ -419,7 +422,7 @@ public class MealViewFragment extends ListFragment{
                         }
                     }
                 });
-                initialRefreshed = true;
+                //initialRefreshed = true;
                 new RetrieveMenuInFragmentTask(displayedMonth, displayedDay, displayedYear, true,
                         initialMeal, getActivity()).execute();
             }

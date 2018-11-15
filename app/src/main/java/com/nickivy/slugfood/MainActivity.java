@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         // Set theme based on pref
-        theme = prefs.getBoolean("dark_theme",false)? R.style.MainTheme_Dark :
+        theme = prefs.getBoolean("dark_theme", false) ? R.style.MainTheme_Dark :
                 R.style.MainTheme_Colorful;
         setTheme(theme);
         mostRecentRotation = getResources().getConfiguration().orientation;
