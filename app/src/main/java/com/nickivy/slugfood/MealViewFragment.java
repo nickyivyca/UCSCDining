@@ -313,9 +313,11 @@ public class MealViewFragment extends ListFragment{
 
             // If only dinner available, set to dinner
             // (rare occurence, pretty much only on return from holidays)
+            // Updated to reflect late night addition
             if (Util.fullMenuObj.get(collegeNum).getBreakfast().isEmpty() &&
-                Util.fullMenuObj.get(collegeNum).getLunch().isEmpty() &&
-                !Util.fullMenuObj.get(collegeNum).getDinner().isEmpty()) {
+                    Util.fullMenuObj.get(collegeNum).getLunch().isEmpty() &&
+                    !Util.fullMenuObj.get(collegeNum).getDinner().isEmpty() &&
+                    (Util.getCurrentMeal(collegeNum) < Util.DINNER)) {
                 mViewPager.setCurrentItem(2,false);
             }
 
