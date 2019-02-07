@@ -75,10 +75,7 @@ public class MenuParser {
         Document dinnerDoc = fetchDocument(URLPart1 + URLPart2s[k] + month + "%2F" +
                 day + "%2F" + year + URLPart3 + Util.meals[2]);
         Document latenightDoc = null;
-        if (k == 3) {
-            latenightDoc = fetchDocument(rcURLPart1 + month + "%2F" + day + "%2F" + year +
-                    rcURLPart2);
-        } else if (k != 1 && k != 2 ) {
+        if (k != 1 && k != 2 ) {
             latenightDoc = fetchDocument(URLPart1 + URLPart2s[k] + month + "%2F" +
                     day + "%2F" + year + URLPart3 + "Late+Night");
         }
@@ -92,9 +89,7 @@ public class MenuParser {
         dinnerFoodNames = dinnerDoc.select("div[class=\"pickmenucoldispname\"]");
         dinnerNutIds = dinnerDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
 
-        if (k == 3) {
-            latenightFoodNames = latenightDoc.select("td[valign=\"top\"]");
-        } else if (k != 1 && k != 2 ){
+        if (k != 1 && k != 2 ){
             latenightFoodNames = latenightDoc.select("div[class=\"pickmenucoldispname\"]");
             latenightNutIds = latenightDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
         }
@@ -126,18 +121,7 @@ public class MenuParser {
             }
         }
 
-        if (k == 3) {
-            if(latenightFoodNames != null && latenightFoodNames.size() > 0){
-                for(int j = 0; j < latenightFoodNames.size(); j++){                //Dinner
-                    if(latenightFoodNames.get(j).text().contains("Late Night")){
-                        Elements latenight = latenightFoodNames.get(j).select(" div[class=\"menusamprecipes\"]");
-                        for(int i = 0; i < latenight.size(); i++){
-                            latenightList.add(new MenuItem(latenight.get(i).text(), Util.RCNONUT));
-                        }
-                    }
-                }
-            }
-        } else if (k != 1 && k != 2 ){
+        if (k != 1 && k != 2 ){
             //Catch if the dining hall is closed for that day
             if(latenightFoodNames != null && latenightFoodNames.size() > 0){
                 for(int i = 0; i < latenightFoodNames.size(); i++){
