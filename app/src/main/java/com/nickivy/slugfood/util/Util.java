@@ -99,6 +99,9 @@ public class Util {
     public static final int NO_BACKUP_COLLEGE = 6;
     public static final String RCNONUT = "12345";
 
+    public static final String MEAL_CHANNEL_ID = "channel_meals",
+    EVENT_CHANNEL_ID = "channel_event";
+
     /**
      * Returns today's date as a 3-number int array. [month, day, year]
      *

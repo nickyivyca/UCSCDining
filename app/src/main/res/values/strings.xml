@@ -81,4 +81,7 @@
 
     <string name="nutinfo">Nutritional Info</string>
 
+    <string name="notification_channel_meal">Favorite Items</string>
+    <string name="notification_channel_events">Events</string>
+
 </resources>

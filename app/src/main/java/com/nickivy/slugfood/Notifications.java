@@ -1,12 +1,14 @@
 package com.nickivy.slugfood;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -69,10 +71,10 @@ public class Notifications extends BroadcastReceiver {
                     mBuilder = new NotificationCompat.Builder(context)
                             .setSmallIcon(R.drawable.ic_icon)
                             .setDefaults(Notification.DEFAULT_ALL)
-                            //.setContentTitle("College Night")
                             .setContentTitle(title)
                             .setContentText(title + (sayTomorrow ? " tomorrow" : " today"))
-                            .setAutoCancel(true);
+                            .setAutoCancel(true)
+                            .setChannelId(Util.EVENT_CHANNEL_ID);
                 } else if (Util.fullMenuObj.get(i).getIsHealthyMonday()) {
                     mBuilder = new NotificationCompat.Builder(context)
                             .setSmallIcon(R.drawable.ic_icon)
@@ -80,7 +82,8 @@ public class Notifications extends BroadcastReceiver {
                             .setContentTitle("Healthy Monday")
                             .setContentText(Util.collegeList[i] + " Healthy Monday " +
                                     (sayTomorrow ? "tomorrow" : "today"))
-                            .setAutoCancel(true);
+                            .setAutoCancel(true)
+                            .setChannelId(Util.EVENT_CHANNEL_ID);
                 } else if (Util.fullMenuObj.get(i).getIsFarmFriday()) {
                     mBuilder = new NotificationCompat.Builder(context)
                             .setSmallIcon(R.drawable.ic_icon)
@@ -88,7 +91,8 @@ public class Notifications extends BroadcastReceiver {
                             .setContentTitle("Farm Friday")
                             .setContentText(Util.collegeList[i] + " Farm Friday " +
                                     (sayTomorrow ? "tomorrow" : "today"))
-                            .setAutoCancel(true);
+                            .setAutoCancel(true)
+                            .setChannelId(Util.EVENT_CHANNEL_ID);
                 }
                 if (mBuilder != null) {
                     Intent notificationIntent = new Intent(context, MainActivity.class);
@@ -103,6 +107,13 @@ public class Notifications extends BroadcastReceiver {
                     NotificationManager mNotifyManager = (NotificationManager)
                             context.getSystemService(context.NOTIFICATION_SERVICE);
 
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        NotificationChannel mChannel = new NotificationChannel(Util.EVENT_CHANNEL_ID,
+                                context.getResources().getString(R.string.notification_channel_events),
+                                NotificationManager.IMPORTANCE_DEFAULT);
+                        mNotifyManager.createNotificationChannel(mChannel);
+                    }
+
                     // Don't notify if notification has already been posted?
                     mNotifyManager.notify(i, mBuilder.build());
                 }
@@ -115,6 +126,11 @@ public class Notifications extends BroadcastReceiver {
         int notNum = -1; // keep track of how many notifications are made - adds negatively
         NotificationManager mNotifyManager = (NotificationManager)
                 context.getSystemService(context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel mChannel = new NotificationChannel(Util.MEAL_CHANNEL_ID,
+                    context.getResources().getString(R.string.notification_channel_meal), NotificationManager.IMPORTANCE_DEFAULT);
+            mNotifyManager.createNotificationChannel(mChannel);
+        }
 
         /*
          * If current day for showing has been adjusted because it is past dining closing,
@@ -139,7 +155,8 @@ public class Notifications extends BroadcastReceiver {
                                     .setContentTitle(item)
                                     .setContentText("At " + Util.collegeList[i] + " Breakfast " +
                                             (sayTomorrow ? "tomorrow" : "today"))
-                                    .setAutoCancel(true);
+                                    .setAutoCancel(true)
+                                    .setChannelId(Util.MEAL_CHANNEL_ID);
                             Intent notificationIntent = new Intent(context, MainActivity.class);
                             notificationIntent.putExtra(Util.TAG_COLLEGE, i);
                             notificationIntent.putExtra(Util.TAG_MEAL, Util.BREAKFAST);
@@ -161,7 +178,8 @@ public class Notifications extends BroadcastReceiver {
                                     .setContentTitle(item)
                                     .setContentText("At " + Util.collegeList[i] + " Lunch " +
                                             (sayTomorrow ? "tomorrow" : "today"))
-                                    .setAutoCancel(true);
+                                    .setAutoCancel(true)
+                                    .setChannelId(Util.MEAL_CHANNEL_ID);
                             Intent notificationIntent = new Intent(context, MainActivity.class);
                             notificationIntent.putExtra(Util.TAG_COLLEGE, i);
                             notificationIntent.putExtra(Util.TAG_MEAL, Util.LUNCH);
@@ -183,7 +201,8 @@ public class Notifications extends BroadcastReceiver {
                                     .setContentTitle(item)
                                     .setContentText("At " + Util.collegeList[i] + " Dinner " +
                                             (sayTomorrow ? "tomorrow" : "today"))
-                                    .setAutoCancel(true);
+                                    .setAutoCancel(true)
+                                    .setChannelId(Util.MEAL_CHANNEL_ID);
                             Intent notificationIntent = new Intent(context, MainActivity.class);
                             notificationIntent.putExtra(Util.TAG_COLLEGE, i);
                             notificationIntent.putExtra(Util.TAG_MEAL, Util.DINNER);
@@ -205,7 +224,8 @@ public class Notifications extends BroadcastReceiver {
                                     .setContentTitle(item)
                                     .setContentText("At " + Util.collegeList[i] + " Late Night " +
                                             (sayTomorrow ? "tomorrow" : "tonight"))
-                                    .setAutoCancel(true);
+                                    .setAutoCancel(true)
+                                    .setChannelId(Util.MEAL_CHANNEL_ID);
                             Intent notificationIntent = new Intent(context, MainActivity.class);
                             notificationIntent.putExtra(Util.TAG_COLLEGE, i);
                             notificationIntent.putExtra(Util.TAG_MEAL, Util.LATENIGHT);

@@ -40,6 +40,7 @@ public class BackgroundLoader extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (Util.TAG_TIMEUPDATE.equals(intent.getAction())) {
+        //if (Util.TAG_TIMEUPDATE.equals(intent.getAction()) || Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             setAlarm(context);
             // Run background data load
             int today[] = Util.getToday();
@@ -62,8 +63,8 @@ public class BackgroundLoader extends BroadcastReceiver {
             SharedPreferences.Editor edit = prefs.edit();
             edit.putBoolean("widget_enabled", false);
             edit.commit();
-        /*} else if (Util.TAG_NOTIFICATIONSON.equals(intent.getAction())) {
-        } else if (Util.TAG_NOTIFICATIONSOFF.equals(intent.getAction())) {*/
+        //} else if (Util.TAG_NOTIFICATIONSON.equals(intent.getAction())) {
+        //} else if (Util.TAG_NOTIFICATIONSOFF.equals(intent.getAction())) {
         } else if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             // Reset alarm in onReceive if enabled from boot
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
