@@ -180,6 +180,47 @@ public class MenuWidget extends AppWidgetProvider {
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences
                     (mContext.getApplicationContext());
 
+
+
+            // Apply theme to widget
+            if (settings.getBoolean("dark_theme",false)) {
+                mData.getViews().setInt(R.id.widget_collegename, "setBackgroundColor", mContext.getResources().getColor(R.color.dark_primary));
+                mData.getViews().setTextColor(R.id.widget_collegename, mContext.getResources().getColor(R.color.dark_primary_text));
+                mData.getViews().setInt(R.id.widget_mealname, "setBackgroundColor", mContext.getResources().getColor(R.color.dark_primary));
+                mData.getViews().setTextColor(R.id.widget_mealname, mContext.getResources().getColor(R.color.dark_primary_text));
+                mData.getViews().setInt(R.id.widget_list, "setBackgroundColor", mContext.getResources().getColor(R.color.dark_primary));
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_college_leftbutton, View.VISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_college_leftbutton, View.INVISIBLE);
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_college_rightbutton, View.VISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_college_rightbutton, View.INVISIBLE);
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_mealname_leftbutton, View.VISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_mealname_leftbutton, View.INVISIBLE);
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_mealname_rightbutton, View.VISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_mealname_rightbutton, View.INVISIBLE);
+            } else {
+                mData.getViews().setInt(R.id.widget_collegename, "setBackgroundColor", mContext.getResources().getColor(R.color.primary));
+                mData.getViews().setTextColor(R.id.widget_collegename, mContext.getResources().getColor(R.color.primary_text));
+                mData.getViews().setInt(R.id.widget_mealname, "setBackgroundColor", mContext.getResources().getColor(R.color.primary));
+                mData.getViews().setTextColor(R.id.widget_mealname, mContext.getResources().getColor(R.color.primary_text));
+                mData.getViews().setInt(R.id.widget_list, "setBackgroundColor", Color.WHITE);
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_college_leftbutton, View.INVISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_college_leftbutton, View.VISIBLE);
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_college_rightbutton, View.INVISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_college_rightbutton, View.VISIBLE);
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_mealname_leftbutton, View.INVISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_mealname_leftbutton, View.VISIBLE);
+
+                mData.getViews().setViewVisibility(R.id.widget_dark_mealname_rightbutton, View.INVISIBLE);
+                mData.getViews().setViewVisibility(R.id.widget_mealname_rightbutton, View.VISIBLE);
+            }
+
             // If so display 'All Closed' and nothing else, but still set date
             mData.getViews().setTextViewText(R.id.widget_mealname, mData.getMonth() + "/" +
                     mData.getDay() + " " + Util.meals[mData.getMeal()]);
@@ -231,9 +272,6 @@ public class MenuWidget extends AppWidgetProvider {
                             mContext.getResources().getColor(R.color.healthy));
                 } else if (!Util.fullMenuObj.get(mData.getCollege()).getIsOpen()) {
                     mData.getViews().setTextColor(R.id.widget_collegename, Color.LTGRAY);
-                } else {
-                    mData.getViews().setTextColor(R.id.widget_collegename, mContext.getResources()
-                            .getColor(R.color.primary_text));
                 }
             }
 
@@ -298,43 +336,6 @@ public class MenuWidget extends AppWidgetProvider {
             mData.getViews().setRemoteAdapter(R.id.widget_list, svcIntent);
             mAppWidgetManager.notifyAppWidgetViewDataChanged(mData.getWidgetId(),
                     R.id.widget_list);
-
-            // Apply theme to widget
-            if (settings.getBoolean("dark_theme",false)) {
-                mData.getViews().setInt(R.id.widget_collegename, "setBackgroundColor", mContext.getResources().getColor(R.color.dark_primary));
-                mData.getViews().setTextColor(R.id.widget_collegename, mContext.getResources().getColor(R.color.dark_primary_text));
-                mData.getViews().setInt(R.id.widget_mealname, "setBackgroundColor", mContext.getResources().getColor(R.color.dark_primary));
-                mData.getViews().setTextColor(R.id.widget_mealname, mContext.getResources().getColor(R.color.dark_primary_text));
-
-                mData.getViews().setViewVisibility(R.id.widget_dark_college_leftbutton, View.VISIBLE);
-                mData.getViews().setViewVisibility(R.id.widget_college_leftbutton, View.INVISIBLE);
-
-                mData.getViews().setViewVisibility(R.id.widget_dark_college_rightbutton, View.VISIBLE);
-                mData.getViews().setViewVisibility(R.id.widget_college_rightbutton, View.INVISIBLE);
-
-                mData.getViews().setViewVisibility(R.id.widget_dark_mealname_leftbutton, View.VISIBLE);
-                mData.getViews().setViewVisibility(R.id.widget_mealname_leftbutton, View.INVISIBLE);
-
-                mData.getViews().setViewVisibility(R.id.widget_dark_mealname_rightbutton, View.VISIBLE);
-                mData.getViews().setViewVisibility(R.id.widget_mealname_rightbutton, View.INVISIBLE);
-            } else {
-                mData.getViews().setInt(R.id.widget_collegename, "setBackgroundColor", mContext.getResources().getColor(R.color.primary));
-                mData.getViews().setTextColor(R.id.widget_collegename, mContext.getResources().getColor(R.color.primary_text));
-                mData.getViews().setInt(R.id.widget_mealname, "setBackgroundColor", mContext.getResources().getColor(R.color.primary));
-                mData.getViews().setTextColor(R.id.widget_mealname, mContext.getResources().getColor(R.color.primary_text));
-
-                mData.getViews().setViewVisibility(R.id.widget_dark_college_leftbutton, View.INVISIBLE);
-                mData.getViews().setViewVisibility(R.id.widget_college_leftbutton, View.VISIBLE);
-
-                mData.getViews().setViewVisibility(R.id.widget_dark_college_rightbutton, View.INVISIBLE);
-                mData.getViews().setViewVisibility(R.id.widget_college_rightbutton, View.VISIBLE);
-
-                mData.getViews().setViewVisibility(R.id.widget_dark_mealname_leftbutton, View.INVISIBLE);
-                mData.getViews().setViewVisibility(R.id.widget_mealname_leftbutton, View.VISIBLE);
-
-                mData.getViews().setViewVisibility(R.id.widget_dark_mealname_rightbutton, View.INVISIBLE);
-                mData.getViews().setViewVisibility(R.id.widget_mealname_rightbutton, View.VISIBLE);
-            }
 
             mAppWidgetManager.updateAppWidget(mData.getWidgetId(), mData.getViews());
             saveData(mContext);
