@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -28,22 +29,19 @@ import android.util.Log;
 
 public class MenuParser {
 
-    public static final String URLPart1 = "http://nutrition.sa.ucsc.edu/pickMenu.asp?locationNum=";
+    public static final String URLPart1 = "https://nutrition.sa.ucsc.edu/longmenu.aspx?sName=UC+Santa+Cruz+Dining&locationNum=";
 
     public static final String[] URLPart2s = {
-            "05&locationName=Cowell&dtdate=",
+            "05&locationName=Cowell+Stevenson+Dining+Hall&dtdate=",
             "20&locationName=+Crown+Merrill&dtdate=",
             "25&locationName=Porter&dtdate=",
             "30&locationName=+Rachel+Carson+Oakes+Dining+Hall&dtdate=",
             "40&locationName=College+Nine+%26+Ten&dtdate="
     };
 
-    private static final String URLPart3 = "&mealName=";
+    private static final String[] CookieLocations = {"05", "20", "25", "30", "40"};
 
-    private static final String rcURLPart1 = "http://nutrition.sa.ucsc.edu/menuSamp.asp?" +
-            "myaction=read&sName=&dtdate=";
-
-    private static final String rcURLPart2 = "&locationNum=30&locationName=Rachel+Carson+Oakes+Dining+Hall&sName=&naFlag=1";
+    private static final String URLPart3 = "&naFlag=1&WeeksMenus=UCSC+-+This+Week%27s+Menus&mealName=";
 
     private static final String icalurl = "https://calendar.google.com/calendar/ical/ucsc.edu_t59u0f85lnvamgj30m22e3fmgo%40group.calendar.google.com/public/basic.ics";
 
@@ -68,19 +66,56 @@ public class MenuParser {
                 dinnerFoodNames = null,
                 latenightNutIds = null,
                 latenightFoodNames = null;
-        Document breakfastDoc = fetchDocument(URLPart1 + URLPart2s[k] + month + "%2F" +
+
+        /*Connection.Response res = Jsoup.connect("https://nutrition.sa.ucsc.edu/location.aspx").execute();
+        String WebInaCartDates = res.cookie("WebInaCartDates");
+        String WebInaCartLocation = res.cookie("WebInaCartLocation");
+        String WebInaCartMeals = res.cookie("WebInaCartMeals");
+        String WebInaCartQtys = res.cookie("WebInaCartQtys");
+        String WebInaCartRecipes = res.cookie("WebInaCartRecipes");
+
+        Util.log("cartdates." + WebInaCartDates + ".");
+        Util.log("cartlocation." + WebInaCartLocation + ".");
+        Util.log("cartmeals." + WebInaCartMeals + ".");
+        Util.log("cartqtys." + WebInaCartQtys + ".");
+        Util.log("cartdates." + WebInaCartDates + ".");
+        Util.log("cartrecipes." + WebInaCartRecipes + ".");*/
+        //.cookie("SavedAllergens", SavedAllergens).cookie("SavedWebCodes", SavedWebCodes)
+
+        //Connection.Response res = Jsoup.connect("https://nutrition.sa.ucsc.edu");
+
+        /*res = Jsoup.connect("https://nutrition.sa.ucsc.edu/shortmenu.aspx?sName=UC+Santa+Cruz+Dining&locationNum=05&locationName=Cowell+Stevenson+Dining+Hall&naFlag=1")
+                .cookie("WebInaCartLocation", WebInaCartLocation).cookie("WebInaCartDates", WebInaCartDates).cookie("WebInaCartMeals", WebInaCartMeals)
+                .cookie("WebInaCartQtys", WebInaCartQtys).cookie("WebInaCartRecipes", WebInaCartRecipes).execute();
+        Util.log("attempted with cookie");
+        WebInaCartLocation = res.cookie("WebInaCartLocation");
+        Util.log("cartlocation." + WebInaCartLocation + ".");*/
+
+
+
+        //Document testdoc1 = fetchDocumentwithCookie("https://nutrition.sa.ucsc.edu/shortmenu.aspx?sName=UC+Santa+Cruz+Dining&locationNum=05&locationName=Cowell+Stevenson+Dining+Hall&naFlag=1", "WebInaCartLocation", "05");
+
+        //Util.log("got with cart location cookie");
+
+        /*Document testDoc = Jsoup.connect("https://nutrition.sa.ucsc.edu/longmenu.aspx?sName=UC+Santa+Cruz+Dining&locationNum=05&locationName=Cowell+Stevenson+Dining+Hall&naFlag=1&WeeksMenus=UCSC+-+This+Week's+Menus&dtdate=09%2f14%2f2019&mealName=Breakfast")
+                .cookie("WebInaCartLocation", "05").get();*/
+        Util.log("finding breakfast doc, url: " + URLPart1 + URLPart2s[k] + month + "%2F" +
                 day + "%2F" + year + URLPart3 + Util.meals[0]);
-        Document lunchDoc = fetchDocument(URLPart1 + URLPart2s[k] + month + "%2F" +
-                day + "%2F" + year + URLPart3 + Util.meals[1]);
-        Document dinnerDoc = fetchDocument(URLPart1 + URLPart2s[k] + month + "%2F" +
-                day + "%2F" + year + URLPart3 + Util.meals[2]);
+        Document breakfastDoc = fetchDocumentwithCookie(URLPart1 + URLPart2s[k] + month + "%2F" +
+                day + "%2F" + year + URLPart3 + Util.meals[0], CookieLocations[k]);
+        Util.log("found breakfast doc");
+        Document lunchDoc = fetchDocumentwithCookie(URLPart1 + URLPart2s[k] + month + "%2F" +
+                day + "%2F" + year + URLPart3 + Util.meals[1], CookieLocations[k]);
+        Document dinnerDoc = fetchDocumentwithCookie(URLPart1 + URLPart2s[k] + month + "%2F" +
+                day + "%2F" + year + URLPart3 + Util.meals[2], CookieLocations[k]);
         Document latenightDoc = null;
         if (k != 1 && k != 2 ) {
-            latenightDoc = fetchDocument(URLPart1 + URLPart2s[k] + month + "%2F" +
-                    day + "%2F" + year + URLPart3 + "Late+Night");
+            latenightDoc = fetchDocumentwithCookie(URLPart1 + URLPart2s[k] + month + "%2F" +
+                    day + "%2F" + year + URLPart3 + "Late+Night", CookieLocations[k]);
         }
 
         breakfastFoodNames = breakfastDoc.select("div[class=\"pickmenucoldispname\"]");
+        Util.log(breakfastFoodNames.toString());
         breakfastNutIds = breakfastDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
 
         lunchFoodNames = lunchDoc.select("div[class=\"pickmenucoldispname\"]");
@@ -342,6 +377,39 @@ public class MenuParser {
                 Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
                 try {
                     ret = Jsoup.connect(url).get();
+                } catch (IOException e2) {
+                    Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
+                    // Give up after three times
+                    throw e2;
+                }
+            }
+        }
+        return ret;
+    }
+    public static Document fetchDocumentwithCookie(String url, String cookieVal)
+            throws IOException{
+        Document ret;
+        try {
+            ret = Jsoup.connect(url).cookie("WebInaCartLocation", cookieVal).cookie("WebInaCartDates", "")
+                    .cookie("WebInaCartMeals", "").cookie("WebInaCartQtys", "")
+                    .cookie("WebInaCartRecipes", "").get();
+        } catch (UnknownHostException e) {
+            // Internet connection completely missing is a separate error from okhttp
+            Log.v(Util.LOGTAG, Util.LOGMSG_INTERNETERROR);
+            e.printStackTrace();
+            throw e;
+        } catch (IOException e) {
+            Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
+            try {
+                ret = Jsoup.connect(url).cookie("WebInaCartLocation", cookieVal).cookie("WebInaCartDates", "")
+                        .cookie("WebInaCartMeals", "").cookie("WebInaCartQtys", "")
+                        .cookie("WebInaCartRecipes", "").get();
+            } catch (IOException e1) {
+                Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
+                try {
+                    ret = Jsoup.connect(url).cookie("WebInaCartLocation", cookieVal).cookie("WebInaCartDates", "")
+                            .cookie("WebInaCartMeals", "").cookie("WebInaCartQtys", "")
+                            .cookie("WebInaCartRecipes", "").get();
                 } catch (IOException e2) {
                     Log.w(Util.LOGTAG, Util.LOGMSG_OKHTTP);
                     // Give up after three times
