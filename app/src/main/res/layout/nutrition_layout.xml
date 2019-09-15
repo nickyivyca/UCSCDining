@@ -152,6 +152,14 @@
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:textColor="#000000"/>
+                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/nutrition_totalfat_percent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"

@@ -475,6 +475,7 @@ public class MealViewFragment extends ListFragment{
                                     "%2F" + displayedDay + "%2F" + displayedYear +
                                     "&RecNumAndPort=" + Util.fullMenuObj.get(college)
                                     .getBreakfast().get(pos).getCode());
+                            intent.putExtra(Util.TAG_COOKIE_COLLEGE, college);
                             startActivity(intent);
                         }
                     });
@@ -490,6 +491,7 @@ public class MealViewFragment extends ListFragment{
                                     "%2F" + displayedDay + "%2F" + displayedYear +
                                     "&RecNumAndPort=" + Util.fullMenuObj.get(college)
                                     .getLunch().get(pos).getCode());
+                            intent.putExtra(Util.TAG_COOKIE_COLLEGE, college);
                             startActivity(intent);
                         }
                     });
@@ -505,6 +507,7 @@ public class MealViewFragment extends ListFragment{
                                     "%2F" + displayedDay + "%2F" + displayedYear +
                                     "&RecNumAndPort=" + Util.fullMenuObj.get(college)
                                     .getDinner().get(pos).getCode());
+                            intent.putExtra(Util.TAG_COOKIE_COLLEGE, college);
                             startActivity(intent);
                         }
                     });
@@ -524,6 +527,7 @@ public class MealViewFragment extends ListFragment{
                                         "%2F" + displayedDay + "%2F" + displayedYear +
                                         "&RecNumAndPort=" + Util.fullMenuObj.get(college)
                                         .getLateNight().get(pos).getCode());
+                                intent.putExtra(Util.TAG_COOKIE_COLLEGE, college);
                                 startActivity(intent);
                             }
                         }

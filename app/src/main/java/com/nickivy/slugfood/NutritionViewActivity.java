@@ -37,7 +37,7 @@ public class NutritionViewActivity extends AppCompatActivity {
             carbs_amount, carbs_percent, fiber_amount, fiber_percent, sugars, protein_amount,
             protein_percent,
             percent_vitamina, percent_vitb12, percent_vitaminc, percent_iron, percent_sodium,
-            percent_fiber,
+            percent_fiber, totalfat_percent,
             ingredients_list, allergens_list;
 
     @Override
@@ -101,7 +101,8 @@ public class NutritionViewActivity extends AppCompatActivity {
         view.setText("ALLERGENS: ");
         view = (TextView) findViewById(R.id.nutrition_percentdvnotice);
         view.setText("*Percent Daily Values (DV) are based on a 2,000 calorie diet.");
-        new RetrieveNutritionTask(this, getIntent().getStringExtra(Util.TAG_URL)).execute();
+        new RetrieveNutritionTask(this, getIntent().getStringExtra(Util.TAG_URL),
+                getIntent().getIntExtra(Util.TAG_COOKIE_COLLEGE, 0)).execute();
     }
 
 
@@ -109,14 +110,16 @@ public class NutritionViewActivity extends AppCompatActivity {
 
         private Activity mActivity;
         private String mUrl;
+        private int mCookieLoc;
 
         /**
          * @param activity activity to set text in
          * @param url url for page of nutrition info
          */
-        public RetrieveNutritionTask(Activity activity, String url) {
+        public RetrieveNutritionTask(Activity activity, String url, int cookieloc) {
             mActivity = activity;
             mUrl = url;
+            mCookieLoc = cookieloc;
         }
 
         @Override
@@ -127,7 +130,9 @@ public class NutritionViewActivity extends AppCompatActivity {
         protected Integer doInBackground(Void... voids) {
             Document page;
             try {
-                page = Jsoup.connect(mUrl).get();
+                page = Jsoup.connect(mUrl).cookie("WebInaCartLocation", Util.CookieLocations[mCookieLoc])
+                        .cookie("WebInaCartDates", "").cookie("WebInaCartMeals", "")
+                        .cookie("WebInaCartQtys", "").cookie("WebInaCartRecipes", "").get();
             } catch (UnknownHostException e) {
                 // Internet connection completely missing is a separate error from okhttp
                 Log.v(Util.LOGTAG, "Internet connection missing");
@@ -136,15 +141,21 @@ public class NutritionViewActivity extends AppCompatActivity {
             } catch (IOException e) {
                 Log.w(Util.LOGTAG, "connection error");
                 try {
-                    page = Jsoup.connect(mUrl).get();
+                    page = Jsoup.connect(mUrl).cookie("WebInaCartLocation", Util.CookieLocations[mCookieLoc])
+                            .cookie("WebInaCartDates", "").cookie("WebInaCartMeals", "")
+                            .cookie("WebInaCartQtys", "").cookie("WebInaCartRecipes", "").get();
                 } catch (IOException e1) {
                     Log.w(Util.LOGTAG, "connection error");
                     try {
-                        page = Jsoup.connect(mUrl).get();
+                        page = Jsoup.connect(mUrl).cookie("WebInaCartLocation", Util.CookieLocations[mCookieLoc])
+                                .cookie("WebInaCartDates", "").cookie("WebInaCartMeals", "")
+                                .cookie("WebInaCartQtys", "").cookie("WebInaCartRecipes", "").get();
                     } catch (IOException e2) {
                         Log.w(Util.LOGTAG, "connection error");
                         try {
-                            page = Jsoup.connect(mUrl).get();
+                            page = Jsoup.connect(mUrl).cookie("WebInaCartLocation", Util.CookieLocations[mCookieLoc])
+                                    .cookie("WebInaCartDates", "").cookie("WebInaCartMeals", "")
+                                    .cookie("WebInaCartQtys", "").cookie("WebInaCartRecipes", "").get();
                         } catch (IOException e3) {
                             Log.w(Util.LOGTAG, "connection error");
                             // Give up after four times
@@ -169,36 +180,38 @@ public class NutritionViewActivity extends AppCompatActivity {
                  * was only for Chicken Nuggets but it turns out this happens for more items than
                  * just chicken nuggets.
                  */
+
                 servingsize = "Serving Size " + fonts.get(2).text();
                 calories = page.select("b").get(1).text();
                 calories_fat = fonts.get(4).text();
                 totalfat_amount = fonts.get(11).text();
+                totalfat_percent = fonts.get(12).text();
                 satfat = "Saturated Fat " + fonts.get(18).text();
-                satfat_percent = fonts.get(57).text().substring(1);
+                satfat_percent = fonts.get(19).text() + "%";
                 transfat = "Trans Fat " + fonts.get(26).text();
                 cholesterol_amount = fonts.get(32).text();
-                cholesterol_percent = fonts.get(61).text().substring(1);
+                cholesterol_percent = fonts.get(33).text() + "%";
                 sodium_amount = fonts.get(39).text();
                 sodium_percent = fonts.get(40).text() + "%";
-                carbs_amount = fonts.get(14).text();
-                carbs_percent = fonts.get(15).text() + "%";
+                carbs_amount = fonts.get(13).text();
+                //carbs_percent = fonts.get(15).text() + "%";
                 fiber_amount = fonts.get(22).text();
                 fiber_percent = fonts.get(23).text() + "%";
                 sugars = "Sugars " + fonts.get(29).text();
 
                 protein_amount = fonts.get(36).text();
-                protein_percent = fonts.get(47).text().substring(1);
 
+                //protein_percent = fonts.get(47).text().substring(1); // protein percent not given anymore?
                 /*
                  * Percents appearing below normal list. Strangely, the page includes 2 often different
                  * amounts of sodium and fiber.
                  */
-                percent_vitamina = "Vitamin A - IU" + fonts.get(67).text().substring(1);
-                percent_vitb12 = "Vitamin B12" + fonts.get(71).text().substring(1);
-                percent_vitaminc = "Vitamin C" + fonts.get(69).text().substring(1);
-                percent_iron = "Iron" + fonts.get(63).text().substring(1);
-                percent_sodium = "Sodium" + fonts.get(65).text().substring(1);
-                percent_fiber = "Dietary Fiber" + fonts.get(51).text().substring(1);
+                percent_vitamina = "Vitamin A - IU " + fonts.get(67).text();
+                //percent_vitb12 = "Vitamin B12" + fonts.get(71).text().substring(1);
+                percent_vitaminc = "Vitamin C " + fonts.get(69).text();
+                percent_iron = "Iron " + fonts.get(63).text();
+                percent_sodium = "Sodium " + fonts.get(65).text();
+                percent_fiber = "Dietary Fiber " + fonts.get(51).text();
 
                 ingredients_list = page.select("span").get(1).text();
                 allergens_list = page.select("span").get(3).text();
@@ -206,6 +219,8 @@ public class NutritionViewActivity extends AppCompatActivity {
 
             } catch(java.lang.IndexOutOfBoundsException e) {
                 try {
+                    // TODO: update this once I find an item that uses alternate nutrition mapping
+                    Util.log("going into other range");
                     title = page.select("div").get(0).text();
                     servingsize = "Serving Size " + fonts.get(2).text();
                     calories = page.select("b").get(1).text();
@@ -225,7 +240,7 @@ public class NutritionViewActivity extends AppCompatActivity {
                     sugars = "Sugars " + "- - - g";
 
                     protein_amount = fonts.get(31).text();
-                    protein_percent = fonts.get(56).text().substring(1);
+                    //protein_percent = fonts.get(56).text().substring(1);
 
                     /*
                      * Percents appearing below normal list. Strangely, the page includes 2 often different
@@ -236,7 +251,7 @@ public class NutritionViewActivity extends AppCompatActivity {
                     percent_vitaminc = "Vitamin C" + fonts.get(64).text().substring(1);
                     percent_iron = "Iron" + fonts.get(58).text().substring(1);
                     percent_sodium = "Sodium" + fonts.get(60).text().substring(1);
-                    percent_fiber = "Dietary Fiber" + fonts.get(46).text().substring(1);
+                    percent_fiber = "Dietary Fiber " + fonts.get(46).text().substring(1);
 
                     ingredients_list = page.select("span").get(1).text();
                     allergens_list = page.select("span").get(3).text();
@@ -288,6 +303,8 @@ public class NutritionViewActivity extends AppCompatActivity {
                         view.setText(calories_fat);
                         view = (TextView) mActivity.findViewById(R.id.nutrition_totalfat_amount);
                         view.setText(totalfat_amount);
+                        view = (TextView) mActivity.findViewById(R.id.nutrition_totalfat_percent);
+                        view.setText(totalfat_percent);
                         view = (TextView) mActivity.findViewById(R.id.nutrition_satfat);
                         view.setText(satfat);
                         view = (TextView) mActivity.findViewById(R.id.nutrition_satfat_percent);

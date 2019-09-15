@@ -29,6 +29,9 @@ public class Util {
             DINNER = 2,
             LATENIGHT = 3;
 
+
+    public static final String[] CookieLocations = {"05", "20", "25", "30", "40"};
+
     public static final String[] meals = {
             "Breakfast",
             "Lunch",
@@ -75,7 +78,7 @@ public class Util {
 
     public static final String brunchMessage = "See lunch for today\'s brunch menu";
 
-    public static final String nuturlpart1 = "http://nutrition.sa.ucsc.edu/label.asp?locationNum=";
+    public static final String nuturlpart1 = "https://nutrition.sa.ucsc.edu/label.aspx?locationNum=";
 
     // Tags for intent passed to main activity from widget
     public static final String TAG_COLLEGE = "tag_college",
@@ -84,6 +87,7 @@ public class Util {
     TAG_DAY = "tag_day",
     TAG_YEAR = "tag_year",
     TAG_URL = "tag_url",
+    TAG_COOKIE_COLLEGE = "tag_cookie_college",
     TAG_USESAVED = "tag_usesaved",
     TAG_TIMEUPDATE = "com.nickivy.slugfood.time_update",
     TAG_RELOAD = "tag_reload",
