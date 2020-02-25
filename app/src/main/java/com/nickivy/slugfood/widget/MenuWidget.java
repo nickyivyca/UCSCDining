@@ -1,6 +1,5 @@
 package com.nickivy.slugfood.widget;
 
-import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -12,7 +11,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 
@@ -20,13 +19,11 @@ import com.nickivy.slugfood.BackgroundLoader;
 import com.nickivy.slugfood.MainActivity;
 import com.nickivy.slugfood.R;
 import com.nickivy.slugfood.parser.MealDataFetcher;
-import com.nickivy.slugfood.parser.MenuParser;
 import com.nickivy.slugfood.util.Util;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 
 /**

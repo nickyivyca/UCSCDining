@@ -9,18 +9,17 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -93,7 +92,7 @@ public class MealViewFragmentLarge extends Fragment {
                     .findViewById(R.id.large_refresh_layout);
             TypedValue typed_value = new TypedValue();
             getActivity().getTheme().
-                    resolveAttribute(android.support.v7.appcompat.R.attr.actionBarSize, typed_value,
+                    resolveAttribute(androidx.appcompat.R.attr.actionBarSize, typed_value,
                             true);
             mSwipeRefreshLayout.setProgressViewOffset(false, 0,
                     getResources().getDimensionPixelSize(typed_value.resourceId));

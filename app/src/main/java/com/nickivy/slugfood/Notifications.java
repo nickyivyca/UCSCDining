@@ -10,10 +10,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
-import android.util.Log;
+import androidx.core.app.NotificationCompat;
 
-import com.nickivy.slugfood.parser.MenuParser;
 import com.nickivy.slugfood.util.Util;
 
 import java.util.HashSet;
