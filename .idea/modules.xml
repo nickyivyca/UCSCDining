@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/UCSCDining.iml" filepath="$PROJECT_DIR$/UCSCDining.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/UCSCDining.iml" filepath="$PROJECT_DIR$/UCSCDining.iml" group="UCSCDining" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="UCSCDining/app" />
     </modules>
   </component>
 </project>

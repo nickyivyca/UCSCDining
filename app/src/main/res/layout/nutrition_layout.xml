@@ -375,7 +375,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/nutrition_percent_vitamina"
+                    android:id="@+id/nutrition_lowerpercent1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
@@ -385,7 +385,7 @@
                     android:layout_centerInParent="true"
                     android:background="@drawable/dot"/>
                 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/nutrition_percent_vitb12"
+                    android:id="@+id/nutrition_lowerpercent2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -402,7 +402,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/nutrition_percent_vitaminc"
+                    android:id="@+id/nutrition_lowerpercent3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
@@ -412,7 +412,7 @@
                     android:layout_centerInParent="true"
                     android:background="@drawable/dot"/>
                 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/nutrition_percent_iron"
+                    android:id="@+id/nutrition_lowerpercent4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -429,7 +429,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/nutrition_percent_sodium"
+                    android:id="@+id/nutrition_lowerpercent5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
@@ -439,7 +439,7 @@
                     android:layout_centerInParent="true"
                     android:background="@drawable/dot"/>
                 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/nutrition_percent_fiber"
+                    android:id="@+id/nutrition_lowerpercent6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"

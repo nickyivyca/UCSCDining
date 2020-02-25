@@ -125,7 +125,7 @@ public class MenuParser {
             //Catch if the dining hall is closed for that day
             if(latenightFoodNames != null && latenightFoodNames.size() > 0){
                 for(int i = 0; i < latenightFoodNames.size(); i++){
-                    String nutid = dinnerNutIds.get(i).attr("VALUE");
+                    String nutid = latenightNutIds.get(i).attr("VALUE");
                     latenightList.add(new MenuItem(latenightFoodNames.get(i).text(),
                             nutid.substring(0, nutid.length()-3)));
                 }
