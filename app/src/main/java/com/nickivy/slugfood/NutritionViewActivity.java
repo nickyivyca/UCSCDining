@@ -56,13 +56,15 @@ public class NutritionViewActivity extends AppCompatActivity {
         view = (TextView) findViewById(R.id.nutrition_servingsize);
         view.setText("Serving Size");
         view = (TextView) findViewById(R.id.nutrition_amountperserving);
-        view.setText("Amount Per Serving");
+        view.setText("Amount per serving");
         view = (TextView) findViewById(R.id.nutrition_calories);
+        view.setText("0");
+        view = (TextView) findViewById(R.id.nutrition_calories_label);
         view.setText("Calories");
-        view = (TextView) findViewById(R.id.nutrition_calories_fat);
-        view.setText("Calories from Fat");
+        /*view = (TextView) findViewById(R.id.nutrition_calories_fat);
+        view.setText("Calories from Fat");*/
         view = (TextView) findViewById(R.id.nutrition_percentdailyvalues);
-        view.setText("% Daily Values*");
+        view.setText("% Daily Value*");
         view = (TextView) findViewById(R.id.nutrition_totalfat);
         view.setText("Total Fat ");
         view = (TextView) findViewById(R.id.nutrition_satfat);
@@ -91,10 +93,10 @@ public class NutritionViewActivity extends AppCompatActivity {
         view.setText("Iron");
         view = (TextView) findViewById(R.id.nutrition_lowerpercent4);
         view.setText("Potassium");
-        view = (TextView) findViewById(R.id.nutrition_lowerpercent5);
+        /*view = (TextView) findViewById(R.id.nutrition_lowerpercent5);
         view.setText("Added Sugar");
         view = (TextView) findViewById(R.id.nutrition_lowerpercent6);
-        view.setText("");
+        view.setText("");*/
         view = (TextView) findViewById(R.id.nutrition_ingredients);
         view.setText("INGREDIENTS: ");
         view = (TextView) findViewById(R.id.nutrition_allergens);
@@ -182,35 +184,36 @@ public class NutritionViewActivity extends AppCompatActivity {
                  */
 
                 servingsize = "Serving Size " + fonts.get(2).text();
-                calories = page.select("b").get(1).text();
-                calories_fat = fonts.get(4).text();
-                totalfat_amount = fonts.get(11).text();
-                totalfat_percent = fonts.get(12).text();
-                satfat = "Saturated Fat " + fonts.get(19).text();
-                satfat_percent = fonts.get(20).text() + "%";
-                transfat = "Trans Fat " + fonts.get(27).text();
-                cholesterol_amount = fonts.get(33).text();
-                cholesterol_percent = fonts.get(34).text() + "%";
-                sodium_amount = fonts.get(40).text();
-                sodium_percent = fonts.get(41).text() + "%";
-                carbs_amount = fonts.get(15).text();
-                carbs_percent = fonts.get(16).text() + "%";
-                fiber_amount = fonts.get(23).text();
-                fiber_percent = fonts.get(24).text() + "%";
-                sugars = "Sugars " + fonts.get(30).text();
+                calories = page.select("b").get(1).text().substring(9);
+                //calories_fat = fonts.get(4).text();
+                totalfat_amount = fonts.get(10).text();
+                totalfat_percent = fonts.get(11).text() + "%";
+                satfat = "Saturated Fat " + fonts.get(18).text();
+                satfat_percent = fonts.get(19).text() + "%";
+                transfat = "Trans Fat " + fonts.get(26).text();
+                cholesterol_amount = fonts.get(32).text();
+                cholesterol_percent = fonts.get(33).text() + "%";
+                sodium_amount = fonts.get(39).text();
+                sodium_percent = fonts.get(40).text() + "%";
+                carbs_amount = fonts.get(14).text();
+                carbs_percent = fonts.get(15).text() + "%";
+                fiber_amount = fonts.get(22).text();
+                fiber_percent = fonts.get(23).text() + "%";
+                sugars = "Sugars " + fonts.get(29).text();
 
-                protein_amount = fonts.get(37).text();
+                protein_amount = fonts.get(36).text();
 
                 //protein_percent = fonts.get(47).text().substring(1); // protein percent not given anymore?
                 /*
                  * Percents appearing below normal list. Strangely, the page includes 2 often different
                  * amounts of sodium and fiber.
                  */
-                lowerpercent1 = "Vitamin D - mcg " + fonts.get(46).text();
-                lowerpercent2 = "Calcium " + fonts.get(48).text().substring(1);
-                lowerpercent3 = "Iron " + fonts.get(50).text();
-                lowerpercent4 = "Potassium " + fonts.get(52).text();
-                lowerpercent5 = "Added Sugar " + fonts.get(54).text();
+                lowerpercent1 = "Vitamin D - mcg " + fonts.get(45).text();
+                Log.v(Util.LOGTAG, fonts.get(45).text());
+                lowerpercent2 = "Calcium " + fonts.get(47).text();
+                lowerpercent3 = "Iron " + fonts.get(49).text();
+                lowerpercent4 = "Potassium " + fonts.get(51).text();
+                //lowerpercent5 = "Added Sugar " + fonts.get(54).text();
                 //lowerpercent6 = "Dietary Fiber " + fonts.get(51).text();
 
                 ingredients_list = page.select("span").get(1).text();
@@ -259,8 +262,8 @@ public class NutritionViewActivity extends AppCompatActivity {
                         view.setText(servingsize);
                         view = (TextView) mActivity.findViewById(R.id.nutrition_calories);
                         view.setText(calories);
-                        view = (TextView) mActivity.findViewById(R.id.nutrition_calories_fat);
-                        view.setText(calories_fat);
+                        /*view = (TextView) mActivity.findViewById(R.id.nutrition_calories_fat);
+                        view.setText(calories_fat);*/
                         view = (TextView) mActivity.findViewById(R.id.nutrition_totalfat_amount);
                         view.setText(totalfat_amount);
                         view = (TextView) mActivity.findViewById(R.id.nutrition_totalfat_percent);
@@ -300,10 +303,10 @@ public class NutritionViewActivity extends AppCompatActivity {
                         view.setText(lowerpercent3);
                         view = (TextView) mActivity.findViewById(R.id.nutrition_lowerpercent4);
                         view.setText(lowerpercent4);
-                        view = (TextView) mActivity.findViewById(R.id.nutrition_lowerpercent5);
+                        /*view = (TextView) mActivity.findViewById(R.id.nutrition_lowerpercent5);
                         view.setText(lowerpercent5);
                         view = (TextView) mActivity.findViewById(R.id.nutrition_lowerpercent6);
-                        view.setText(lowerpercent6);
+                        view.setText(lowerpercent6);*/
 
                         view = (TextView) mActivity.findViewById(R.id.nutrition_ingredients_list);
                         view.setText(ingredients_list);
