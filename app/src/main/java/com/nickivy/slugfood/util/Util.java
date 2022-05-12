@@ -44,7 +44,7 @@ public class Util {
             "Crown/Merrill",
             "Porter/Kresge",
             "Rachel Carson/Oakes",
-            "Nine/Ten"
+            "Nine/Lewis"
     };
 
     public static ArrayList<CollegeMenu> fullMenuObj = new ArrayList<CollegeMenu>(){{

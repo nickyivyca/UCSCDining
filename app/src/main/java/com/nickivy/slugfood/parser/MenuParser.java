@@ -77,17 +77,17 @@ public class MenuParser {
                     day + "%2F" + year + URLPart3 + "Late+Night", Util.CookieLocations[k]);
         }
 
-        breakfastFoodNames = breakfastDoc.select("div[class=\"longmenucoldispname\"]");
+        breakfastFoodNames = breakfastDoc.select("div[class=\"longmenucoldispname\"],div[class^=\"longmenucolmenucat\"]");
         breakfastNutIds = breakfastDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
 
-        lunchFoodNames = lunchDoc.select("div[class=\"longmenucoldispname\"]");
+        lunchFoodNames = lunchDoc.select("div[class=\"longmenucoldispname\"],div[class^=\"longmenucolmenucat\"]");
         lunchNutIds = lunchDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
 
-        dinnerFoodNames = dinnerDoc.select("div[class=\"longmenucoldispname\"]");
+        dinnerFoodNames = dinnerDoc.select("div[class=\"longmenucoldispname\"],div[class^=\"longmenucolmenucat\"]");
         dinnerNutIds = dinnerDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
 
         if (k != 1 && k != 2 ){
-            latenightFoodNames = latenightDoc.select("div[class=\"longmenucoldispname\"]");
+            latenightFoodNames = latenightDoc.select("div[class=\"longmenucoldispname\"],div[class^=\"longmenucolmenucat\"]");
             latenightNutIds = latenightDoc.select("INPUT[TYPE=\"CHECKBOX\"]");
         }
 
@@ -98,36 +98,68 @@ public class MenuParser {
 
         //Catch if the dining hall is closed for that day
         if(breakfastFoodNames != null && breakfastFoodNames.size() > 0){
+            int findex = 0;
             for(int i = 0; i < breakfastFoodNames.size(); i++){
-                String nutid = breakfastNutIds.get(i).attr("VALUE");
-                breakfastList.add(new MenuItem(breakfastFoodNames.get(i).text(),
-                        nutid.substring(0, nutid.length()-3)));
+                if (!breakfastFoodNames.get(i).text().startsWith("-- ")) {
+                    String nutid = breakfastNutIds.get(findex).attr("VALUE");
+                    breakfastList.add(new MenuItem(breakfastFoodNames.get(i).text(),
+                            nutid.substring(0, nutid.length()-3)));
+                    findex++;
+                } else {
+                    if (breakfastFoodNames.get(i).text().contains("-- Cereal --")) {
+                        break;
+                    }
+                }
             }
         }
         //Catch if the dining hall is closed for that day
         if(lunchFoodNames != null && lunchFoodNames.size() > 0){
+            int findex = 0;
             for(int i = 0; i < lunchFoodNames.size(); i++){
-                String nutid = lunchNutIds.get(i).attr("VALUE");
-                lunchList.add(new MenuItem(lunchFoodNames.get(i).text(),
-                        nutid.substring(0, nutid.length()-3)));
+                if (!lunchFoodNames.get(i).text().startsWith("-- ")) {
+                    String nutid = lunchNutIds.get(findex).attr("VALUE");
+                    lunchList.add(new MenuItem(lunchFoodNames.get(i).text(),
+                            nutid.substring(0, nutid.length() - 3)));
+                    findex++;
+                } else {
+                    if (lunchFoodNames.get(i).text().contains("-- Cereal --")) {
+                        break;
+                    }
+                }
             }
         }
         //Catch if the dining hall is closed for that day
         if(dinnerFoodNames != null && dinnerFoodNames.size() > 0){
+            int findex = 0;
             for(int i = 0; i < dinnerFoodNames.size(); i++){
-                String nutid = dinnerNutIds.get(i).attr("VALUE");
-                dinnerList.add(new MenuItem(dinnerFoodNames.get(i).text(),
-                        nutid.substring(0, nutid.length()-3)));
+                if (!dinnerFoodNames.get(i).text().startsWith("-- ")) {
+                    String nutid = dinnerNutIds.get(findex).attr("VALUE");
+                    dinnerList.add(new MenuItem(dinnerFoodNames.get(i).text(),
+                            nutid.substring(0, nutid.length()-3)));
+                    findex++;
+                } else {
+                    if (dinnerFoodNames.get(i).text().contains("-- Cereal --")) {
+                        break;
+                    }
+                }
             }
         }
 
         if (k != 1 && k != 2 ){
             //Catch if the dining hall is closed for that day
             if(latenightFoodNames != null && latenightFoodNames.size() > 0){
+                int findex = 0;
                 for(int i = 0; i < latenightFoodNames.size(); i++){
-                    String nutid = latenightNutIds.get(i).attr("VALUE");
-                    latenightList.add(new MenuItem(latenightFoodNames.get(i).text(),
-                            nutid.substring(0, nutid.length()-3)));
+                    if (!latenightFoodNames.get(i).text().startsWith("-- ")) {
+                        String nutid = latenightNutIds.get(findex).attr("VALUE");
+                        latenightList.add(new MenuItem(latenightFoodNames.get(i).text(),
+                                nutid.substring(0, nutid.length()-3)));
+                        findex++;
+                    } else {
+                        if (latenightFoodNames.get(i).text().contains("-- Cereal --")) {
+                            break;
+                        }
+                    }
                 }
             }
         }
