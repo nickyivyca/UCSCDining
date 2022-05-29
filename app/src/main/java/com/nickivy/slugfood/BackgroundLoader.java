@@ -137,7 +137,7 @@ public class BackgroundLoader extends BroadcastReceiver {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        m.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
+        m.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, breakfastIntent);
 
         lunchIntent = PendingIntent.getBroadcast(context, Util.LUNCH_SWITCH_TIME,
@@ -146,7 +146,7 @@ public class BackgroundLoader extends BroadcastReceiver {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        m.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
+        m.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, lunchIntent);
 
         dinnerIntent = PendingIntent.getBroadcast(context, Util.DINNER_SWITCH_TIME,
@@ -155,7 +155,7 @@ public class BackgroundLoader extends BroadcastReceiver {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        m.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
+        m.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, dinnerIntent);
 
         latenightIntent = PendingIntent.getBroadcast(context, Util.LATENIGHT_SWITCH_TIME,
@@ -164,7 +164,7 @@ public class BackgroundLoader extends BroadcastReceiver {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        m.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
+        m.setInexactRepeating(AlarmManager.RTC, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, latenightIntent);
     }
 
