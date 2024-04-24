@@ -81,7 +81,7 @@ public class MealDataFetcher {
         boolean nocache = prefs.getBoolean("disable_cache",false);
         // If data for today does not exist, or manual refresh is requested, download/store data
         if(cexists || MenuParser.manualRefresh || nocache){
-            int res = MenuParser.getMealList(month, day, year);
+            int res = MenuParser.getMealList(month, day, year, context);
             if (res != Util.GETLIST_SUCCESS) {
                 running = false;
                 return res;

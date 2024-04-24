@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <base-config cleartextTrafficPermitted="true">
-        <base includeSubdomains="true">http://nutrition.sa.ucsc.edu/</base>
-    </base-config>
+    <domain-config>
+        <domain includeSubdomains="true">nutrition.sa.ucsc.edu/</domain>
+        <trust-anchors>
+            <certificates src="@raw/cert"/>
+        </trust-anchors>
+    </domain-config>
 </network-security-config>

@@ -1,20 +1,46 @@
 package com.nickivy.slugfood.parser;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.UnknownHostException;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import com.nickivy.slugfood.R;
 import com.nickivy.slugfood.util.MenuItem;
 import com.nickivy.slugfood.util.Util;
 
+import android.content.Context;
 import android.util.Log;
+
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509ExtendedTrustManager;
+import javax.net.ssl.X509TrustManager;
+
+//import okhttp3.OkHttpClient;
+
+import nl.altindag.ssl.util.CertificateUtils;
+import nl.altindag.ssl.SSLFactory;
+import okhttp3.OkHttpClient;
+
+//import com.squareup.okhttp3.OkHttpClient;
+//import com.squareup.okhttp.*;
+//import okhttp3.OkHttpClient;
+//import okhttp3.OkHttpClient.Builder;
+
+
 
 /**
  * Parses the incoming file.
@@ -55,7 +81,7 @@ public class MenuParser {
 
     public static int getSingleMealList(int k, int month, int day, int year, boolean collegeNight,
                                            boolean otherCollegeforCNight, boolean healthyMonday,
-                                           boolean farmFriday) throws IOException {
+                                           boolean farmFriday, Context context) throws IOException {
         Elements breakfastNutIds = null,
                 breakfastFoodNames = null,
                 lunchNutIds = null,
@@ -66,15 +92,15 @@ public class MenuParser {
                 latenightFoodNames = null;
 
         Document breakfastDoc = fetchDocumentwithCookie(URLPart1 + URLPart2s[k] + month + "%2F" +
-                day + "%2F" + year + URLPart3 + Util.meals[0], Util.CookieLocations[k]);
+                day + "%2F" + year + URLPart3 + Util.meals[0], Util.CookieLocations[k], context);
         Document lunchDoc = fetchDocumentwithCookie(URLPart1 + URLPart2s[k] + month + "%2F" +
-                day + "%2F" + year + URLPart3 + Util.meals[1], Util.CookieLocations[k]);
+                day + "%2F" + year + URLPart3 + Util.meals[1], Util.CookieLocations[k], context);
         Document dinnerDoc = fetchDocumentwithCookie(URLPart1 + URLPart2s[k] + month + "%2F" +
-                day + "%2F" + year + URLPart3 + Util.meals[2], Util.CookieLocations[k]);
+                day + "%2F" + year + URLPart3 + Util.meals[2], Util.CookieLocations[k], context);
         Document latenightDoc = null;
         if (k != 1 && k != 2 ) {
             latenightDoc = fetchDocumentwithCookie(URLPart1 + URLPart2s[k] + month + "%2F" +
-                    day + "%2F" + year + URLPart3 + "Late+Night", Util.CookieLocations[k]);
+                    day + "%2F" + year + URLPart3 + "Late+Night", Util.CookieLocations[k], context);
         }
 
         breakfastFoodNames = breakfastDoc.select("div[class=\"longmenucoldispname\"],div[class^=\"longmenucolmenucat\"]");
@@ -239,7 +265,7 @@ public class MenuParser {
     /**
      * Puts downloaded data from specified date (instead of today) into the full menu object.
      */
-    public static int getMealList(int month, int day, int year) throws IOException {
+    public static int getMealList(int month, int day, int year, Context context) throws IOException {
         /**
          * outer array is colleges, inner is [0]
          * college night, [1] if college night is 'secondary' college, [2]healthy monday,
@@ -327,7 +353,7 @@ public class MenuParser {
 
         for (int i = 0; i < 5; i++) {
             int res = getSingleMealList(i, month, day, year, eventBools[i][0], eventBools[i][1],
-                    eventBools[i][2], eventBools[i][3]);
+                    eventBools[i][2], eventBools[i][3], context);
                 /*
                  * For some stupid reason, it throws these stupid unexpected status line errors half the
                  * time on mobile data. So we have to intercept those somehow. getsinglemeallist returns
@@ -337,13 +363,13 @@ public class MenuParser {
                  */
             if (res == Util.GETLIST_OKHTTP_FAILURE) {
                 res = getSingleMealList(i, month, day, year, eventBools[i][0], eventBools[i][1],
-                        eventBools[i][2], eventBools[i][3]);
+                        eventBools[i][2], eventBools[i][3], context);
                 if (res == Util.GETLIST_OKHTTP_FAILURE) {
                     res = getSingleMealList(i, month, day, year, eventBools[i][0], eventBools[i][1],
-                            eventBools[i][2], eventBools[i][3]);
+                            eventBools[i][2], eventBools[i][3], context);
                     if (res == Util.GETLIST_OKHTTP_FAILURE) {
                         res = getSingleMealList(i, month, day, year, eventBools[i][0], eventBools[i][1],
-                                eventBools[i][2], eventBools[i][3]);
+                                eventBools[i][2], eventBools[i][3], context);
                         if (res == Util.GETLIST_OKHTTP_FAILURE) {
                             return Util.GETLIST_INTERNET_FAILURE;
                         }
@@ -384,9 +410,27 @@ public class MenuParser {
         }
         return ret;
     }
-    public static Document fetchDocumentwithCookie(String url, String cookieVal)
+    public static Document fetchDocumentwithCookie(String url, String cookieVal, Context context)
             throws IOException{
+
+        InputStream trustedCertificatesAsInputStream = context.getResources().openRawResource(R.raw.cert);
+        List<Certificate> trustedCertificates = CertificateUtils.loadCertificate(trustedCertificatesAsInputStream);
+
+        SSLFactory sslFactory = SSLFactory.builder()
+                .withTrustMaterial(trustedCertificates)
+                .build();
+
+        SSLSocketFactory sslSocketFactory = sslFactory.getSslSocketFactory();
+        X509ExtendedTrustManager trustManager = sslFactory.getTrustManager().orElseThrow();
+
+//        OkHttpClient cleint = OkHttpClient.Builder();
+
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .sslSocketFactory(sslSocketFactory, trustManager)
+                .build();
+
         Document ret;
+        Log.v(Util.LOGTAG, "Fetching " + url);
         try {
             ret = Jsoup.connect(url).cookie("WebInaCartLocation", cookieVal).cookie("WebInaCartDates", "")
                     .cookie("WebInaCartMeals", "").cookie("WebInaCartQtys", "")
